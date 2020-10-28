@@ -8,8 +8,9 @@ import (
 
 // Message holds configuration information exchanged between parts of traefik.
 type Message struct {
-	ProviderName  string
-	Configuration *Configuration
+	ProviderName       string
+	ErrorLoadingConfig bool
+	Configuration      *Configuration
 }
 
 // +k8s:deepcopy-gen=true

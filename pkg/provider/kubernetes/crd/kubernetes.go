@@ -95,6 +95,10 @@ func (p *Provider) Provide(configurationChan chan<- dynamic.Message, pool *safe.
 	logger.Debugf("Using label selector: %q", p.LabelSelector)
 	k8sClient, err := p.newK8sClient(ctxLog, p.LabelSelector)
 	if err != nil {
+		configurationChan <- dynamic.Message{
+			ProviderName:       providerName,
+			ErrorLoadingConfig: true,
+		}
 		return err
 	}
 
@@ -152,10 +156,18 @@ func (p *Provider) Provide(configurationChan chan<- dynamic.Message, pool *safe.
 
 		notify := func(err error, time time.Duration) {
 			logger.Errorf("Provider connection error: %v; retrying in %s", err, time)
+			configurationChan <- dynamic.Message{
+				ProviderName:       providerName,
+				ErrorLoadingConfig: true,
+			}
 		}
 		err := backoff.RetryNotify(safe.OperationWithRecover(operation), backoff.WithContext(job.NewBackOff(backoff.NewExponentialBackOff()), ctxPool), notify)
 		if err != nil {
 			logger.Errorf("Cannot connect to Provider: %v", err)
+			configurationChan <- dynamic.Message{
+				ProviderName:       providerName,
+				ErrorLoadingConfig: true,
+			}
 		}
 	})
 

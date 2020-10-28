@@ -302,6 +302,35 @@ func TestListenProvidersPublishesConfigForEachProvider(t *testing.T) {
 	assert.Equal(t, expected, publishedProviderConfig)
 }
 
+func TestListenConfigurationLoadErrors(t *testing.T) {
+	routinesPool := safe.NewPool(context.Background())
+	message := dynamic.Message{
+		ProviderName:       "mock",
+		ErrorLoadingConfig: true,
+	}
+	pvd := &mockProvider{
+		messages: []dynamic.Message{message},
+	}
+
+	watcher := NewConfigurationWatcher(routinesPool, pvd, 0, []string{})
+
+	alreadyCalled := false
+	watcher.AddConfigLoadErrorListener(func() {
+		if alreadyCalled {
+			t.Error("Same config load error should not be published multiple times")
+		}
+		alreadyCalled = true
+	})
+
+	watcher.Start()
+	defer watcher.Stop()
+
+	// give some time so that the configuration can be processed
+	time.Sleep(100 * time.Millisecond)
+
+	assert.True(t, alreadyCalled)
+}
+
 func TestPublishConfigUpdatedByProvider(t *testing.T) {
 	routinesPool := safe.NewPool(context.Background())
 

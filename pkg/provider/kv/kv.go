@@ -72,15 +72,18 @@ func (p *Provider) Provide(configurationChan chan<- dynamic.Message, pool *safe.
 
 	notify := func(err error, time time.Duration) {
 		logger.Errorf("KV connection error: %+v, retrying in %s", err, time)
+		p.sendConfigLoadErrorToChannel(configurationChan)
 	}
 	err := backoff.RetryNotify(safe.OperationWithRecover(operation), job.NewBackOff(backoff.NewExponentialBackOff()), notify)
 	if err != nil {
+		p.sendConfigLoadErrorToChannel(configurationChan)
 		return fmt.Errorf("cannot connect to KV server: %w", err)
 	}
 
 	configuration, err := p.buildConfiguration()
 	if err != nil {
 		logger.Errorf("Cannot build the configuration: %v", err)
+		p.sendConfigLoadErrorToChannel(configurationChan)
 	} else {
 		configurationChan <- dynamic.Message{
 			ProviderName:  p.name,
@@ -94,6 +97,7 @@ func (p *Provider) Provide(configurationChan chan<- dynamic.Message, pool *safe.
 		err := p.watchKv(ctxLog, configurationChan)
 		if err != nil {
 			logger.Errorf("Cannot watch KV store: %v", err)
+			p.sendConfigLoadErrorToChannel(configurationChan)
 		}
 	})
 
@@ -133,11 +137,13 @@ func (p *Provider) watchKv(ctx context.Context, configurationChan chan<- dynamic
 
 	notify := func(err error, time time.Duration) {
 		log.FromContext(ctx).Errorf("KV connection error: %+v, retrying in %s", err, time)
+		p.sendConfigLoadErrorToChannel(configurationChan)
 	}
 
 	err := backoff.RetryNotify(safe.OperationWithRecover(operation),
 		backoff.WithContext(job.NewBackOff(backoff.NewExponentialBackOff()), ctx), notify)
 	if err != nil {
+		p.sendConfigLoadErrorToChannel(configurationChan)
 		return fmt.Errorf("cannot connect to KV server: %w", err)
 	}
 	return nil
@@ -191,4 +197,11 @@ func (p *Provider) createKVClient(ctx context.Context) (store.Store, error) {
 	}
 
 	return &storeWrapper{Store: kvStore}, nil
+}
+
+func (p *Provider) sendConfigLoadErrorToChannel(configurationChan chan<- dynamic.Message) {
+	configurationChan <- dynamic.Message{
+		ProviderName:       p.name,
+		ErrorLoadingConfig: true,
+	}
 }

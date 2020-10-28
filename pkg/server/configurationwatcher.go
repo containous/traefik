@@ -28,7 +28,8 @@ type ConfigurationWatcher struct {
 	configurationValidatedChan chan dynamic.Message
 	providerConfigUpdateMap    map[string]chan dynamic.Message
 
-	configurationListeners []func(dynamic.Configuration)
+	configurationListeners          []func(dynamic.Configuration)
+	configurationLoadErrorListeners []func()
 
 	routinesPool *safe.Pool
 }
@@ -77,6 +78,14 @@ func (c *ConfigurationWatcher) AddListener(listener func(dynamic.Configuration))
 	c.configurationListeners = append(c.configurationListeners, listener)
 }
 
+// AddConfigLoadErrorListener adds a new listener function used when the load of a new config fails.
+func (c *ConfigurationWatcher) AddConfigLoadErrorListener(listener func()) {
+	if c.configurationLoadErrorListeners == nil {
+		c.configurationLoadErrorListeners = make([]func(), 0)
+	}
+	c.configurationLoadErrorListeners = append(c.configurationLoadErrorListeners, listener)
+}
+
 func (c *ConfigurationWatcher) startProvider() {
 	logger := log.WithoutContext()
 
@@ -106,6 +115,13 @@ func (c *ConfigurationWatcher) listenProviders(ctx context.Context) {
 			return
 		case configMsg, ok := <-c.configurationChan:
 			if !ok {
+				return
+			}
+
+			if configMsg.ErrorLoadingConfig {
+				for _, listener := range c.configurationLoadErrorListeners {
+					listener()
+				}
 				return
 			}
 

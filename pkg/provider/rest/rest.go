@@ -41,6 +41,7 @@ func (p *Provider) CreateRouter() *mux.Router {
 func (p *Provider) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	if vars["provider"] != "rest" {
+		p.configurationChan <- dynamic.Message{ProviderName: "rest", ErrorLoadingConfig: true}
 		http.Error(rw, "Only 'rest' provider can be updated through the REST API", http.StatusBadRequest)
 		return
 	}
@@ -49,6 +50,7 @@ func (p *Provider) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	if err := json.NewDecoder(req.Body).Decode(configuration); err != nil {
 		log.WithoutContext().Errorf("Error parsing configuration %+v", err)
+		p.configurationChan <- dynamic.Message{ProviderName: "rest", ErrorLoadingConfig: true}
 		http.Error(rw, fmt.Sprintf("%+v", err), http.StatusBadRequest)
 		return
 	}

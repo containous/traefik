@@ -65,8 +65,9 @@ func TestErrorWhenEmptyConfig(t *testing.T) {
 
 	timeout := time.After(time.Second)
 	select {
-	case <-configChan:
-		t.Fatal("We should not receive config message")
+	case configuration := <-configChan:
+		assert.Nil(t, configuration.Configuration)
+		assert.True(t, configuration.ErrorLoadingConfig)
 	case <-timeout:
 		t.Fatal("timeout while waiting for config")
 	case <-errorChan:

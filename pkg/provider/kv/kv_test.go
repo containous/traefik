@@ -906,7 +906,7 @@ func TestKvWatchTree(t *testing.T) {
 		},
 	}
 
-	configChan := make(chan dynamic.Message)
+	configChan := make(chan dynamic.Message, 10)
 	go func() {
 		err := provider.watchKv(context.Background(), configChan)
 		require.NoError(t, err)
