@@ -18,6 +18,7 @@ import (
 	"github.com/traefik/traefik/v2/pkg/provider/ecs"
 	"github.com/traefik/traefik/v2/pkg/provider/file"
 	"github.com/traefik/traefik/v2/pkg/provider/http"
+	knative "github.com/traefik/traefik/v2/pkg/provider/knative/crd"
 	"github.com/traefik/traefik/v2/pkg/provider/kubernetes/crd"
 	"github.com/traefik/traefik/v2/pkg/provider/kubernetes/ingress"
 	"github.com/traefik/traefik/v2/pkg/provider/kv/consul"
@@ -174,6 +175,7 @@ type Providers struct {
 	Marathon          *marathon.Provider      `description:"Enable Marathon backend with default settings." json:"marathon,omitempty" toml:"marathon,omitempty" yaml:"marathon,omitempty" export:"true" label:"allowEmpty" file:"allowEmpty"`
 	KubernetesIngress *ingress.Provider       `description:"Enable Kubernetes backend with default settings." json:"kubernetesIngress,omitempty" toml:"kubernetesIngress,omitempty" yaml:"kubernetesIngress,omitempty" export:"true" label:"allowEmpty" file:"allowEmpty"`
 	KubernetesCRD     *crd.Provider           `description:"Enable Kubernetes backend with default settings." json:"kubernetesCRD,omitempty" toml:"kubernetesCRD,omitempty" yaml:"kubernetesCRD,omitempty" export:"true" label:"allowEmpty" file:"allowEmpty"`
+	Knative           *knative.Provider       `description:"Enable Knative backend with default settings." json:"knative,omitempty" toml:"knative,omitempty" yaml:"knative,omitempty" export:"true" label:"allowEmpty"`
 	Rest              *rest.Provider          `description:"Enable Rest backend with default settings." json:"rest,omitempty" toml:"rest,omitempty" yaml:"rest,omitempty" export:"true" label:"allowEmpty" file:"allowEmpty"`
 	Rancher           *rancher.Provider       `description:"Enable Rancher backend with default settings." json:"rancher,omitempty" toml:"rancher,omitempty" yaml:"rancher,omitempty" export:"true" label:"allowEmpty" file:"allowEmpty"`
 	ConsulCatalog     *consulcatalog.Provider `description:"Enable ConsulCatalog backend with default settings." json:"consulCatalog,omitempty" toml:"consulCatalog,omitempty" yaml:"consulCatalog,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`

@@ -537,6 +537,42 @@ TLS insecure skip verify (Default: ```false```)
 `--providers.http.tls.key`:  
 TLS key
 
+`--providers.knative`:  
+Enable Knative backend with default settings. (Default: ```false```)
+
+`--providers.knative.certauthfilepath`:  
+Kubernetes certificate authority file path (not needed for in-cluster client).
+
+`--providers.knative.disablepasshostheaders`:  
+Kubernetes disable PassHost Headers. (Default: ```false```)
+
+`--providers.knative.endpoint`:  
+Kubernetes server endpoint (required for external cluster client).
+
+`--providers.knative.ingressclass`:  
+Value of kubernetes.io/ingress.class annotation to watch for.
+
+`--providers.knative.labelselector`:  
+Kubernetes label selector to use.
+
+`--providers.knative.loadbalancerdomain`:  
+set for load-balancer ingress points that are DNS based.
+
+`--providers.knative.loadbalancerdomaininternal`:  
+set if there is a cluster-local DNS name to access the Ingress.
+
+`--providers.knative.loadbalancerip`:  
+set for load-balancer ingress points that are IP based.
+
+`--providers.knative.namespaces`:  
+Kubernetes namespaces.
+
+`--providers.knative.throttleduration`:  
+Ingress refresh throttle duration (Default: ```0```)
+
+`--providers.knative.token`:  
+Kubernetes bearer token (not needed for in-cluster client).
+
 `--providers.kubernetescrd`:  
 Enable Kubernetes backend with default settings. (Default: ```false```)
 

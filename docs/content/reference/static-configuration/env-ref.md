@@ -537,6 +537,42 @@ TLS insecure skip verify (Default: ```false```)
 `TRAEFIK_PROVIDERS_HTTP_TLS_KEY`:  
 TLS key
 
+`TRAEFIK_PROVIDERS_KNATIVE`:  
+Enable Knative backend with default settings. (Default: ```false```)
+
+`TRAEFIK_PROVIDERS_KNATIVE_CERTAUTHFILEPATH`:  
+Kubernetes certificate authority file path (not needed for in-cluster client).
+
+`TRAEFIK_PROVIDERS_KNATIVE_DISABLEPASSHOSTHEADERS`:  
+Kubernetes disable PassHost Headers. (Default: ```false```)
+
+`TRAEFIK_PROVIDERS_KNATIVE_ENDPOINT`:  
+Kubernetes server endpoint (required for external cluster client).
+
+`TRAEFIK_PROVIDERS_KNATIVE_INGRESSCLASS`:  
+Value of kubernetes.io/ingress.class annotation to watch for.
+
+`TRAEFIK_PROVIDERS_KNATIVE_LABELSELECTOR`:  
+Kubernetes label selector to use.
+
+`TRAEFIK_PROVIDERS_KNATIVE_LOADBALANCERDOMAIN`:  
+set for load-balancer ingress points that are DNS based.
+
+`TRAEFIK_PROVIDERS_KNATIVE_LOADBALANCERDOMAININTERNAL`:  
+set if there is a cluster-local DNS name to access the Ingress.
+
+`TRAEFIK_PROVIDERS_KNATIVE_LOADBALANCERIP`:  
+set for load-balancer ingress points that are IP based.
+
+`TRAEFIK_PROVIDERS_KNATIVE_NAMESPACES`:  
+Kubernetes namespaces.
+
+`TRAEFIK_PROVIDERS_KNATIVE_THROTTLEDURATION`:  
+Ingress refresh throttle duration (Default: ```0```)
+
+`TRAEFIK_PROVIDERS_KNATIVE_TOKEN`:  
+Kubernetes bearer token (not needed for in-cluster client).
+
 `TRAEFIK_PROVIDERS_KUBERNETESCRD`:  
 Enable Kubernetes backend with default settings. (Default: ```false```)
 
