@@ -137,11 +137,19 @@ func (p *Provider) Provide(configurationChan chan<- dynamic.Message, pool *safe.
 
 		notify := func(err error, time time.Duration) {
 			logger.Errorf("Provider connection error %+v, retrying in %s", err, time)
+			configurationChan <- dynamic.Message{
+				ProviderName:       "consulcatalog",
+				ErrorLoadingConfig: true,
+			}
 		}
 
 		err := backoff.RetryNotify(safe.OperationWithRecover(operation), backoff.WithContext(job.NewBackOff(backoff.NewExponentialBackOff()), ctxLog), notify)
 		if err != nil {
 			logger.Errorf("Cannot connect to consul catalog server %+v", err)
+			configurationChan <- dynamic.Message{
+				ProviderName:       "consulcatalog",
+				ErrorLoadingConfig: true,
+			}
 		}
 	})
 

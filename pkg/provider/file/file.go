@@ -49,6 +49,7 @@ func (p *Provider) Init() error {
 func (p *Provider) Provide(configurationChan chan<- dynamic.Message, pool *safe.Pool) error {
 	configuration, err := p.BuildConfiguration()
 	if err != nil {
+		sendConfigLoadErrorToChannel(configurationChan)
 		return err
 	}
 
@@ -61,10 +62,12 @@ func (p *Provider) Provide(configurationChan chan<- dynamic.Message, pool *safe.
 		case len(p.Filename) > 0:
 			watchItem = filepath.Dir(p.Filename)
 		default:
+			sendConfigLoadErrorToChannel(configurationChan)
 			return errors.New("error using file configuration provider, neither filename or directory defined")
 		}
 
 		if err := p.addWatcher(pool, watchItem, configurationChan, p.watcherCallback); err != nil {
+			sendConfigLoadErrorToChannel(configurationChan)
 			return err
 		}
 	}
@@ -135,12 +138,14 @@ func (p *Provider) watcherCallback(configurationChan chan<- dynamic.Message, eve
 
 	if _, err := os.Stat(watchItem); err != nil {
 		logger.Errorf("Unable to watch %s : %v", watchItem, err)
+		sendConfigLoadErrorToChannel(configurationChan)
 		return
 	}
 
 	configuration, err := p.BuildConfiguration()
 	if err != nil {
 		logger.Errorf("Error occurred during watcher callback: %s", err)
+		sendConfigLoadErrorToChannel(configurationChan)
 		return
 	}
 
@@ -151,6 +156,13 @@ func sendConfigToChannel(configurationChan chan<- dynamic.Message, configuration
 	configurationChan <- dynamic.Message{
 		ProviderName:  "file",
 		Configuration: configuration,
+	}
+}
+
+func sendConfigLoadErrorToChannel(configurationChan chan<- dynamic.Message) {
+	configurationChan <- dynamic.Message{
+		ProviderName:       "file",
+		ErrorLoadingConfig: true,
 	}
 }
 

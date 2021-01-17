@@ -105,6 +105,10 @@ func (p *Provider) Provide(configurationChan chan<- dynamic.Message, pool *safe.
 
 	k8sClient, err := p.newK8sClient(ctxLog)
 	if err != nil {
+		configurationChan <- dynamic.Message{
+			ProviderName:       "kubernetes",
+			ErrorLoadingConfig: true,
+		}
 		return err
 	}
 
@@ -164,11 +168,19 @@ func (p *Provider) Provide(configurationChan chan<- dynamic.Message, pool *safe.
 
 		notify := func(err error, time time.Duration) {
 			logger.Errorf("Provider connection error: %s; retrying in %s", err, time)
+			configurationChan <- dynamic.Message{
+				ProviderName:       "kubernetes",
+				ErrorLoadingConfig: true,
+			}
 		}
 
 		err := backoff.RetryNotify(safe.OperationWithRecover(operation), backoff.WithContext(job.NewBackOff(backoff.NewExponentialBackOff()), ctxPool), notify)
 		if err != nil {
 			logger.Errorf("Cannot connect to Provider: %s", err)
+			configurationChan <- dynamic.Message{
+				ProviderName:       "kubernetes",
+				ErrorLoadingConfig: true,
+			}
 		}
 	})
 

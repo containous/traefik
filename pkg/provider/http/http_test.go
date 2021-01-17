@@ -224,6 +224,39 @@ func TestProvider_Provide(t *testing.T) {
 	}
 }
 
+func TestProvider_ProvideConfigLoadError(t *testing.T) {
+	handler := func(rw http.ResponseWriter, req *http.Request) {
+		rw.WriteHeader(http.StatusInternalServerError)
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(handler))
+	defer server.Close()
+
+	provider := Provider{
+		Endpoint:     server.URL,
+		PollTimeout:  ptypes.Duration(1 * time.Second),
+		PollInterval: ptypes.Duration(100 * time.Millisecond),
+	}
+
+	err := provider.Init()
+	require.NoError(t, err)
+
+	configurationChan := make(chan dynamic.Message)
+
+	err = provider.Provide(configurationChan, safe.NewPool(context.Background()))
+	require.NoError(t, err)
+
+	timeout := time.After(time.Second)
+
+	select {
+	case configuration := <-configurationChan:
+		assert.Nil(t, configuration.Configuration)
+		assert.True(t, configuration.ErrorLoadingConfig)
+	case <-timeout:
+		t.Errorf("timeout while waiting for config")
+	}
+}
+
 func TestProvider_ProvideConfigurationOnlyOnceIfUnchanged(t *testing.T) {
 	handler := func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(http.StatusOK)
