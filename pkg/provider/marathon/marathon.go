@@ -50,6 +50,7 @@ type Provider struct {
 	Trace                  bool             `description:"Display additional provider logs." json:"trace,omitempty" toml:"trace,omitempty" yaml:"trace,omitempty" export:"true"`
 	Watch                  bool             `description:"Watch provider." json:"watch,omitempty" toml:"watch,omitempty" yaml:"watch,omitempty" export:"true"`
 	Endpoint               string           `description:"Marathon server endpoint. You can also specify multiple endpoint for Marathon." json:"endpoint,omitempty" toml:"endpoint,omitempty" yaml:"endpoint,omitempty"`
+	QueryParameters        string           `description:"Set Marathon api query parameters." json:"queryParameters,omitempty" toml:"queryParameters,omitempty" yaml:"queryParameters,omitempty" export:"true"`
 	DefaultRule            string           `description:"Default rule." json:"defaultRule,omitempty" toml:"defaultRule,omitempty" yaml:"defaultRule,omitempty"`
 	ExposedByDefault       bool             `description:"Expose Marathon apps by default." json:"exposedByDefault,omitempty" toml:"exposedByDefault,omitempty" yaml:"exposedByDefault,omitempty" export:"true"`
 	DCOSToken              string           `description:"DCOSToken for DCOS environment, This will override the Authorization header." json:"dcosToken,omitempty" toml:"dcosToken,omitempty" yaml:"dcosToken,omitempty"`
@@ -70,6 +71,7 @@ type Provider struct {
 func (p *Provider) SetDefaults() {
 	p.Watch = true
 	p.Endpoint = "http://127.0.0.1:8080"
+	p.QueryParameters = "embed=apps.tasks&embed=apps.deployments&apps.readiness"
 	p.ExposedByDefault = true
 	p.DialerTimeout = ptypes.Duration(5 * time.Second)
 	p.ResponseHeaderTimeout = ptypes.Duration(60 * time.Second)
@@ -209,11 +211,27 @@ func (p *Provider) getConfigurations(ctx context.Context) *dynamic.Configuration
 	return p.buildConfiguration(ctx, applications)
 }
 
-func (p *Provider) getApplications() (*marathon.Applications, error) {
-	v := url.Values{}
-	v.Add("embed", "apps.tasks")
-	v.Add("embed", "apps.deployments")
-	v.Add("embed", "apps.readiness")
+func (p *Provider) validateQueryParameters() (url.Values, error) {
+	values := url.Values{}
 
+	m, err := url.ParseQuery(p.QueryParameters)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse QueryParameters: %w", err)
+	}
+
+	for k, v := range m {
+		for _, e := range v {
+			values.Add(k, fmt.Sprint(e))
+		}
+	}
+
+	return values, nil
+}
+
+func (p *Provider) getApplications() (*marathon.Applications, error) {
+	v, err := p.validateQueryParameters()
+	if err != nil {
+		return nil, err
+	}
 	return p.marathonClient.Applications(v)
 }

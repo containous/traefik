@@ -187,7 +187,38 @@ providers:
 
 Marathon server endpoint.
 
-You can optionally specify multiple endpoints:
+You can optionally specify multiple endpoints.
+
+### `queryParameters`
+
+_Optional, Default=```embed=apps.tasks&embed=apps.deployments&embed=apps.readiness```_
+
+```toml tab="File (TOML)"
+[providers.marathon]
+  queryParameters = "label=namespace==traefik&embed=apps.tasks&embed=apps.deployments&embed=apps.readiness"
+  # ...
+```
+
+```toml tab="File (YAML)"
+providers:
+  marathon:
+    queryParameters: "label=namespace==traefik&embed=apps.tasks&embed=apps.deployments&embed=apps.readiness"
+    # ...
+```
+
+```bash tab="CLI"
+--providers.marathon.queryParameters="label=namespace==traefik&embed=apps.tasks&embed=apps.deployments&embed=apps.readiness"
+```
+
+Overrides QueryParameters. The query defines which applications will be pulled from Marathon api.
+
+Used to filter the application list received from Marathon, i.e, the filtering is done by Marathon and not by traefik.
+
+The query is written in [URL query string](https://en.wikipedia.org/wiki/Query_string) format.
+Supported parameters described in Marathon `/v2/apps` GET endpoint [documentation](https://github.com/mesosphere/marathon/blob/54edfdcd65d6ed1da51bfde3e54e32b660095fc2/docs/docs/rest-api/public/api/v2/apps.raml#L9).
+
+**Note**: Most of this functionality can be obtained by Traefik side filtering using [Constraints](./#constraints).
+This option should be used if you wish to reduce the amount of data received from Marathon api. 
 
 ### `exposedByDefault`
 

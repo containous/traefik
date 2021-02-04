@@ -672,6 +672,9 @@ Force to use the task's hostname. (Default: ```false```)
 `TRAEFIK_PROVIDERS_MARATHON_KEEPALIVE`:  
 Set a TCP Keep Alive time. (Default: ```10```)
 
+`TRAEFIK_PROVIDERS_MARATHON_QUERYPARAMETERS`:  
+Set Marathon api query parameters. (Default: ```embed=apps.tasks&embed=apps.deployments&apps.readiness```)
+
 `TRAEFIK_PROVIDERS_MARATHON_RESPECTREADINESSCHECKS`:  
 Filter out tasks with non-successful readiness checks during deployments. (Default: ```false```)
 

@@ -672,6 +672,9 @@ Force to use the task's hostname. (Default: ```false```)
 `--providers.marathon.keepalive`:  
 Set a TCP Keep Alive time. (Default: ```10```)
 
+`--providers.marathon.queryparameters`:  
+Set Marathon api query parameters. (Default: ```embed=apps.tasks&embed=apps.deployments&apps.readiness```)
+
 `--providers.marathon.respectreadinesschecks`:  
 Filter out tasks with non-successful readiness checks during deployments. (Default: ```false```)
 
