@@ -576,6 +576,32 @@ certificatesResolvers:
 # ...
 ```
 
+### Kubernetes
+
+Traefik can also store your ACME certificates to a Kubernetes secret resource.
+
+```toml tab="File (TOML)"
+[certificatesResolvers.myresolver.acme]
+  # ...
+  storage = "kubernetes:///mynamespace"
+  # ...
+```
+
+```yaml tab="File (YAML)"
+certificatesResolvers:
+  myresolver:
+    acme:
+      # ...
+      storage: "kubernetes:///mynamespace"
+      # ...
+```
+
+```bash tab="CLI"
+# ...
+--certificatesresolvers.myresolver.acme.storage=kubernetes:///mynamespace
+# ...
+```
+
 ## Fallback
 
 If Let's Encrypt is not reachable, the following certificates will apply:

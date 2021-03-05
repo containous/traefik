@@ -368,18 +368,27 @@ func switchRouter(routerFactory *server.RouterFactory, serverEntryPointsTCP serv
 
 // initACMEProvider creates an acme provider from the ACME part of globalConfiguration.
 func initACMEProvider(c *static.Configuration, providerAggregator *aggregator.ProviderAggregator, tlsManager *traefiktls.Manager, httpChallengeProvider, tlsChallengeProvider challenge.Provider) []*acme.Provider {
-	localStores := map[string]*acme.LocalStore{}
+	stores := map[string]acme.Store{}
 
 	var resolvers []*acme.Provider
 	for name, resolver := range c.CertificatesResolvers {
 		if resolver.ACME != nil {
-			if localStores[resolver.ACME.Storage] == nil {
-				localStores[resolver.ACME.Storage] = acme.NewLocalStore(resolver.ACME.Storage)
+			if stores[resolver.ACME.Storage] == nil {
+				if strings.HasPrefix(resolver.ACME.Storage, "kubernetes://") {
+					var err error
+					stores[resolver.ACME.Storage], err = acme.KubernetesStoreFromURI(resolver.ACME.Storage)
+					if err != nil {
+						log.WithoutContext().Errorf("The ACME resolver %q is skipped from the resolvers list because: %v", name, err)
+						continue
+					}
+				} else {
+					stores[resolver.ACME.Storage] = acme.NewLocalStore(resolver.ACME.Storage)
+				}
 			}
 
 			p := &acme.Provider{
 				Configuration:         resolver.ACME,
-				Store:                 localStores[resolver.ACME.Storage],
+				Store:                 stores[resolver.ACME.Storage],
 				ResolverName:          name,
 				HTTPChallengeProvider: httpChallengeProvider,
 				TLSChallengeProvider:  tlsChallengeProvider,
