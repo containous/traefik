@@ -408,13 +408,14 @@ type TLSClientCertificateInfo struct {
 // TLSCLientCertificateDNInfo holds the client TLS certificate distinguished name info configuration.
 // cf https://tools.ietf.org/html/rfc3739
 type TLSCLientCertificateDNInfo struct {
-	Country         bool `json:"country,omitempty" toml:"country,omitempty" yaml:"country,omitempty" export:"true"`
-	Province        bool `json:"province,omitempty" toml:"province,omitempty" yaml:"province,omitempty" export:"true"`
-	Locality        bool `json:"locality,omitempty" toml:"locality,omitempty" yaml:"locality,omitempty" export:"true"`
-	Organization    bool `json:"organization,omitempty" toml:"organization,omitempty" yaml:"organization,omitempty" export:"true"`
-	CommonName      bool `json:"commonName,omitempty" toml:"commonName,omitempty" yaml:"commonName,omitempty" export:"true"`
-	SerialNumber    bool `json:"serialNumber,omitempty" toml:"serialNumber,omitempty" yaml:"serialNumber,omitempty" export:"true"`
-	DomainComponent bool `json:"domainComponent,omitempty" toml:"domainComponent,omitempty" yaml:"domainComponent,omitempty" export:"true"`
+	Country            bool `json:"country,omitempty" toml:"country,omitempty" yaml:"country,omitempty" export:"true"`
+	Province           bool `json:"province,omitempty" toml:"province,omitempty" yaml:"province,omitempty" export:"true"`
+	Locality           bool `json:"locality,omitempty" toml:"locality,omitempty" yaml:"locality,omitempty" export:"true"`
+	Organization       bool `json:"organization,omitempty" toml:"organization,omitempty" yaml:"organization,omitempty" export:"true"`
+	OrganizationalUnit bool `json:"organizationalUnit,omitempty" toml:"organizationalUnit,omitempty" yaml:"organizationalUnit,omitempty" export:"true"`
+	CommonName         bool `json:"commonName,omitempty" toml:"commonName,omitempty" yaml:"commonName,omitempty" export:"true"`
+	SerialNumber       bool `json:"serialNumber,omitempty" toml:"serialNumber,omitempty" yaml:"serialNumber,omitempty" export:"true"`
+	DomainComponent    bool `json:"domainComponent,omitempty" toml:"domainComponent,omitempty" yaml:"domainComponent,omitempty" export:"true"`
 }
 
 // +k8s:deepcopy-gen=true

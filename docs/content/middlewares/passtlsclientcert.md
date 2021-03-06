@@ -76,6 +76,7 @@ http:
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.domaincomponent=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.locality=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.organization=true"
+      - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.organizationalunit=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.province=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.serialnumber=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.commonname=true"
@@ -83,6 +84,7 @@ http:
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.domaincomponent=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.locality=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.organization=true"
+      - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.organizationalunit=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.province=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.serialnumber=true"
     ```
@@ -104,6 +106,7 @@ http:
             province: true
             locality: true
             organization: true
+            organizationalUnit: true
             commonName: true
             serialNumber: true
             domainComponent: true
@@ -112,6 +115,7 @@ http:
             province: true
             locality: true
             organization: true
+            organizationalUnit: true
             commonName: true
             serialNumber: true
             domainComponent: true
@@ -127,6 +131,7 @@ http:
     - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.domaincomponent=true"
     - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.locality=true"
     - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.organization=true"
+    - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.organizationalunit=true"
     - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.province=true"
     - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.serialnumber=true"
     - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.commonname=true"
@@ -134,6 +139,7 @@ http:
     - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.domaincomponent=true"
     - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.locality=true"
     - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.organization=true"
+    - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.organizationalunit=true"
     - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.province=true"
     - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.serialnumber=true"
     ```
@@ -148,6 +154,7 @@ http:
       "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.domaincomponent": "true",
       "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.locality": "true",
       "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.organization": "true",
+      "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.organizationalunit": "true",
       "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.province": "true",
       "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.serialnumber": "true",
       "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.commonname": "true",
@@ -155,6 +162,7 @@ http:
       "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.domaincomponent": "true",
       "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.locality": "true",
       "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.organization": "true",
+      "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.organizationalunit": "true",
       "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.province": "true",
       "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.serialnumber": "true"
     }
@@ -171,6 +179,7 @@ http:
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.domaincomponent=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.locality=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.organization=true"
+      - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.organizationalunit=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.province=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.subject.serialnumber=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.commonname=true"
@@ -178,6 +187,7 @@ http:
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.domaincomponent=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.locality=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.organization=true"
+      - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.organizationalunit=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.province=true"
       - "traefik.http.middlewares.test-passtlsclientcert.passtlsclientcert.info.issuer.serialnumber=true"
     ```
@@ -195,6 +205,7 @@ http:
             province = true
             locality = true
             organization = true
+            organizationalUnit = true
             commonName = true
             serialNumber = true
             domainComponent = true
@@ -203,6 +214,7 @@ http:
             province = true
             locality = true
             organization = true
+            organizationalUnit = true
             commonName = true
             serialNumber = true
             domainComponent = true
@@ -223,6 +235,7 @@ http:
                 province: true
                 locality: true
                 organization: true
+                organizationalUnit: true
                 commonName: true
                 serialNumber: true
                 domainComponent: true
@@ -231,6 +244,7 @@ http:
                 province: true
                 locality: true
                 organization: true
+                organizationalUnit: true
                 commonName: true
                 serialNumber: true
                 domainComponent: true
@@ -543,6 +557,18 @@ The escape organization info in the subject part is formatted as below:
 O=Cheese,O=Cheese 2
 ```
 
+##### `info.subject.organizationalUnit`
+
+Set the `info.subject.organizationalUnit` option to `true` to add the `organizationalUnit` information into the subject.
+
+The data is taken from the subject part with the `OU` key.
+
+The escape organizational unit info in the subject part is formatted as below:
+
+```text
+OU=Cheese Section,OU=Cheese Section 2
+```
+
 ##### `info.subject.commonName`
 
 Set the `info.subject.commonName` option to `true` to add the `commonName` information into the subject.
@@ -635,6 +661,18 @@ The escape organization info in the issuer part is formatted as below:
 
 ```text
 O=Cheese,O=Cheese 2
+```
+
+##### `info.issuer.organizationalUnit`
+
+Set the `info.issuer.organizationalUnit` option to `true` to add the `organizationalUnit` information into the issuer.
+
+The data is taken from the issuer part with the `OU` key.
+
+The escape organizational unit info in the issuer part is formatted as below:
+
+```text
+OU=Cheese Section,OU=Cheese Section 2
 ```
 
 ##### `info.issuer.commonName`

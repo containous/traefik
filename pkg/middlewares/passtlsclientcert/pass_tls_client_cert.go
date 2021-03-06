@@ -37,13 +37,14 @@ var attributeTypeNames = map[string]string{
 
 // DistinguishedNameOptions is a struct for specifying the configuration for the distinguished name info.
 type DistinguishedNameOptions struct {
-	CommonName          bool
-	CountryName         bool
-	DomainComponent     bool
-	LocalityName        bool
-	OrganizationName    bool
-	SerialNumber        bool
-	StateOrProvinceName bool
+	CommonName             bool
+	CountryName            bool
+	DomainComponent        bool
+	LocalityName           bool
+	OrganizationName       bool
+	OrganizationalUnitName bool
+	SerialNumber           bool
+	StateOrProvinceName    bool
 }
 
 func newDistinguishedNameOptions(info *dynamic.TLSCLientCertificateDNInfo) *DistinguishedNameOptions {
@@ -52,13 +53,14 @@ func newDistinguishedNameOptions(info *dynamic.TLSCLientCertificateDNInfo) *Dist
 	}
 
 	return &DistinguishedNameOptions{
-		CommonName:          info.CommonName,
-		CountryName:         info.Country,
-		DomainComponent:     info.DomainComponent,
-		LocalityName:        info.Locality,
-		OrganizationName:    info.Organization,
-		SerialNumber:        info.SerialNumber,
-		StateOrProvinceName: info.Province,
+		CommonName:             info.CommonName,
+		CountryName:            info.Country,
+		DomainComponent:        info.DomainComponent,
+		LocalityName:           info.Locality,
+		OrganizationName:       info.Organization,
+		OrganizationalUnitName: info.OrganizationalUnit,
+		SerialNumber:           info.SerialNumber,
+		StateOrProvinceName:    info.Province,
 	}
 }
 
@@ -216,6 +218,10 @@ func getDNInfo(ctx context.Context, options *DistinguishedNameOptions, cs *pkix.
 
 	if options.OrganizationName {
 		writeParts(ctx, content, cs.Organization, "O")
+	}
+
+	if options.OrganizationalUnitName {
+		writeParts(ctx, content, cs.OrganizationalUnit, "OU")
 	}
 
 	if options.SerialNumber {
