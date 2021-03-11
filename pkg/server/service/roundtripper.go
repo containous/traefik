@@ -123,6 +123,8 @@ func createRoundTripper(cfg *dynamic.ServersTransport) (http.RoundTripper, error
 		IdleConnTimeout:       90 * time.Second,
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
+		ReadBufferSize:        64 * 1024,
+		WriteBufferSize:       64 * 1024,
 	}
 
 	transport.RegisterProtocol("h2c", &h2cTransportWrapper{

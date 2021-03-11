@@ -2,7 +2,7 @@ package gateway
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/traefik/traefik/v2/pkg/provider/kubernetes/k8s"
@@ -43,7 +43,7 @@ func newClientMock(paths ...string) clientMock {
 	var c clientMock
 
 	for _, path := range paths {
-		yamlContent, err := ioutil.ReadFile(filepath.FromSlash("./fixtures/" + path))
+		yamlContent, err := os.ReadFile(filepath.FromSlash("./fixtures/" + path))
 		if err != nil {
 			panic(err)
 		}

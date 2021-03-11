@@ -2,7 +2,7 @@ package crd
 
 import (
 	"context"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -4537,7 +4537,7 @@ func TestCrossNamespace(t *testing.T) {
 			var k8sObjects []runtime.Object
 			var crdObjects []runtime.Object
 			for _, path := range test.paths {
-				yamlContent, err := ioutil.ReadFile(filepath.FromSlash("./fixtures/" + path))
+				yamlContent, err := os.ReadFile(filepath.FromSlash("./fixtures/" + path))
 				if err != nil {
 					panic(err)
 				}

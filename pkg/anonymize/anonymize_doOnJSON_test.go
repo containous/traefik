@@ -1,7 +1,7 @@
 package anonymize
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,12 +9,12 @@ import (
 )
 
 func Test_doOnJSON(t *testing.T) {
-	baseConfiguration, err := ioutil.ReadFile("./testdata/example.json")
+	baseConfiguration, err := os.ReadFile("./testdata/example.json")
 	require.NoError(t, err)
 
 	anomConfiguration := doOnJSON(string(baseConfiguration))
 
-	expectedConfiguration, err := ioutil.ReadFile("./testdata/expected.json")
+	expectedConfiguration, err := os.ReadFile("./testdata/expected.json")
 	require.NoError(t, err)
 
 	assert.JSONEq(t, string(expectedConfiguration), anomConfiguration)

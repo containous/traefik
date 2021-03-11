@@ -550,23 +550,24 @@ func (p *Provider) makeGatewayStatus(listenerStatuses []v1alpha1.ListenerStatus)
 
 	gatewayStatus.Listeners = listenerStatuses
 
-	// update "Scheduled" status with "ResourcesAvailable" reason
-	gatewayStatus.Conditions = append(gatewayStatus.Conditions, metav1.Condition{
-		Type:               string(v1alpha1.GatewayConditionScheduled),
-		Status:             metav1.ConditionTrue,
-		Reason:             "ResourcesAvailable",
-		Message:            "Resources available",
-		LastTransitionTime: metav1.Now(),
-	})
-
-	// update "Ready" status with "ListenersValid" reason
-	gatewayStatus.Conditions = append(gatewayStatus.Conditions, metav1.Condition{
-		Type:               string(v1alpha1.GatewayConditionReady),
-		Status:             metav1.ConditionTrue,
-		Reason:             "ListenersValid",
-		Message:            "Listeners valid",
-		LastTransitionTime: metav1.Now(),
-	})
+	gatewayStatus.Conditions = append(gatewayStatus.Conditions,
+		// update "Scheduled" status with "ResourcesAvailable" reason
+		metav1.Condition{
+			Type:               string(v1alpha1.GatewayConditionScheduled),
+			Status:             metav1.ConditionTrue,
+			Reason:             "ResourcesAvailable",
+			Message:            "Resources available",
+			LastTransitionTime: metav1.Now(),
+		},
+		// update "Ready" status with "ListenersValid" reason
+		metav1.Condition{
+			Type:               string(v1alpha1.GatewayConditionReady),
+			Status:             metav1.ConditionTrue,
+			Reason:             "ListenersValid",
+			Message:            "Listeners valid",
+			LastTransitionTime: metav1.Now(),
+		},
+	)
 
 	return gatewayStatus, nil
 }

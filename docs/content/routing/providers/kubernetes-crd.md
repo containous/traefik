@@ -292,15 +292,16 @@ The Kubernetes Ingress Controller, The Custom Resource Way.
     
 You can find an excerpt of the available custom resources in the table below:
 
-| Kind                                     | Purpose                                                       | Concept Behind                                                 |
-|------------------------------------------|---------------------------------------------------------------|----------------------------------------------------------------|
-| [IngressRoute](#kind-ingressroute)       | HTTP Routing                                                  | [HTTP router](../routers/index.md#configuring-http-routers)    |
-| [Middleware](#kind-middleware)           | Tweaks the HTTP requests before they are sent to your service | [HTTP Middlewares](../../middlewares/overview.md)              |
-| [TraefikService](#kind-traefikservice)   | Abstraction for HTTP loadbalancing/mirroring                  | [HTTP service](../services/index.md#configuring-http-services) |
-| [IngressRouteTCP](#kind-ingressroutetcp) | TCP Routing                                                   | [TCP router](../routers/index.md#configuring-tcp-routers)      |
-| [IngressRouteUDP](#kind-ingressrouteudp) | UDP Routing                                                   | [UDP router](../routers/index.md#configuring-udp-routers)      |
-| [TLSOptions](#kind-tlsoption)            | Allows to configure some parameters of the TLS connection     | [TLSOptions](../../https/tls.md#tls-options)                   |
-| [TLSStores](#kind-tlsstore)              | Allows to configure the default TLS store                     | [TLSStores](../../https/tls.md#certificates-stores)            |
+| Kind                                       | Purpose                                                            | Concept Behind                                                 |
+|--------------------------------------------|--------------------------------------------------------------------|----------------------------------------------------------------|
+| [IngressRoute](#kind-ingressroute)         | HTTP Routing                                                       | [HTTP router](../routers/index.md#configuring-http-routers)    |
+| [Middleware](#kind-middleware)             | Tweaks the HTTP requests before they are sent to your service      | [HTTP Middlewares](../../middlewares/overview.md)              |
+| [TraefikService](#kind-traefikservice)     | Abstraction for HTTP loadbalancing/mirroring                       | [HTTP service](../services/index.md#configuring-http-services) |
+| [IngressRouteTCP](#kind-ingressroutetcp)   | TCP Routing                                                        | [TCP router](../routers/index.md#configuring-tcp-routers)      |
+| [IngressRouteUDP](#kind-ingressrouteudp)   | UDP Routing                                                        | [UDP router](../routers/index.md#configuring-udp-routers)      |
+| [TLSOptions](#kind-tlsoption)              | Allows to configure some parameters of the TLS connection          | [TLSOptions](../../https/tls.md#tls-options)                   |
+| [TLSStores](#kind-tlsstore)                | Allows to configure the default TLS store                          | [TLSStores](../../https/tls.md#certificates-stores)            |
+| [ServersTransport](#kind-serverstransport) | Allows to configure the transport between Traefik and the backends | [ServersTransport](../../services/#serverstransport_1)         |
 
 ### Kind: `IngressRoute`
 

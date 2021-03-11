@@ -3,7 +3,7 @@ package integration
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -135,7 +135,7 @@ func (s *DockerSuite) TestDefaultDockerContainers(c *check.C) {
 	resp, err := try.ResponseUntilStatusCode(req, 1500*time.Millisecond, http.StatusOK)
 	c.Assert(err, checker.IsNil)
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	c.Assert(err, checker.IsNil)
 
 	var version map[string]interface{}
@@ -228,7 +228,7 @@ func (s *DockerSuite) TestDockerContainersWithLabels(c *check.C) {
 	resp, err := try.ResponseUntilStatusCode(req, 1500*time.Millisecond, http.StatusOK)
 	c.Assert(err, checker.IsNil)
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	c.Assert(err, checker.IsNil)
 
 	var version map[string]interface{}
@@ -307,7 +307,7 @@ func (s *DockerSuite) TestRestartDockerContainers(c *check.C) {
 	resp, err := try.ResponseUntilStatusCode(req, 1500*time.Millisecond, http.StatusOK)
 	c.Assert(err, checker.IsNil)
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	c.Assert(err, checker.IsNil)
 
 	var version map[string]interface{}

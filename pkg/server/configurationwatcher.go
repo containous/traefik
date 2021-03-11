@@ -28,6 +28,7 @@ type ConfigurationWatcher struct {
 	configurationValidatedChan chan dynamic.Message
 	providerConfigUpdateMap    map[string]chan dynamic.Message
 
+	requiredProvider       string
 	configurationListeners []func(dynamic.Configuration)
 
 	routinesPool *safe.Pool
@@ -39,6 +40,7 @@ func NewConfigurationWatcher(
 	pvd provider.Provider,
 	providersThrottleDuration time.Duration,
 	defaultEntryPoints []string,
+	requiredProvider string,
 ) *ConfigurationWatcher {
 	watcher := &ConfigurationWatcher{
 		provider:                   pvd,
@@ -48,6 +50,7 @@ func NewConfigurationWatcher(
 		providersThrottleDuration:  providersThrottleDuration,
 		routinesPool:               routinesPool,
 		defaultEntryPoints:         defaultEntryPoints,
+		requiredProvider:           requiredProvider,
 	}
 
 	currentConfigurations := make(dynamic.Configurations)
@@ -146,8 +149,11 @@ func (c *ConfigurationWatcher) loadMessage(configMsg dynamic.Message) {
 	conf := mergeConfiguration(newConfigurations, c.defaultEntryPoints)
 	conf = applyModel(conf)
 
-	for _, listener := range c.configurationListeners {
-		listener(conf)
+	// We wait for first configuration of the require provider before applying configurations.
+	if _, ok := newConfigurations[c.requiredProvider]; c.requiredProvider == "" || ok {
+		for _, listener := range c.configurationListeners {
+			listener(conf)
+		}
 	}
 }
 

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -44,7 +43,7 @@ func TestForwardAuthFail(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusForbidden, res.StatusCode)
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	err = res.Body.Close()
 	require.NoError(t, err)
@@ -92,7 +91,7 @@ func TestForwardAuthSuccess(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	err = res.Body.Close()
 	require.NoError(t, err)
@@ -134,7 +133,7 @@ func TestForwardAuthRedirect(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "http://example.com/redirect-test", location.String())
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	err = res.Body.Close()
 	require.NoError(t, err)
@@ -187,7 +186,7 @@ func TestForwardAuthRemoveHopByHopHeaders(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "http://example.com/redirect-test", location.String(), "they should be equal")
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	assert.NotEmpty(t, string(body), "there should be something in the body")
 }
@@ -238,7 +237,7 @@ func TestForwardAuthFailResponseHeaders(t *testing.T) {
 		assert.Equal(t, value, res.Header[key])
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	err = res.Body.Close()
 	require.NoError(t, err)
@@ -489,5 +488,5 @@ type mockBackend struct {
 }
 
 func (b *mockBackend) Setup(componentName string) (opentracing.Tracer, io.Closer, error) {
-	return b.Tracer, ioutil.NopCloser(nil), nil
+	return b.Tracer, io.NopCloser(nil), nil
 }

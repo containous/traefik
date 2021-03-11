@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -58,7 +57,7 @@ func (s *AccessLogSuite) TestAccessLog(c *check.C) {
 	defer display(c)
 
 	defer func() {
-		traefikLog, err := ioutil.ReadFile(traefikTestLogFile)
+		traefikLog, err := os.ReadFile(traefikTestLogFile)
 		c.Assert(err, checker.IsNil)
 		log.WithoutContext().Info(string(traefikLog))
 	}()
@@ -545,7 +544,7 @@ func (s *AccessLogSuite) TestAccessLogAuthFrontendSuccess(c *check.C) {
 }
 
 func checkNoOtherTraefikProblems(c *check.C) {
-	traefikLog, err := ioutil.ReadFile(traefikTestLogFile)
+	traefikLog, err := os.ReadFile(traefikTestLogFile)
 	c.Assert(err, checker.IsNil)
 	if len(traefikLog) > 0 {
 		fmt.Printf("%s\n", string(traefikLog))
@@ -583,7 +582,7 @@ func checkAccessLogExactValuesOutput(c *check.C, values []accessLogValue) int {
 }
 
 func extractLines(c *check.C) []string {
-	accessLog, err := ioutil.ReadFile(traefikTestAccessLogFile)
+	accessLog, err := os.ReadFile(traefikTestAccessLogFile)
 	c.Assert(err, checker.IsNil)
 
 	lines := strings.Split(string(accessLog), "\n")
@@ -613,7 +612,7 @@ func ensureWorkingDirectoryIsClean() {
 }
 
 func checkTraefikStarted(c *check.C) []byte {
-	traefikLog, err := ioutil.ReadFile(traefikTestLogFile)
+	traefikLog, err := os.ReadFile(traefikTestLogFile)
 	c.Assert(err, checker.IsNil)
 	if len(traefikLog) > 0 {
 		fmt.Printf("%s\n", string(traefikLog))
@@ -663,7 +662,7 @@ func waitForTraefik(c *check.C, containerName string) {
 func displayTraefikLogFile(c *check.C, path string) {
 	if c.Failed() {
 		if _, err := os.Stat(path); !os.IsNotExist(err) {
-			content, errRead := ioutil.ReadFile(path)
+			content, errRead := os.ReadFile(path)
 			fmt.Printf("%s: Traefik logs: \n", c.TestName())
 			if errRead == nil {
 				fmt.Println(content)

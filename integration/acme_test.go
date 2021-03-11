@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -67,7 +66,7 @@ func setupPebbleRootCA() (*http.Transport, error) {
 	os.Setenv("LEGO_CA_CERTIFICATES", path)
 	os.Setenv("LEGO_CA_SERVER_NAME", "pebble")
 
-	customCAs, err := ioutil.ReadFile(path)
+	customCAs, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

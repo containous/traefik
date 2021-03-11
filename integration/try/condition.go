@@ -3,7 +3,7 @@ package try
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"reflect"
 	"strings"
@@ -19,7 +19,7 @@ type ResponseCondition func(*http.Response) error
 // The condition returns an error if the request body does not contain all the given strings.
 func BodyContains(values ...string) ResponseCondition {
 	return func(res *http.Response) error {
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read response body: %w", err)
 		}
@@ -37,7 +37,7 @@ func BodyContains(values ...string) ResponseCondition {
 // The condition returns an error if the request body  contain one of the given strings.
 func BodyNotContains(values ...string) ResponseCondition {
 	return func(res *http.Response) error {
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read response body: %w", err)
 		}
@@ -55,7 +55,7 @@ func BodyNotContains(values ...string) ResponseCondition {
 // The condition returns an error if the request body does not contain one of the given strings.
 func BodyContainsOr(values ...string) ResponseCondition {
 	return func(res *http.Response) error {
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read response body: %w", err)
 		}
@@ -73,7 +73,7 @@ func BodyContainsOr(values ...string) ResponseCondition {
 // The condition returns an error if the request body does not have body content.
 func HasBody() ResponseCondition {
 	return func(res *http.Response) error {
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read response body: %w", err)
 		}

@@ -3,9 +3,10 @@ package api
 import (
 	"encoding/json"
 	"flag"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -144,7 +145,7 @@ func TestHandler_RawData(t *testing.T) {
 			assert.Equal(t, test.expected.statusCode, resp.StatusCode)
 			assert.Equal(t, resp.Header.Get("Content-Type"), "application/json")
 
-			contents, err := ioutil.ReadAll(resp.Body)
+			contents, err := io.ReadAll(resp.Body)
 			require.NoError(t, err)
 
 			err = resp.Body.Close()
@@ -161,11 +162,11 @@ func TestHandler_RawData(t *testing.T) {
 				newJSON, err := json.MarshalIndent(rtRepr, "", "\t")
 				require.NoError(t, err)
 
-				err = ioutil.WriteFile(test.expected.json, newJSON, 0o644)
+				err = os.WriteFile(test.expected.json, newJSON, 0o644)
 				require.NoError(t, err)
 			}
 
-			data, err := ioutil.ReadFile(test.expected.json)
+			data, err := os.ReadFile(test.expected.json)
 			require.NoError(t, err)
 			assert.JSONEq(t, string(data), string(contents))
 		})
@@ -267,7 +268,7 @@ func TestHandler_GetMiddleware(t *testing.T) {
 				return
 			}
 
-			data, err := ioutil.ReadAll(resp.Body)
+			data, err := io.ReadAll(resp.Body)
 			require.NoError(t, err)
 
 			err = resp.Body.Close()

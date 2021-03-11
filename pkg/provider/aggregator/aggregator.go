@@ -119,10 +119,6 @@ func (p ProviderAggregator) Init() error {
 
 // Provide calls the provide method of every providers.
 func (p ProviderAggregator) Provide(configurationChan chan<- dynamic.Message, pool *safe.Pool) error {
-	if p.internalProvider != nil {
-		launchProvider(configurationChan, pool, p.internalProvider)
-	}
-
 	if p.fileProvider != nil {
 		launchProvider(configurationChan, pool, p.fileProvider)
 	}
@@ -132,6 +128,12 @@ func (p ProviderAggregator) Provide(configurationChan chan<- dynamic.Message, po
 		safe.Go(func() {
 			launchProvider(configurationChan, pool, prd)
 		})
+	}
+
+	// internal provider must be the last because we use it to know if all the providers are loaded.
+	// ConfigurationWatcher will wait for this requiredProvider before applying configurations.
+	if p.internalProvider != nil {
+		launchProvider(configurationChan, pool, p.internalProvider)
 	}
 
 	return nil

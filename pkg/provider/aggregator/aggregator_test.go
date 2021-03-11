@@ -32,12 +32,11 @@ func TestProviderAggregator_Provide(t *testing.T) {
 		errCh <- aggregator.Provide(cfgCh, pool)
 	}()
 
-	// Make sure the internal provider is always called first, followed by the file provider.
-	requireReceivedMessageFromProviders(t, cfgCh, []string{"internal"})
+	// Make sure the file provider is always called first.
 	requireReceivedMessageFromProviders(t, cfgCh, []string{"file"})
 
 	// Check if all providers have been called, the order doesn't matter.
-	requireReceivedMessageFromProviders(t, cfgCh, []string{"salad", "tomato", "onion"})
+	requireReceivedMessageFromProviders(t, cfgCh, []string{"salad", "tomato", "onion", "internal"})
 
 	require.NoError(t, <-errCh)
 }
@@ -52,7 +51,8 @@ func requireReceivedMessageFromProviders(t *testing.T, cfgCh <-chan dynamic.Mess
 
 	for range names {
 		select {
-		case <-time.After(10 * time.Millisecond):
+		case <-time.After(100 * time.Millisecond):
+			require.Fail(t, "Timeout while waiting for configuration.")
 		case msg = <-cfgCh:
 			receivedMessagesFrom = append(receivedMessagesFrom, msg.ProviderName)
 		}

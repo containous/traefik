@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/traefik/traefik/v2/pkg/log"
@@ -34,7 +33,7 @@ func (clientTLS *ClientTLS) CreateTLSConfig(ctx context.Context) (*tls.Config, e
 		var ca []byte
 		if _, errCA := os.Stat(clientTLS.CA); errCA == nil {
 			var err error
-			ca, err = ioutil.ReadFile(clientTLS.CA)
+			ca, err = os.ReadFile(clientTLS.CA)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read CA. %w", err)
 			}

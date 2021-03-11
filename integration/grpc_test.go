@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
-	"io/ioutil"
 	"math/rand"
 	"net"
 	"os"
@@ -35,9 +34,9 @@ type myserver struct {
 
 func (s *GRPCSuite) SetUpSuite(c *check.C) {
 	var err error
-	LocalhostCert, err = ioutil.ReadFile("./resources/tls/local.cert")
+	LocalhostCert, err = os.ReadFile("./resources/tls/local.cert")
 	c.Assert(err, check.IsNil)
-	LocalhostKey, err = ioutil.ReadFile("./resources/tls/local.key")
+	LocalhostKey, err = os.ReadFile("./resources/tls/local.key")
 	c.Assert(err, check.IsNil)
 }
 
@@ -112,7 +111,7 @@ func callHelloClientGRPC(name string, secure bool) (string, error) {
 	} else {
 		client, closer, err = getHelloClientGRPCh2c()
 	}
-	defer closer()
+	defer func() { _ = closer() }()
 
 	if err != nil {
 		return "", err
@@ -139,6 +138,7 @@ func callStreamExampleClientGRPC() (helloworld.Greeter_StreamExampleClient, func
 
 func (s *GRPCSuite) TestGRPC(c *check.C) {
 	lis, err := net.Listen("tcp", ":0")
+	c.Assert(err, check.IsNil)
 	_, port, err := net.SplitHostPort(lis.Addr().String())
 	c.Assert(err, check.IsNil)
 
@@ -181,6 +181,7 @@ func (s *GRPCSuite) TestGRPC(c *check.C) {
 
 func (s *GRPCSuite) TestGRPCh2c(c *check.C) {
 	lis, err := net.Listen("tcp", ":0")
+	c.Assert(err, check.IsNil)
 	_, port, err := net.SplitHostPort(lis.Addr().String())
 	c.Assert(err, check.IsNil)
 
@@ -219,6 +220,7 @@ func (s *GRPCSuite) TestGRPCh2c(c *check.C) {
 
 func (s *GRPCSuite) TestGRPCh2cTermination(c *check.C) {
 	lis, err := net.Listen("tcp", ":0")
+	c.Assert(err, check.IsNil)
 	_, port, err := net.SplitHostPort(lis.Addr().String())
 	c.Assert(err, check.IsNil)
 
@@ -261,6 +263,7 @@ func (s *GRPCSuite) TestGRPCh2cTermination(c *check.C) {
 
 func (s *GRPCSuite) TestGRPCInsecure(c *check.C) {
 	lis, err := net.Listen("tcp", ":0")
+	c.Assert(err, check.IsNil)
 	_, port, err := net.SplitHostPort(lis.Addr().String())
 	c.Assert(err, check.IsNil)
 
@@ -340,7 +343,7 @@ func (s *GRPCSuite) TestGRPCBuffer(c *check.C) {
 	c.Assert(err, check.IsNil)
 	var client helloworld.Greeter_StreamExampleClient
 	client, closer, err := callStreamExampleClientGRPC()
-	defer closer()
+	defer func() { _ = closer() }()
 	c.Assert(err, check.IsNil)
 
 	received := make(chan bool)
@@ -400,8 +403,10 @@ func (s *GRPCSuite) TestGRPCBufferWithFlushInterval(c *check.C) {
 
 	var client helloworld.Greeter_StreamExampleClient
 	client, closer, err := callStreamExampleClientGRPC()
-	defer closer()
-	defer func() { stopStreamExample <- true }()
+	defer func() {
+		_ = closer()
+		stopStreamExample <- true
+	}()
 	c.Assert(err, check.IsNil)
 
 	received := make(chan bool)
@@ -425,6 +430,7 @@ func (s *GRPCSuite) TestGRPCBufferWithFlushInterval(c *check.C) {
 
 func (s *GRPCSuite) TestGRPCWithRetry(c *check.C) {
 	lis, err := net.Listen("tcp", ":0")
+	c.Assert(err, check.IsNil)
 	_, port, err := net.SplitHostPort(lis.Addr().String())
 	c.Assert(err, check.IsNil)
 

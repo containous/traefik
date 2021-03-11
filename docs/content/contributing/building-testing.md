@@ -30,7 +30,7 @@ Successfully tagged traefik-webui:latest
 [...]
 docker build  -t "traefik-dev:4475--feature-documentation" -f build.Dockerfile .
 Sending build context to Docker daemon    279MB
-Step 1/10 : FROM golang:1.14-alpine
+Step 1/10 : FROM golang:1.16-alpine
  ---> f4bfb3d22bda
 [...]
 Successfully built 5c3c1a911277
@@ -62,7 +62,7 @@ PRE_TARGET= make test-unit
 
 Requirements:
 
-- `go` v1.14+
+- `go` v1.16+
 - environment variable `GO111MODULE=on`
 - [go-bindata](https://github.com/containous/go-bindata) `GO111MODULE=off go get -u github.com/containous/go-bindata/...`
 

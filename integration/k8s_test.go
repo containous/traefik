@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -164,14 +163,14 @@ func testConfiguration(c *check.C, path, apiPort string) {
 	newJSON, err := json.MarshalIndent(rtRepr, "", "\t")
 	c.Assert(err, checker.IsNil)
 
-	err = ioutil.WriteFile(expectedJSON, newJSON, 0o644)
+	err = os.WriteFile(expectedJSON, newJSON, 0o644)
 	c.Assert(err, checker.IsNil)
 	c.Errorf("We do not want a passing test in file update mode")
 }
 
 func matchesConfig(wantConfig string, buf *bytes.Buffer) try.ResponseCondition {
 	return func(res *http.Response) error {
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read response body: %w", err)
 		}
@@ -198,7 +197,7 @@ func matchesConfig(wantConfig string, buf *bytes.Buffer) try.ResponseCondition {
 			return err
 		}
 
-		expected, err := ioutil.ReadFile(wantConfig)
+		expected, err := os.ReadFile(wantConfig)
 		if err != nil {
 			return err
 		}

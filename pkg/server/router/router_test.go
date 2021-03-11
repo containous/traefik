@@ -2,7 +2,7 @@ package router
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -827,7 +827,7 @@ func BenchmarkRouterServe(b *testing.B) {
 
 	res := &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(strings.NewReader("")),
+		Body:       io.NopCloser(strings.NewReader("")),
 	}
 
 	routersConfig := map[string]*dynamic.Router{
@@ -879,7 +879,7 @@ func BenchmarkRouterServe(b *testing.B) {
 func BenchmarkService(b *testing.B) {
 	res := &http.Response{
 		StatusCode: 200,
-		Body:       ioutil.NopCloser(strings.NewReader("")),
+		Body:       io.NopCloser(strings.NewReader("")),
 	}
 
 	serviceConfig := map[string]*dynamic.Service{

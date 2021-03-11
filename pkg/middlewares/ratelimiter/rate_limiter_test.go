@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	"time"
 
@@ -279,10 +280,12 @@ func TestRateLimit(t *testing.T) {
 				// actual default value
 				burst = 1
 			}
+
 			period := time.Duration(test.config.Period)
 			if period == 0 {
 				period = time.Second
 			}
+
 			if test.config.Average == 0 {
 				if reqCount < 75*test.incomingLoad/100 {
 					t.Fatalf("we (arbitrarily) expect at least 75%% of the requests to go through with no rate limiting, and yet only %d/%d went through", reqCount, test.incomingLoad)
@@ -297,14 +300,18 @@ func TestRateLimit(t *testing.T) {
 			// we take into account the configured burst,
 			// because it also helps absorbing non-bursty traffic.
 			rate := float64(test.config.Average) / float64(period)
+
 			wantCount := int(int64(rate*float64(test.loadDuration)) + burst)
+
 			// Allow for a 2% leeway
 			maxCount := wantCount * 102 / 100
+
 			// With very high CPU loads,
 			// we can expect some extra delay in addition to the rate limiting we already do,
 			// so we allow for some extra leeway there.
 			// Feel free to adjust wrt to the load on e.g. the CI.
-			minCount := wantCount * 95 / 100
+			minCount := computeMinCount(wantCount)
+
 			if reqCount < minCount {
 				t.Fatalf("rate was slower than expected: %d requests (wanted > %d) in %v", reqCount, minCount, elapsed)
 			}
@@ -313,4 +320,12 @@ func TestRateLimit(t *testing.T) {
 			}
 		})
 	}
+}
+
+func computeMinCount(wantCount int) int {
+	if os.Getenv("CI") != "" {
+		return wantCount * 60 / 100
+	}
+
+	return wantCount * 95 / 100
 }

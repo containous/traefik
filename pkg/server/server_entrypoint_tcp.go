@@ -362,11 +362,11 @@ func (ln tcpKeepAliveListener) Accept() (net.Conn, error) {
 		return nil, err
 	}
 
-	if err = tc.SetKeepAlive(true); err != nil {
+	if err := tc.SetKeepAlive(true); err != nil {
 		return nil, err
 	}
 
-	if err = tc.SetKeepAlivePeriod(3 * time.Minute); err != nil {
+	if err := tc.SetKeepAlivePeriod(3 * time.Minute); err != nil {
 		// Some systems, such as OpenBSD, have no user-settable per-socket TCP
 		// keepalive options.
 		if !errors.Is(err, syscall.ENOPROTOOPT) {

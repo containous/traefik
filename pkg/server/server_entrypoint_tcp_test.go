@@ -48,7 +48,7 @@ func TestShutdownTCP(t *testing.T) {
 		for {
 			_, err := http.ReadRequest(bufio.NewReader(conn))
 
-			if errors.Is(err, io.EOF) || (err != nil && strings.HasSuffix(err.Error(), "use of closed network connection")) {
+			if errors.Is(err, io.EOF) || (err != nil && errors.Is(err, net.ErrClosed)) {
 				return
 			}
 			require.NoError(t, err)
@@ -70,6 +70,8 @@ func testShutdown(t *testing.T, router *tcp.Router) {
 
 	epConfig.LifeCycle.RequestAcceptGraceTimeout = 0
 	epConfig.LifeCycle.GraceTimeOut = ptypes.Duration(5 * time.Second)
+	epConfig.RespondingTimeouts.ReadTimeout = ptypes.Duration(5 * time.Second)
+	epConfig.RespondingTimeouts.WriteTimeout = ptypes.Duration(5 * time.Second)
 
 	entryPoint, err := NewTCPEntryPoint(context.Background(), &static.EntryPoint{
 		// We explicitly use an IPV4 address because on Alpine, with an IPV6 address
@@ -95,6 +97,11 @@ func testShutdown(t *testing.T, router *tcp.Router) {
 	// but since we only pass it along to the HTTP server after at least one byte is peaked,
 	// the HTTP server (and hence its shutdown) does not know about the connection until that first byte peaking.
 	err = request.Write(conn)
+	require.NoError(t, err)
+
+	reader := bufio.NewReader(conn)
+	// Wait for first byte in response.
+	_, err = reader.Peek(1)
 	require.NoError(t, err)
 
 	go entryPoint.Shutdown(context.Background())
@@ -123,7 +130,7 @@ func testShutdown(t *testing.T, router *tcp.Router) {
 
 	// And make sure that the connection we had opened before shutting things down is still operational
 
-	resp, err := http.ReadResponse(bufio.NewReader(conn), request)
+	resp, err := http.ReadResponse(reader, request)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
@@ -133,22 +140,17 @@ func startEntrypoint(entryPoint *TCPEntryPoint, router *tcp.Router) (net.Conn, e
 
 	entryPoint.SwitchRouter(router)
 
-	var conn net.Conn
-	var err error
-	var epStarted bool
 	for i := 0; i < 10; i++ {
-		conn, err = net.Dial("tcp", entryPoint.listener.Addr().String())
+		conn, err := net.Dial("tcp", entryPoint.listener.Addr().String())
 		if err != nil {
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}
-		epStarted = true
-		break
+
+		return conn, err
 	}
-	if !epStarted {
-		return nil, errors.New("entry point never started")
-	}
-	return conn, err
+
+	return nil, errors.New("entry point never started")
 }
 
 func TestReadTimeoutWithoutFirstByte(t *testing.T) {

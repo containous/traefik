@@ -13,10 +13,8 @@ func ContextWithSignal(ctx context.Context) context.Context {
 	signals := make(chan os.Signal)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
-		select {
-		case <-signals:
-			cancel()
-		}
+		<-signals
+		cancel()
 	}()
 	return newCtx
 }

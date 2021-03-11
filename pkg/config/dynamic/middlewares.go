@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -447,7 +446,7 @@ func (c *ClientTLS) CreateTLSConfig() (*tls.Config, error) {
 	if c.CA != "" {
 		var ca []byte
 		if _, errCA := os.Stat(c.CA); errCA == nil {
-			ca, err = ioutil.ReadFile(c.CA)
+			ca, err = os.ReadFile(c.CA)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read CA. %w", err)
 			}

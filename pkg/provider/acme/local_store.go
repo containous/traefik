@@ -2,7 +2,7 @@ package acme
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"os"
 	"sync"
 
@@ -60,7 +60,7 @@ func (s *LocalStore) get(resolverName string) (*StoredData, error) {
 			}
 			defer f.Close()
 
-			file, err := ioutil.ReadAll(f)
+			file, err := io.ReadAll(f)
 			if err != nil {
 				return nil, err
 			}
@@ -108,7 +108,7 @@ func (s *LocalStore) listenSaveAction() {
 				logger.Error(err)
 			}
 
-			err = ioutil.WriteFile(s.filename, data, 0o600)
+			err = os.WriteFile(s.filename, data, 0o600)
 			if err != nil {
 				logger.Error(err)
 			}

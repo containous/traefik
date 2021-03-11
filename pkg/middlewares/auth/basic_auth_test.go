@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -66,7 +66,7 @@ func TestBasicAuthSuccess(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.StatusCode, "they should be equal")
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	defer res.Body.Close()
 
@@ -97,7 +97,7 @@ func TestBasicAuthUserHeader(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	defer res.Body.Close()
 
@@ -128,7 +128,7 @@ func TestBasicAuthHeaderRemoved(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	err = res.Body.Close()
 	require.NoError(t, err)
@@ -159,7 +159,7 @@ func TestBasicAuthHeaderPresent(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
 	err = res.Body.Close()
 	require.NoError(t, err)
@@ -215,9 +215,8 @@ func TestBasicAuthUsersFromFile(t *testing.T) {
 			t.Parallel()
 
 			// Creates the temporary configuration file with the users
-			usersFile, err := ioutil.TempFile("", "auth-users")
+			usersFile, err := os.CreateTemp(t.TempDir(), "auth-users")
 			require.NoError(t, err)
-			defer os.Remove(usersFile.Name())
 
 			_, err = usersFile.Write([]byte(test.userFileContent))
 			require.NoError(t, err)
@@ -250,7 +249,7 @@ func TestBasicAuthUsersFromFile(t *testing.T) {
 				require.Equal(t, http.StatusOK, res.StatusCode, "Cannot authenticate user "+userName)
 
 				var body []byte
-				body, err = ioutil.ReadAll(res.Body)
+				body, err = io.ReadAll(res.Body)
 				require.NoError(t, err)
 				err = res.Body.Close()
 				require.NoError(t, err)
@@ -270,7 +269,7 @@ func TestBasicAuthUsersFromFile(t *testing.T) {
 				require.Equal(t, `Basic realm="`+test.realm+`"`, res.Header.Get("WWW-Authenticate"))
 			}
 
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 			require.NoError(t, err)
 			err = res.Body.Close()
 			require.NoError(t, err)

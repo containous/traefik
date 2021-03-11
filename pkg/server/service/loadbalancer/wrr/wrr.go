@@ -24,6 +24,19 @@ type stickyCookie struct {
 	httpOnly bool
 }
 
+// Balancer is a WeightedRoundRobin load balancer based on Earliest Deadline First (EDF).
+// (https://en.wikipedia.org/wiki/Earliest_deadline_first_scheduling)
+// Each pick from the schedule has the earliest deadline entry selected.
+// Entries have deadlines set at currentDeadline + 1 / weight,
+// providing weighted round robin behavior with floating point weights and an O(log n) pick time.
+type Balancer struct {
+	stickyCookie *stickyCookie
+
+	mutex       sync.RWMutex
+	handlers    []*namedHandler
+	curDeadline float64
+}
+
 // New creates a new load balancer.
 func New(sticky *dynamic.Sticky) *Balancer {
 	balancer := &Balancer{}
@@ -66,19 +79,6 @@ func (b *Balancer) Pop() interface{} {
 	h := b.handlers[len(b.handlers)-1]
 	b.handlers = b.handlers[0 : len(b.handlers)-1]
 	return h
-}
-
-// Balancer is a WeightedRoundRobin load balancer based on Earliest Deadline First (EDF).
-// (https://en.wikipedia.org/wiki/Earliest_deadline_first_scheduling)
-// Each pick from the schedule has the earliest deadline entry selected.
-// Entries have deadlines set at currentDeadline + 1 / weight,
-// providing weighted round robin behavior with floating point weights and an O(log n) pick time.
-type Balancer struct {
-	stickyCookie *stickyCookie
-
-	mutex       sync.RWMutex
-	handlers    []*namedHandler
-	curDeadline float64
 }
 
 func (b *Balancer) nextServer() (*namedHandler, error) {

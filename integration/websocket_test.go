@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -279,7 +278,7 @@ func (s *WebsocketSuite) TestSSLTermination(c *check.C) {
 
 	// Add client self-signed cert
 	roots := x509.NewCertPool()
-	certContent, err := ioutil.ReadFile("./resources/tls/local.cert")
+	certContent, err := os.ReadFile("./resources/tls/local.cert")
 	c.Assert(err, checker.IsNil)
 	roots.AppendCertsFromPEM(certContent)
 	gorillawebsocket.DefaultDialer.TLSClientConfig = &tls.Config{
@@ -461,8 +460,7 @@ func (s *WebsocketSuite) TestSSLhttp2(c *check.C) {
 	}))
 
 	ts.TLS = &tls.Config{}
-	ts.TLS.NextProtos = append(ts.TLS.NextProtos, `h2`)
-	ts.TLS.NextProtos = append(ts.TLS.NextProtos, `http/1.1`)
+	ts.TLS.NextProtos = append(ts.TLS.NextProtos, `h2`, `http/1.1`)
 	ts.StartTLS()
 
 	file := s.adaptFile(c, "fixtures/websocket/config_https.toml", struct {
@@ -485,7 +483,7 @@ func (s *WebsocketSuite) TestSSLhttp2(c *check.C) {
 
 	// Add client self-signed cert
 	roots := x509.NewCertPool()
-	certContent, err := ioutil.ReadFile("./resources/tls/local.cert")
+	certContent, err := os.ReadFile("./resources/tls/local.cert")
 	c.Assert(err, checker.IsNil)
 	roots.AppendCertsFromPEM(certContent)
 	gorillawebsocket.DefaultDialer.TLSClientConfig = &tls.Config{

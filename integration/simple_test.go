@@ -5,7 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -688,7 +688,7 @@ func (s *SimpleSuite) TestWRR(c *check.C) {
 		c.Assert(err, checker.IsNil)
 		c.Assert(response.StatusCode, checker.Equals, http.StatusOK)
 
-		body, err := ioutil.ReadAll(response.Body)
+		body, err := io.ReadAll(response.Body)
 		c.Assert(err, checker.IsNil)
 
 		if strings.Contains(string(body), server1) {
@@ -739,7 +739,7 @@ func (s *SimpleSuite) TestWRRSticky(c *check.C) {
 			req.AddCookie(cookie)
 		}
 
-		body, err := ioutil.ReadAll(response.Body)
+		body, err := io.ReadAll(response.Body)
 		c.Assert(err, checker.IsNil)
 
 		if strings.Contains(string(body), server1) {
@@ -819,7 +819,7 @@ func (s *SimpleSuite) TestMirrorWithBody(c *check.C) {
 	c.Assert(err, checker.IsNil)
 
 	verifyBody := func(req *http.Request) {
-		b, _ := ioutil.ReadAll(req.Body)
+		b, _ := io.ReadAll(req.Body)
 		switch req.Header.Get("Size") {
 		case "20":
 			if !bytes.Equal(b, body20) {
@@ -1030,7 +1030,7 @@ func (s *SimpleSuite) TestContentTypeDisableAutoDetect(c *check.C) {
 
 			rw.WriteHeader(http.StatusOK)
 
-			data, err := ioutil.ReadFile("fixtures/test.pdf")
+			data, err := os.ReadFile("fixtures/test.pdf")
 			c.Assert(err, checker.IsNil)
 
 			_, err = rw.Write(data)

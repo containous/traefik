@@ -40,7 +40,7 @@ func Do(baseConfig interface{}, indent bool) (string, error) {
 }
 
 func doOnJSON(input string) string {
-	mailExp := regexp.MustCompile(`\w[-._\w]*\w@\w[-._\w]*\w\.\w{2,3}"`)
+	mailExp := regexp.MustCompile(`\w[-.\w]*\w@\w[-.\w]*\w\.\w{2,3}"`)
 	return xurls.Relaxed().ReplaceAllString(mailExp.ReplaceAllString(input, maskLarge+"\""), maskLarge)
 }
 

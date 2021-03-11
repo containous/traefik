@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -42,9 +41,7 @@ var (
 )
 
 func TestLogRotation(t *testing.T) {
-	tempDir := createTempDir(t, "traefik_")
-
-	fileName := filepath.Join(tempDir, "traefik.log")
+	fileName := filepath.Join(t.TempDir(), "traefik.log")
 	rotatedFileName := fileName + ".rotated"
 
 	config := &types.AccessLog{FilePath: fileName, Format: CommonFormat}
@@ -100,7 +97,7 @@ func TestLogRotation(t *testing.T) {
 
 func lineCount(t *testing.T, fileName string) int {
 	t.Helper()
-	fileContents, err := ioutil.ReadFile(fileName)
+	fileContents, err := os.ReadFile(fileName)
 	if err != nil {
 		t.Fatalf("Error reading from file %s: %s", fileName, err)
 	}
@@ -117,8 +114,6 @@ func lineCount(t *testing.T, fileName string) int {
 }
 
 func TestLoggerHeaderFields(t *testing.T) {
-	tmpDir := createTempDir(t, CommonFormat)
-
 	expectedValue := "expectedValue"
 
 	testCases := []struct {
@@ -172,7 +167,7 @@ func TestLoggerHeaderFields(t *testing.T) {
 	for _, test := range testCases {
 		test := test
 		t.Run(test.desc, func(t *testing.T) {
-			logFile, err := ioutil.TempFile(tmpDir, "*.log")
+			logFile, err := os.CreateTemp(t.TempDir(), "*.log")
 			require.NoError(t, err)
 
 			config := &types.AccessLog{
@@ -202,7 +197,7 @@ func TestLoggerHeaderFields(t *testing.T) {
 				writer.WriteHeader(http.StatusOK)
 			}))
 
-			logData, err := ioutil.ReadFile(logFile.Name())
+			logData, err := os.ReadFile(logFile.Name())
 			require.NoError(t, err)
 
 			if test.expected == types.AccessLogDrop {
@@ -215,13 +210,11 @@ func TestLoggerHeaderFields(t *testing.T) {
 }
 
 func TestLoggerCLF(t *testing.T) {
-	tmpDir := createTempDir(t, CommonFormat)
-
-	logFilePath := filepath.Join(tmpDir, logFileNameSuffix)
+	logFilePath := filepath.Join(t.TempDir(), logFileNameSuffix)
 	config := &types.AccessLog{FilePath: logFilePath, Format: CommonFormat}
 	doLogging(t, config)
 
-	logData, err := ioutil.ReadFile(logFilePath)
+	logData, err := os.ReadFile(logFilePath)
 	require.NoError(t, err)
 
 	expectedLog := ` TestHost - TestUser [13/Apr/2016:07:14:19 -0700] "POST testpath HTTP/0.0" 123 12 "testReferer" "testUserAgent" 1 "testRouter" "http://127.0.0.1/testService" 1ms`
@@ -229,13 +222,11 @@ func TestLoggerCLF(t *testing.T) {
 }
 
 func TestAsyncLoggerCLF(t *testing.T) {
-	tmpDir := createTempDir(t, CommonFormat)
-
-	logFilePath := filepath.Join(tmpDir, logFileNameSuffix)
+	logFilePath := filepath.Join(t.TempDir(), logFileNameSuffix)
 	config := &types.AccessLog{FilePath: logFilePath, Format: CommonFormat, BufferingSize: 1024}
 	doLogging(t, config)
 
-	logData, err := ioutil.ReadFile(logFilePath)
+	logData, err := os.ReadFile(logFilePath)
 	require.NoError(t, err)
 
 	expectedLog := ` TestHost - TestUser [13/Apr/2016:07:14:19 -0700] "POST testpath HTTP/0.0" 123 12 "testReferer" "testUserAgent" 1 "testRouter" "http://127.0.0.1/testService" 1ms`
@@ -452,9 +443,7 @@ func TestLoggerJSON(t *testing.T) {
 		t.Run(test.desc, func(t *testing.T) {
 			t.Parallel()
 
-			tmpDir := createTempDir(t, JSONFormat)
-
-			logFilePath := filepath.Join(tmpDir, logFileNameSuffix)
+			logFilePath := filepath.Join(t.TempDir(), logFileNameSuffix)
 
 			test.config.FilePath = logFilePath
 			if test.tls {
@@ -463,7 +452,7 @@ func TestLoggerJSON(t *testing.T) {
 				doLogging(t, test.config)
 			}
 
-			logData, err := ioutil.ReadFile(logFilePath)
+			logData, err := os.ReadFile(logFilePath)
 			require.NoError(t, err)
 
 			jsonData := make(map[string]interface{})
@@ -677,7 +666,7 @@ func TestNewLogHandlerOutputStdout(t *testing.T) {
 
 			doLogging(t, test.config)
 
-			written, err := ioutil.ReadFile(file.Name())
+			written, err := os.ReadFile(file.Name())
 			require.NoError(t, err, "unable to read captured stdout from file")
 			assertValidLogData(t, test.expectedLog, written)
 		})
@@ -713,16 +702,16 @@ func assertValidLogData(t *testing.T, expected string, logData []byte) {
 	assert.Equal(t, resultExpected[OriginContentSize], result[OriginContentSize], formatErrMessage)
 	assert.Equal(t, resultExpected[RequestRefererHeader], result[RequestRefererHeader], formatErrMessage)
 	assert.Equal(t, resultExpected[RequestUserAgentHeader], result[RequestUserAgentHeader], formatErrMessage)
-	assert.Regexp(t, regexp.MustCompile("[0-9]*"), result[RequestCount], formatErrMessage)
+	assert.Regexp(t, regexp.MustCompile(`\d*`), result[RequestCount], formatErrMessage)
 	assert.Equal(t, resultExpected[RouterName], result[RouterName], formatErrMessage)
 	assert.Equal(t, resultExpected[ServiceURL], result[ServiceURL], formatErrMessage)
-	assert.Regexp(t, regexp.MustCompile("[0-9]*ms"), result[Duration], formatErrMessage)
+	assert.Regexp(t, regexp.MustCompile(`\d*ms`), result[Duration], formatErrMessage)
 }
 
 func captureStdout(t *testing.T) (out *os.File, restoreStdout func()) {
 	t.Helper()
 
-	file, err := ioutil.TempFile("", "testlogger")
+	file, err := os.CreateTemp("", "testlogger")
 	require.NoError(t, err, "failed to create temp file")
 
 	original := os.Stdout
@@ -734,17 +723,6 @@ func captureStdout(t *testing.T) (out *os.File, restoreStdout func()) {
 	}
 
 	return file, restoreStdout
-}
-
-func createTempDir(t *testing.T, prefix string) string {
-	t.Helper()
-
-	tmpDir, err := ioutil.TempDir("", prefix)
-	require.NoError(t, err, "failed to create temp dir")
-
-	t.Cleanup(func() { _ = os.RemoveAll(tmpDir) })
-
-	return tmpDir
 }
 
 func doLoggingTLSOpt(t *testing.T, config *types.AccessLog, enableTLS bool) {

@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math"
 	"net"
 	"net/http"
@@ -73,12 +73,12 @@ func (r *retry) GetTracingInformation() (string, ext.SpanKindEnum) {
 }
 
 func (r *retry) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	// if we might make multiple attempts, swap the body for an ioutil.NopCloser
+	// if we might make multiple attempts, swap the body for an io.NopCloser
 	// cf https://github.com/traefik/traefik/issues/1008
 	if r.attempts > 1 {
 		body := req.Body
 		defer body.Close()
-		req.Body = ioutil.NopCloser(body)
+		req.Body = io.NopCloser(body)
 	}
 
 	attempts := 1

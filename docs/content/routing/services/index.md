@@ -332,7 +332,7 @@ Below are the available options for the health check mechanism:
 !!! info "Recovering Servers"
 
     Traefik keeps monitoring the health of unhealthy servers.
-    If a server has recovered (returning `2xx` -> `3xx` responses again), it will be added back to the load balacer rotation pool.
+    If a server has recovered (returning `2xx` -> `3xx` responses again), it will be added back to the load balancer rotation pool.
 
 !!! warning "Health check in Kubernetes"
 

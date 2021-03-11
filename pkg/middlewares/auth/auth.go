@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -46,7 +46,7 @@ func loadUsers(fileName string, appendUsers []string) ([]string, error) {
 }
 
 func getLinesFromFile(filename string) ([]string, error) {
-	dat, err := ioutil.ReadFile(filename)
+	dat, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -271,11 +271,11 @@ func Test_createConfiguration(t *testing.T) {
 				newJSON, err := json.MarshalIndent(cfg, "", "  ")
 				require.NoError(t, err)
 
-				err = ioutil.WriteFile(filename, newJSON, 0o644)
+				err = os.WriteFile(filename, newJSON, 0o644)
 				require.NoError(t, err)
 			}
 
-			expectedJSON, err := ioutil.ReadFile(filename)
+			expectedJSON, err := os.ReadFile(filename)
 			require.NoError(t, err)
 
 			actualJSON, err := json.MarshalIndent(cfg, "", "  ")

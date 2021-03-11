@@ -2,7 +2,6 @@ package integration
 
 import (
 	"crypto/tls"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -26,11 +25,11 @@ func (s *TLSClientHeadersSuite) SetUpSuite(c *check.C) {
 }
 
 func (s *TLSClientHeadersSuite) TestTLSClientHeaders(c *check.C) {
-	rootCertContent, err := ioutil.ReadFile(rootCertPath)
+	rootCertContent, err := os.ReadFile(rootCertPath)
 	c.Assert(err, check.IsNil)
-	serverCertContent, err := ioutil.ReadFile(certPemPath)
+	serverCertContent, err := os.ReadFile(certPemPath)
 	c.Assert(err, check.IsNil)
-	ServerKeyContent, err := ioutil.ReadFile(certKeyPath)
+	ServerKeyContent, err := os.ReadFile(certKeyPath)
 	c.Assert(err, check.IsNil)
 
 	file := s.adaptFile(c, "fixtures/tlsclientheaders/simple.toml", struct {

@@ -2,7 +2,7 @@ package acme
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -23,7 +23,7 @@ func TestLocalStore_GetAccount(t *testing.T) {
   }
 }`, email)
 
-	err := ioutil.WriteFile(acmeFile, []byte(filePayload), 0o600)
+	err := os.WriteFile(acmeFile, []byte(filePayload), 0o600)
 	require.NoError(t, err)
 
 	testCases := []struct {
@@ -68,7 +68,7 @@ func TestLocalStore_SaveAccount(t *testing.T) {
 
 	time.Sleep(100 * time.Millisecond)
 
-	file, err := ioutil.ReadFile(acmeFile)
+	file, err := os.ReadFile(acmeFile)
 	require.NoError(t, err)
 
 	expected := `{

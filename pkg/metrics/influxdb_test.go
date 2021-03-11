@@ -3,7 +3,7 @@ package metrics
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
@@ -79,7 +79,7 @@ func TestInfluxDB(t *testing.T) {
 func TestInfluxDBHTTP(t *testing.T) {
 	c := make(chan *string)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			http.Error(w, "can't read body "+err.Error(), http.StatusBadRequest)
 			return

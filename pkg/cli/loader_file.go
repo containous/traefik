@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -56,7 +55,7 @@ func (f *FileLoader) Load(args []string, cmd *cli.Command) (bool, error) {
 	logger := log.WithoutContext()
 	logger.Printf("Configuration loaded from file: %s", configFile)
 
-	content, _ := ioutil.ReadFile(configFile)
+	content, _ := os.ReadFile(configFile)
 	logger.Debug(string(content))
 
 	return true, nil
@@ -79,7 +78,7 @@ func loadConfigFiles(configFile string, element interface{}) (string, error) {
 		return "", nil
 	}
 
-	if err = file.Decode(filePath, element); err != nil {
+	if err := file.Decode(filePath, element); err != nil {
 		return "", err
 	}
 	return filePath, nil

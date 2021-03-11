@@ -3,7 +3,6 @@ package integration
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -138,11 +137,11 @@ func (s *EtcdSuite) TestSimpleConfiguration(c *check.C) {
 	expectedJSON := filepath.FromSlash("testdata/rawdata-etcd.json")
 
 	if *updateExpected {
-		err = ioutil.WriteFile(expectedJSON, got, 0o666)
+		err = os.WriteFile(expectedJSON, got, 0o666)
 		c.Assert(err, checker.IsNil)
 	}
 
-	expected, err := ioutil.ReadFile(expectedJSON)
+	expected, err := os.ReadFile(expectedJSON)
 	c.Assert(err, checker.IsNil)
 
 	if !bytes.Equal(expected, got) {

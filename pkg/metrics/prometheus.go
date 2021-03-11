@@ -402,7 +402,7 @@ func newCollector(metricName string, labels stdprometheus.Labels, c stdprometheu
 
 // collector wraps a Collector object from the Prometheus client library.
 // It adds information on how many generations this metric should be present
-// in the /metrics output, relatived to the time it was last tracked.
+// in the /metrics output, relative to the time it was last tracked.
 type collector struct {
 	id        string
 	labels    stdprometheus.Labels

@@ -30,38 +30,64 @@
     lines = 230 # default 60
     statements = 120 # default 40
 
+  [linters-settings.forbidigo]
+    forbid = [
+      '^print(ln)?$',
+      '^spew\.Print(f|ln)?$',
+      '^spew\.Dump$',
+    ]
+
+  [linters-settings.depguard]
+    list-type = "blacklist"
+    include-go-root = false
+    packages = ["github.com/pkg/errors"]
+
+  [linters-settings.godox]
+    keywords = ["FIXME"]
+
+  [linters-settings.importas]
+    corev1 = "k8s.io/api/core/v1"
+    networkingv1beta1 = "k8s.io/api/networking/v1beta1"
+    extensionsv1beta1 = "k8s.io/api/extensions/v1beta1"
+    metav1 = "k8s.io/apimachinery/pkg/apis/meta/v1"
+    kubeerror = "k8s.io/apimachinery/pkg/api/errors"
+
 [linters]
   enable-all = true
   disable = [
+    "scopelint", # Deprecated
+    "interfacer", # Deprecated
+    "maligned", # Deprecated
+    "sqlclosecheck", # Not relevant (SQL)
+    "rowserrcheck", # Not relevant (SQL)
+    "lll", # Not relevant
     "gocyclo", # FIXME must be fixed
-    "gosec",
-    "dupl",
-    "maligned",
-    "lll",
-    "unparam",
-    "prealloc",
-    "scopelint",
+    "cyclop", # Duplicate of gocyclo
+    "gocognit", # Too strict
+    "nestif", # Too many false-positive.
+    "prealloc", # Too many false-positive.
+    "makezero", # Not relevant
+    "ifshort", # Not relevant
+    "dupl", # Too strict
+    "gosec", # Too strict
     "gochecknoinits",
     "gochecknoglobals",
-    "godox",
-    "gocognit",
-    "bodyclose", # Too many false-positive and panics.
     "wsl", # Too strict
+    "nlreturn", # Not relevant
     "gomnd", # Too strict
     "stylecheck", # skip because report issues related to some generated files.
     "testpackage", # Too strict
-    "goerr113", # Too strict
-    "nestif", # Too many false-positive.
-    "noctx", # Too strict
-    "exhaustive", # Too strict
-    "nlreturn", # Not relevant
-    "wrapcheck", # Too strict
     "tparallel", # Not relevant
     "paralleltest", # Not relevant
+    "exhaustive", # Not relevant
     "exhaustivestruct", # Not relevant
-    "makezero", # not relevant
-    "forbidigo", # not relevant
-    "ifshort", # not relevant
+    "goerr113", # Too strict
+    "wrapcheck", # Too strict
+    "noctx", # Too strict
+    "bodyclose", # Too many false-positive and panics.
+    "unparam", # Too strict
+    "godox", # Too strict
+    "forcetypeassert", # Too strict
   ]
 
 [issues]
@@ -69,9 +95,9 @@
   max-per-linter = 0
   max-same-issues = 0
   exclude = [
-    "SA1019: http.CloseNotifier is deprecated: the CloseNotifier interface predates Go's context package. New code should use Request.Context instead.", # FIXME must be fixed
     "Error return value of .((os\\.)?std(out|err)\\..*|.*Close|.*Flush|os\\.Remove(All)?|.*printf?|os\\.(Un)?Setenv). is not checked",
     "should have a package comment, unless it's in another file for this package",
+    "SA1019: http.CloseNotifier has been deprecated",  # FIXME must be fixed
   ]
  [[issues.exclude-rules]]
     path = "(.+)_test.go"
@@ -89,17 +115,11 @@
     path = "pkg/h2c/h2c.go"
     text = "Error return value of `rw.Write` is not checked"
  [[issues.exclude-rules]]
-    path = "pkg/middlewares/recovery/recovery.go"
-    text = "`logger` can be `github.com/stretchr/testify/assert.TestingT`"
- [[issues.exclude-rules]]
     path = "pkg/provider/docker/builder_test.go"
     text = "(U1000: func )?`(.+)` is unused"
  [[issues.exclude-rules]]
     path = "pkg/provider/kubernetes/builder_(endpoint|service)_test.go"
     text = "(U1000: func )?`(.+)` is unused"
- [[issues.exclude-rules]]
-    path = "pkg/config/parser/.+_test.go"
-    text = "U1000: field `(foo|fuu)` is unused"
  [[issues.exclude-rules]]
     path = "pkg/server/service/bufferpool.go"
     text = "SA6002: argument should be pointer-like to avoid allocations"
@@ -109,9 +129,6 @@
  [[issues.exclude-rules]]
     path = "pkg/server/middleware/middlewares.go"
     text = "Function 'buildConstructor' has too many statements"
- [[issues.exclude-rules]] # FIXME must be fixed
-    path = "cmd/context.go"
-    text = "S1000: should use a simple channel send/receive instead of `select` with a single case"
  [[issues.exclude-rules]]
     path = "pkg/tracing/haystack/logger.go"
     linters = ["goprintffuncname"]

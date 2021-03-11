@@ -63,27 +63,24 @@ func (c *ChallengeTLSALPN) Present(domain, _, keyAuth string) error {
 
 	timer := time.NewTimer(c.Timeout)
 
-	var errC error
 	select {
 	case t := <-timer.C:
 		timer.Stop()
-		close(c.chans[string(certPEMBlock)])
+
+		c.muChans.Lock()
+		c.cleanChan(string(certPEMBlock))
+		c.muChans.Unlock()
 
 		err = c.CleanUp(domain, "", keyAuth)
 		if err != nil {
 			logger.Errorf("Failed to clean up TLS challenge: %v", err)
 		}
 
-		errC = fmt.Errorf("timeout %s", t)
+		return fmt.Errorf("timeout %s", t)
 	case <-ch:
 		// noop
+		return nil
 	}
-
-	c.muChans.Lock()
-	delete(c.chans, string(certPEMBlock))
-	c.muChans.Unlock()
-
-	return errC
 }
 
 // CleanUp cleans the challenges when certificate is obtained.
@@ -115,16 +112,23 @@ func (c *ChallengeTLSALPN) Provide(configurationChan chan<- dynamic.Message, _ *
 
 // ListenConfiguration sets a new Configuration into the configurationChan.
 func (c *ChallengeTLSALPN) ListenConfiguration(conf dynamic.Configuration) {
+	c.muChans.Lock()
+
 	for _, certificate := range conf.TLS.Certificates {
 		if !containsACMETLS1(certificate.Stores) {
 			continue
 		}
 
-		c.muChans.Lock()
-		if _, ok := c.chans[certificate.CertFile.String()]; ok {
-			close(c.chans[certificate.CertFile.String()])
-		}
-		c.muChans.Unlock()
+		c.cleanChan(certificate.CertFile.String())
+	}
+
+	c.muChans.Unlock()
+}
+
+func (c *ChallengeTLSALPN) cleanChan(key string) {
+	if _, ok := c.chans[key]; ok {
+		close(c.chans[key])
+		delete(c.chans, key)
 	}
 }
 

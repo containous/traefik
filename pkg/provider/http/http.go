@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"hash/fnv"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -139,7 +139,7 @@ func (p *Provider) fetchConfigurationData() ([]byte, error) {
 		return nil, fmt.Errorf("received non-ok response code: %d", res.StatusCode)
 	}
 
-	return ioutil.ReadAll(res.Body)
+	return io.ReadAll(res.Body)
 }
 
 // decodeConfiguration decodes and returns the dynamic configuration from the given data.

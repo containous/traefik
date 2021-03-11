@@ -203,10 +203,10 @@ func (s *RestSuite) TestSimpleConfiguration(c *check.C) {
 	}
 
 	for _, test := range testCase {
-		json, err := json.Marshal(test.config)
+		data, err := json.Marshal(test.config)
 		c.Assert(err, checker.IsNil)
 
-		request, err := http.NewRequest(http.MethodPut, "http://127.0.0.1:8000/secure/api/providers/rest", bytes.NewReader(json))
+		request, err := http.NewRequest(http.MethodPut, "http://127.0.0.1:8000/secure/api/providers/rest", bytes.NewReader(data))
 		c.Assert(err, checker.IsNil)
 
 		response, err := http.DefaultClient.Do(request)

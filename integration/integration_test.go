@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"os/exec"
@@ -143,7 +142,7 @@ func (s *BaseSuite) traefikCmd(args ...string) (*exec.Cmd, func(*check.C)) {
 func (s *BaseSuite) displayLogK3S(c *check.C) {
 	filePath := "./fixtures/k8s/config.skip/k3s.log"
 	if _, err := os.Stat(filePath); err == nil {
-		content, errR := ioutil.ReadFile(filePath)
+		content, errR := os.ReadFile(filePath)
 		if errR != nil {
 			log.WithoutContext().Error(errR)
 		}
@@ -178,7 +177,7 @@ func (s *BaseSuite) adaptFile(c *check.C, path string, tempObjects interface{}) 
 	c.Assert(err, checker.IsNil)
 
 	folder, prefix := filepath.Split(path)
-	tmpFile, err := ioutil.TempFile(folder, strings.TrimSuffix(prefix, filepath.Ext(prefix))+"_*"+filepath.Ext(prefix))
+	tmpFile, err := os.CreateTemp(folder, strings.TrimSuffix(prefix, filepath.Ext(prefix))+"_*"+filepath.Ext(prefix))
 	c.Assert(err, checker.IsNil)
 	defer tmpFile.Close()
 

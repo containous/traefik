@@ -2,7 +2,7 @@ package ingress
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/hashicorp/go-version"
 	"github.com/traefik/traefik/v2/pkg/provider/kubernetes/k8s"
@@ -36,7 +36,7 @@ func newClientMock(serverVersion string, paths ...string) clientMock {
 	c.serverVersion = version.Must(version.NewVersion(serverVersion))
 
 	for _, path := range paths {
-		yamlContent, err := ioutil.ReadFile(path)
+		yamlContent, err := os.ReadFile(path)
 		if err != nil {
 			panic(err)
 		}

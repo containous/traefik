@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -197,7 +196,7 @@ func flattenCertificates(ctx context.Context, tlsConfig *dynamic.TLSConfiguratio
 }
 
 func (p *Provider) loadFileConfigFromDirectory(ctx context.Context, directory string, configuration *dynamic.Configuration) (*dynamic.Configuration, error) {
-	fileList, err := ioutil.ReadDir(directory)
+	fileList, err := os.ReadDir(directory)
 	if err != nil {
 		return configuration, fmt.Errorf("unable to read directory %s: %w", directory, err)
 	}
@@ -436,7 +435,7 @@ func (p *Provider) decodeConfiguration(filePath, content string) (*dynamic.Confi
 
 func readFile(filename string) (string, error) {
 	if len(filename) > 0 {
-		buf, err := ioutil.ReadFile(filename)
+		buf, err := os.ReadFile(filename)
 		if err != nil {
 			return "", err
 		}

@@ -2,7 +2,7 @@ package compress
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -205,7 +205,7 @@ func TestIntegrationShouldNotCompress(t *testing.T) {
 			assert.Equal(t, gzipValue, resp.Header.Get(contentEncodingHeader))
 			assert.Equal(t, acceptEncodingHeader, resp.Header.Get(varyHeader))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			require.NoError(t, err)
 			assert.EqualValues(t, fakeCompressedBody, body)
 		})
@@ -287,7 +287,7 @@ func TestIntegrationShouldCompress(t *testing.T) {
 			assert.Equal(t, gzipValue, resp.Header.Get(contentEncodingHeader))
 			assert.Equal(t, acceptEncodingHeader, resp.Header.Get(varyHeader))
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			require.NoError(t, err)
 			if assert.ObjectsAreEqualValues(body, fakeBody) {
 				assert.Fail(t, "expected a compressed body", "got %v", body)

@@ -3,7 +3,6 @@ package crd
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -147,7 +146,7 @@ func newExternalClusterClient(endpoint, token, caFilePath string) (*clientWrappe
 	}
 
 	if caFilePath != "" {
-		caData, err := ioutil.ReadFile(caFilePath)
+		caData, err := os.ReadFile(caFilePath)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read CA file %s: %w", caFilePath, err)
 		}

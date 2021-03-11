@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"sync"
@@ -88,7 +87,7 @@ func (m *Mirroring) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if errors.Is(err, errBodyTooLarge) {
-		req.Body = ioutil.NopCloser(io.MultiReader(bytes.NewReader(bytesRead), req.Body))
+		req.Body = io.NopCloser(io.MultiReader(bytes.NewReader(bytesRead), req.Body))
 		m.handler.ServeHTTP(rw, req)
 		logger.Debugf("no mirroring, request body larger than allowed size")
 		return
@@ -147,8 +146,8 @@ func (b blackHoleResponseWriter) Header() http.Header {
 	return http.Header{}
 }
 
-func (b blackHoleResponseWriter) Write(bytes []byte) (int, error) {
-	return len(bytes), nil
+func (b blackHoleResponseWriter) Write(data []byte) (int, error) {
+	return len(data), nil
 }
 
 func (b blackHoleResponseWriter) WriteHeader(statusCode int) {}
@@ -182,7 +181,7 @@ func newReusableRequest(req *http.Request, maxBodySize int64) (*reusableRequest,
 
 	// unbounded body size
 	if maxBodySize < 0 {
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -217,7 +216,7 @@ func (rr reusableRequest) clone(ctx context.Context) *http.Request {
 	req := rr.req.Clone(ctx)
 
 	if rr.body != nil {
-		req.Body = ioutil.NopCloser(bytes.NewReader(rr.body))
+		req.Body = io.NopCloser(bytes.NewReader(rr.body))
 	}
 
 	return req

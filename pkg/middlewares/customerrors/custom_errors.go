@@ -92,39 +92,42 @@ func (c *customErrors) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	// check the recorder code against the configured http status code ranges
 	code := catcher.getCode()
 	for _, block := range c.httpCodeRanges {
-		if code >= block[0] && code <= block[1] {
-			logger.Debugf("Caught HTTP Status Code %d, returning error page", code)
+		if code < block[0] || code > block[1] {
+			continue
+		}
 
-			var query string
-			if len(c.backendQuery) > 0 {
-				query = "/" + strings.TrimPrefix(c.backendQuery, "/")
-				query = strings.ReplaceAll(query, "{status}", strconv.Itoa(code))
-			}
+		logger.Debugf("Caught HTTP Status Code %d, returning error page", code)
 
-			pageReq, err := newRequest(backendURL + query)
-			if err != nil {
-				logger.Error(err)
-				rw.WriteHeader(code)
-				_, err = fmt.Fprint(rw, http.StatusText(code))
-				if err != nil {
-					http.Error(rw, err.Error(), http.StatusInternalServerError)
-				}
-				return
-			}
+		var query string
+		if len(c.backendQuery) > 0 {
+			query = "/" + strings.TrimPrefix(c.backendQuery, "/")
+			query = strings.ReplaceAll(query, "{status}", strconv.Itoa(code))
+		}
 
-			recorderErrorPage := newResponseRecorder(ctx, rw)
-			utils.CopyHeaders(pageReq.Header, req.Header)
-
-			c.backendHandler.ServeHTTP(recorderErrorPage, pageReq.WithContext(req.Context()))
-
-			utils.CopyHeaders(rw.Header(), recorderErrorPage.Header())
+		pageReq, err := newRequest(backendURL + query)
+		if err != nil {
+			logger.Error(err)
 			rw.WriteHeader(code)
-
-			if _, err = rw.Write(recorderErrorPage.GetBody().Bytes()); err != nil {
-				logger.Error(err)
+			_, err = fmt.Fprint(rw, http.StatusText(code))
+			if err != nil {
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
 			}
 			return
 		}
+
+		recorderErrorPage := newResponseRecorder(ctx, rw)
+		utils.CopyHeaders(pageReq.Header, req.Header)
+
+		c.backendHandler.ServeHTTP(recorderErrorPage, pageReq.WithContext(req.Context()))
+
+		utils.CopyHeaders(rw.Header(), recorderErrorPage.Header())
+		rw.WriteHeader(code)
+
+		if _, err = rw.Write(recorderErrorPage.GetBody().Bytes()); err != nil {
+			logger.Error(err)
+		}
+
+		return
 	}
 }
 

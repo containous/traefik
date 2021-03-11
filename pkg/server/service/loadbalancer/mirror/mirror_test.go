@@ -3,7 +3,7 @@ package mirror
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"sync/atomic"
@@ -148,7 +148,7 @@ func TestMirroringWithBody(t *testing.T) {
 
 	handler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		assert.NotNil(t, r.Body)
-		bb, err := ioutil.ReadAll(r.Body)
+		bb, err := io.ReadAll(r.Body)
 		assert.NoError(t, err)
 		assert.Equal(t, body, bb)
 		rw.WriteHeader(http.StatusOK)
@@ -159,7 +159,7 @@ func TestMirroringWithBody(t *testing.T) {
 	for i := 0; i < numMirrors; i++ {
 		err := mirror.AddMirror(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 			assert.NotNil(t, r.Body)
-			bb, err := ioutil.ReadAll(r.Body)
+			bb, err := io.ReadAll(r.Body)
 			assert.NoError(t, err)
 			assert.Equal(t, body, bb)
 			atomic.AddInt32(&countMirror, 1)
@@ -213,13 +213,13 @@ func TestCloneRequest(t *testing.T) {
 
 		// first call
 		cloned := rr.clone(ctx)
-		body, err := ioutil.ReadAll(cloned.Body)
+		body, err := io.ReadAll(cloned.Body)
 		assert.NoError(t, err)
 		assert.Equal(t, bb, body)
 
 		// second call
 		cloned = rr.clone(ctx)
-		body, err = ioutil.ReadAll(cloned.Body)
+		body, err = io.ReadAll(cloned.Body)
 		assert.NoError(t, err)
 		assert.Equal(t, bb, body)
 	})

@@ -120,7 +120,7 @@ func Do(timeout time.Duration, operation DoCondition) error {
 			fmt.Print("*")
 			if err = operation(); err == nil {
 				fmt.Println("+")
-				return err
+				return nil
 			}
 		}
 	}

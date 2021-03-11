@@ -132,10 +132,11 @@ you'd add the tag `traefik.http.services.{name-of-your-choice}.loadbalancer.pass
 
 ??? info "`traefik.http.services.<service_name>.loadbalancer.serverstransport`"
     
+    Allows to reference a ServersTransport resource that is defined either with the File provider or the Kubernetes CRD one.
     See [serverstransport](../services/index.md#serverstransport) for more information.
     
     ```yaml
-    traefik.http.services.<service_name>.loadbalancer.serverstransport=foobar
+    traefik.http.services.<service_name>.loadbalancer.serverstransport=foobar@file
     ```
 
 ??? info "`traefik.http.services.<service_name>.loadbalancer.passhostheader`"

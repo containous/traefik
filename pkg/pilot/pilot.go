@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"hash/fnv"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -153,7 +153,7 @@ func (c *client) createUUID() (string, error) {
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", fmt.Errorf("failed read response body: %w", err)
 	}
@@ -236,7 +236,7 @@ func (c *client) sendDataRetryable(ctx context.Context, req *http.Request) error
 
 			defer func() { _ = resp.Body.Close() }()
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				return fmt.Errorf("failed to read response body: %w", err)
 			}

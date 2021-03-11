@@ -30,7 +30,7 @@ func TestScalableHistogram(t *testing.T) {
 	measuredDuration, err := time.ParseDuration(extractedDurationString[0] + "ms")
 	assert.NoError(t, err)
 
-	assert.InDelta(t, 500*time.Millisecond, measuredDuration, float64(1*time.Millisecond))
+	assert.InDelta(t, 500*time.Millisecond, measuredDuration, float64(15*time.Millisecond))
 }
 
 func TestNewMultiRegistry(t *testing.T) {

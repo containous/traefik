@@ -2,7 +2,6 @@ package anonymize
 
 import (
 	"flag"
-	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -464,14 +463,14 @@ func TestDo_dynamicConfiguration(t *testing.T) {
 		},
 	}
 
-	expectedConfiguration, err := ioutil.ReadFile("./testdata/anonymized-dynamic-config.json")
+	expectedConfiguration, err := os.ReadFile("./testdata/anonymized-dynamic-config.json")
 	require.NoError(t, err)
 
 	cleanJSON, err := Do(config, true)
 	require.NoError(t, err)
 
 	if *updateExpected {
-		require.NoError(t, ioutil.WriteFile("testdata/anonymized-dynamic-config.json", []byte(cleanJSON), 0666))
+		require.NoError(t, os.WriteFile("testdata/anonymized-dynamic-config.json", []byte(cleanJSON), 0666))
 	}
 
 	expected := strings.TrimSuffix(string(expectedConfiguration), "\n")
@@ -967,14 +966,14 @@ func TestDo_staticConfiguration(t *testing.T) {
 		},
 	}
 
-	expectedConfiguration, err := ioutil.ReadFile("./testdata/anonymized-static-config.json")
+	expectedConfiguration, err := os.ReadFile("./testdata/anonymized-static-config.json")
 	require.NoError(t, err)
 
 	cleanJSON, err := Do(config, true)
 	require.NoError(t, err)
 
 	if *updateExpected {
-		require.NoError(t, ioutil.WriteFile("testdata/anonymized-static-config.json", []byte(cleanJSON), 0666))
+		require.NoError(t, os.WriteFile("testdata/anonymized-static-config.json", []byte(cleanJSON), 0666))
 	}
 
 	expected := strings.TrimSuffix(string(expectedConfiguration), "\n")

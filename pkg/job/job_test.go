@@ -24,9 +24,21 @@ func TestJobBackOff(t *testing.T) {
 	exp.MinJobInterval = testMinJobInterval
 	exp.Reset()
 
-	expectedResults := []time.Duration{500, 500, 500, 1000, 2000, 4000, 5000, 5000, 500, 1000, 2000, 4000, 5000, 5000}
-	for i, d := range expectedResults {
-		expectedResults[i] = d * time.Millisecond
+	expectedResults := []time.Duration{
+		500 * time.Millisecond,
+		500 * time.Millisecond,
+		500 * time.Millisecond,
+		1 * time.Second,
+		2 * time.Second,
+		4 * time.Second,
+		5 * time.Second,
+		5 * time.Second,
+		500 * time.Millisecond,
+		1 * time.Second,
+		2 * time.Second,
+		4 * time.Second,
+		5 * time.Second,
+		5 * time.Second,
 	}
 
 	for i, expected := range expectedResults {
