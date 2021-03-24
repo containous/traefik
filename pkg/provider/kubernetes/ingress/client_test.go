@@ -8,9 +8,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
+	"k8s.io/api/networking/v1beta1"
 	kubeerror "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/version"
+	fakediscovery "k8s.io/client-go/discovery/fake"
 	kubefake "k8s.io/client-go/kubernetes/fake"
 )
 
@@ -149,6 +153,11 @@ func TestClientIgnoresHelmOwnedSecrets(t *testing.T) {
 
 	kubeClient := kubefake.NewSimpleClientset(helmSecret, secret)
 
+	discovery, _ := kubeClient.Discovery().(*fakediscovery.FakeDiscovery)
+	discovery.FakedServerVersion = &version.Info{
+		GitVersion: "v1.19",
+	}
+
 	client := newClientImpl(kubeClient)
 
 	stopCh := make(chan struct{})
@@ -179,4 +188,73 @@ func TestClientIgnoresHelmOwnedSecrets(t *testing.T) {
 	_, found, err = client.GetSecret("default", "helm-secret")
 	require.NoError(t, err)
 	assert.False(t, found)
+}
+
+func TestClientUsesCorrectServerVersion(t *testing.T) {
+	ingressV1Beta := &v1beta1.Ingress{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "default",
+			Name:      "ingress-v1beta",
+		},
+	}
+
+	ingressV1 := &networkingv1.Ingress{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: "default",
+			Name:      "ingress-v1",
+		},
+	}
+
+	kubeClient := kubefake.NewSimpleClientset(ingressV1Beta, ingressV1)
+
+	discovery, _ := kubeClient.Discovery().(*fakediscovery.FakeDiscovery)
+	discovery.FakedServerVersion = &version.Info{
+		GitVersion: "v1.18.12+foobar",
+	}
+
+	stopCh := make(chan struct{})
+
+	client := newClientImpl(kubeClient)
+
+	eventCh, err := client.WatchAll(nil, stopCh)
+	require.NoError(t, err)
+
+	select {
+	case event := <-eventCh:
+		ingress, ok := event.(*v1beta1.Ingress)
+		require.True(t, ok)
+
+		assert.Equal(t, "ingress-v1beta", ingress.Name)
+	case <-time.After(50 * time.Millisecond):
+		assert.Fail(t, "expected to receive event for ingress")
+	}
+
+	select {
+	case <-eventCh:
+		assert.Fail(t, "received more than one event")
+	case <-time.After(50 * time.Millisecond):
+	}
+
+	discovery.FakedServerVersion = &version.Info{
+		GitVersion: "v1.19",
+	}
+
+	eventCh, err = client.WatchAll(nil, stopCh)
+	require.NoError(t, err)
+
+	select {
+	case event := <-eventCh:
+		ingress, ok := event.(*networkingv1.Ingress)
+		require.True(t, ok)
+
+		assert.Equal(t, "ingress-v1", ingress.Name)
+	case <-time.After(50 * time.Millisecond):
+		assert.Fail(t, "expected to receive event for ingress")
+	}
+
+	select {
+	case <-eventCh:
+		assert.Fail(t, "received more than one event")
+	case <-time.After(50 * time.Millisecond):
+	}
 }

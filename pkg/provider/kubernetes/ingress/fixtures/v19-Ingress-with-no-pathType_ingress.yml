@@ -1,0 +1,17 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: ""
+  namespace: testing
+  annotations:
+    traefik.ingress.kubernetes.io/router.pathmatcher: Path
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /bar
+        backend:
+          service:
+            name: service1
+            port:
+              number: 80

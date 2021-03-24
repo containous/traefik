@@ -1,6 +1,8 @@
 package types
 
 import (
+	"net"
+	"os"
 	"time"
 
 	"github.com/traefik/paerser/types"
@@ -41,7 +43,16 @@ type Datadog struct {
 
 // SetDefaults sets the default values.
 func (d *Datadog) SetDefaults() {
-	d.Address = "localhost:8125"
+	host, ok := os.LookupEnv("DD_AGENT_HOST")
+	if !ok {
+		host = "localhost"
+	}
+
+	port, ok := os.LookupEnv("DD_DOGSTATSD_PORT")
+	if !ok {
+		port = "8125"
+	}
+	d.Address = net.JoinHostPort(host, port)
 	d.PushInterval = types.Duration(10 * time.Second)
 	d.AddEntryPointsLabels = true
 	d.AddServicesLabels = true

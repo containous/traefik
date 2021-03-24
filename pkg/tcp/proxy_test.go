@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"sync"
 	"testing"
 	"time"
 
@@ -175,19 +174,18 @@ func TestProxyProtocol(t *testing.T) {
 
 func TestLookupAddress(t *testing.T) {
 	testCases := []struct {
-		desc       string
-		address    string
-		expectSame assert.ComparisonAssertionFunc
+		desc          string
+		address       string
+		expectRefresh bool
 	}{
 		{
-			desc:       "IP doesn't need refresh",
-			address:    "8.8.4.4:53",
-			expectSame: assert.Same,
+			desc:    "IP doesn't need refresh",
+			address: "8.8.4.4:53",
 		},
 		{
-			desc:       "Hostname needs refresh",
-			address:    "dns.google:53",
-			expectSame: assert.NotSame,
+			desc:          "Hostname needs refresh",
+			address:       "dns.google:53",
+			expectRefresh: true,
 		},
 	}
 
@@ -201,44 +199,13 @@ func TestLookupAddress(t *testing.T) {
 
 			require.NotNil(t, proxy.target)
 
-			proxyListener, err := net.Listen("tcp", ":0")
+			conn, err := proxy.dialBackend()
 			require.NoError(t, err)
 
-			var wg sync.WaitGroup
-			go func(wg *sync.WaitGroup) {
-				for {
-					conn, err := proxyListener.Accept()
-					require.NoError(t, err)
-
-					proxy.ServeTCP(conn.(*net.TCPConn))
-
-					wg.Done()
-				}
-			}(&wg)
-
-			var lastTarget *net.TCPAddr
-
-			for i := 0; i < 3; i++ {
-				wg.Add(1)
-
-				conn, err := net.Dial("tcp", proxyListener.Addr().String())
-				require.NoError(t, err)
-
-				_, err = conn.Write([]byte("ping\n"))
-				require.NoError(t, err)
-
-				err = conn.Close()
-				require.NoError(t, err)
-
-				wg.Wait()
-
-				assert.NotNil(t, proxy.target)
-
-				if lastTarget != nil {
-					test.expectSame(t, lastTarget, proxy.target)
-				}
-
-				lastTarget = proxy.target
+			if test.expectRefresh {
+				assert.NotEqual(t, test.address, conn.RemoteAddr().String())
+			} else {
+				assert.Equal(t, test.address, conn.RemoteAddr().String())
 			}
 		})
 	}
