@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.0
+    controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
   name: httproutes.networking.x-k8s.io
 spec:
@@ -34,7 +34,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: HTTPRouteSpec defines the desired state of HTTPRoute
+            description: Spec defines the desired state of HTTPRoute.
             properties:
               gateways:
                 default:
@@ -71,7 +71,7 @@ spec:
                     type: array
                 type: object
               hostnames:
-                description: "Hostnames defines a set of hostname that should match against the HTTP Host header to select a HTTPRoute to process the request. Hostname is the fully qualified domain name of a network host, as defined by RFC 3986. Note the following deviations from the \"host\" part of the URI as defined in the RFC: \n 1. IPs are not allowed. 2. The `:` delimiter is not respected because ports are not allowed. \n Incoming requests are matched against the hostnames before the HTTPRoute rules. If no hostname is specified, traffic is routed based on the HTTPRouteRules. \n Hostname can be \"precise\" which is a domain name without the terminating dot of a network host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain name prefixed with a single wildcard label (e.g. \"*.example.com\"). The wildcard character '*' must appear by itself as the first DNS label and matches only a single label. You cannot have a wildcard label by itself (e.g. Host == \"*\"). Requests will be matched against the Host field in the following order: 1. If Host is precise, the request matches this rule if    the http host header is equal to Host. 2. If Host is a wildcard, then the request matches this rule if    the http host header is to equal to the suffix    (removing the first label) of the wildcard rule. \n Support: Core"
+                description: "Hostnames defines a set of hostname that should match against the HTTP Host header to select a HTTPRoute to process the request. Hostname is the fully qualified domain name of a network host, as defined by RFC 3986. Note the following deviations from the \"host\" part of the URI as defined in the RFC: \n 1. IPs are not allowed. 2. The `:` delimiter is not respected because ports are not allowed. \n Incoming requests are matched against the hostnames before the HTTPRoute rules. If no hostname is specified, traffic is routed based on the HTTPRouteRules. \n Hostname can be \"precise\" which is a domain name without the terminating dot of a network host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain name prefixed with a single wildcard label (e.g. `*.example.com`). The wildcard character `*` must appear by itself as the first DNS label and matches only a single label. You cannot have a wildcard label by itself (e.g. Host == `*`). Requests will be matched against the Host field in the following order: \n 1. If Host is precise, the request matches this rule if    the HTTP Host header is equal to Host. 2. If Host is a wildcard, then the request matches this rule if    the HTTP Host header is to equal to the suffix    (removing the first label) of the wildcard rule. \n Support: Core"
                 items:
                   description: Hostname is used to specify a hostname that should be matched.
                   maxLength: 253
@@ -80,12 +80,17 @@ spec:
                 maxItems: 16
                 type: array
               rules:
+                default:
+                - matches:
+                  - path:
+                      type: Prefix
+                      value: /
                 description: Rules are a list of HTTP matchers, filters and actions.
                 items:
                   description: HTTPRouteRule defines semantics for matching an HTTP request based on conditions, optionally executing additional processing steps, and forwarding the request to an API object.
                   properties:
                     filters:
-                      description: "Filters define the filters that are applied to requests that match this rule. \n The effects of ordering of multiple behaviors are currently unspecified. This can change in the future based on feedback during the alpha stage. \n Conformance-levels at this level are defined based on the type of filter: - ALL core filters MUST be supported by all implementations. - Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across   implementations. \n Specifying a core filter multiple times has unspecified or custom conformance. \n Support: core"
+                      description: "Filters define the filters that are applied to requests that match this rule. \n The effects of ordering of multiple behaviors are currently unspecified. This can change in the future based on feedback during the alpha stage. \n Conformance-levels at this level are defined based on the type of filter: \n - ALL core filters MUST be supported by all implementations. - Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across   implementations. \n Specifying a core filter multiple times has unspecified or custom conformance. \n Support: Core"
                       items:
                         description: 'HTTPRouteFilter defines additional processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express additional processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter. TODO(hbagdi): re-render CRDs once controller-tools supports union tags: - https://github.com/kubernetes-sigs/controller-tools/pull/298 - https://github.com/kubernetes-sigs/controller-tools/issues/461'
                         properties:
@@ -118,14 +123,19 @@ spec:
                               add:
                                 additionalProperties:
                                   type: string
-                                description: "Add adds the given header (name, value) to the request before the action. \n Input:   GET /foo HTTP/1.1 \n Config:   add: {\"my-header\": \"foo\"} \n Output:   GET /foo HTTP/1.1   my-header: foo \n Support: Extended"
+                                description: "Add adds the given header (name, value) to the request before the action. It appends to any existing values associated with the header name. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   add: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: foo   my-header: bar \n Support: Extended"
                                 type: object
                               remove:
-                                description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   My-Header1: ABC   My-Header2: DEF   My-Header2: GHI \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   My-Header2: DEF \n Support: Extended"
+                                description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   my-header1: foo   my-header2: bar   my-header3: baz \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   my-header2: bar \n Support: Extended"
                                 items:
                                   type: string
                                 maxItems: 16
                                 type: array
+                              set:
+                                additionalProperties:
+                                  type: string
+                                description: "Set overwrites the request with the given header (name, value) before the action. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   set: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: bar \n Support: Extended"
+                                type: object
                             type: object
                           requestMirror:
                             description: "RequestMirror defines a schema for a filter that mirrors requests. \n Support: Extended"
@@ -154,7 +164,7 @@ spec:
                                 - name
                                 type: object
                               port:
-                                description: Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field.
+                                description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n If unspecified, the destination port in the request is used when forwarding to a backendRef or serviceName."
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -163,8 +173,6 @@ spec:
                                 description: "ServiceName refers to the name of the Service to mirror matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
                                 maxLength: 253
                                 type: string
-                            required:
-                            - port
                             type: object
                           type:
                             description: "Type identifies the type of filter to apply. As with other API fields, types are classified into three conformance levels: \n - Core: Filter types and their corresponding configuration defined by   \"Support: Core\" in this package, e.g. \"RequestHeaderModifier\". All   implementations must support core filters. \n - Extended: Filter types and their corresponding configuration defined by   \"Support: Extended\" in this package, e.g. \"RequestMirror\". Implementers   are encouraged to support extended filters. \n - Custom: Filters that are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance levels. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ExtensionRef\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
@@ -184,7 +192,7 @@ spec:
                         description: HTTPRouteForwardTo defines how a HTTPRoute should forward a request.
                         properties:
                           backendRef:
-                            description: "BackendRef is a reference to a backend to forward matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
+                            description: "BackendRef is a reference to a backend to forward matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
                             properties:
                               group:
                                 description: Group is the group of the referent.
@@ -240,14 +248,19 @@ spec:
                                     add:
                                       additionalProperties:
                                         type: string
-                                      description: "Add adds the given header (name, value) to the request before the action. \n Input:   GET /foo HTTP/1.1 \n Config:   add: {\"my-header\": \"foo\"} \n Output:   GET /foo HTTP/1.1   my-header: foo \n Support: Extended"
+                                      description: "Add adds the given header (name, value) to the request before the action. It appends to any existing values associated with the header name. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   add: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: foo   my-header: bar \n Support: Extended"
                                       type: object
                                     remove:
-                                      description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   My-Header1: ABC   My-Header2: DEF   My-Header2: GHI \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   My-Header2: DEF \n Support: Extended"
+                                      description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   my-header1: foo   my-header2: bar   my-header3: baz \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   my-header2: bar \n Support: Extended"
                                       items:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                    set:
+                                      additionalProperties:
+                                        type: string
+                                      description: "Set overwrites the request with the given header (name, value) before the action. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   set: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: bar \n Support: Extended"
+                                      type: object
                                   type: object
                                 requestMirror:
                                   description: "RequestMirror defines a schema for a filter that mirrors requests. \n Support: Extended"
@@ -276,7 +289,7 @@ spec:
                                       - name
                                       type: object
                                     port:
-                                      description: Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field.
+                                      description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n If unspecified, the destination port in the request is used when forwarding to a backendRef or serviceName."
                                       format: int32
                                       maximum: 65535
                                       minimum: 1
@@ -285,8 +298,6 @@ spec:
                                       description: "ServiceName refers to the name of the Service to mirror matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
                                       maxLength: 253
                                       type: string
-                                  required:
-                                  - port
                                   type: object
                                 type:
                                   description: "Type identifies the type of filter to apply. As with other API fields, types are classified into three conformance levels: \n - Core: Filter types and their corresponding configuration defined by   \"Support: Core\" in this package, e.g. \"RequestHeaderModifier\". All   implementations must support core filters. \n - Extended: Filter types and their corresponding configuration defined by   \"Support: Extended\" in this package, e.g. \"RequestMirror\". Implementers   are encouraged to support extended filters. \n - Custom: Filters that are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance levels. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ExtensionRef\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
@@ -301,13 +312,13 @@ spec:
                             maxItems: 16
                             type: array
                           port:
-                            description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n Support: Core"
+                            description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. If unspecified, the destination port in the request is used when forwarding to a backendRef or serviceName. \n Support: Core"
                             format: int32
                             maximum: 65535
                             minimum: 1
                             type: integer
                           serviceName:
-                            description: "ServiceName refers to the name of the Service to forward matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n The protocol to use should be specified with the AppProtocol field on Service resources. This field was introduced in Kubernetes 1.18. If using an earlier version of Kubernetes, a `networking.x-k8s.io/app-protocol` annotation on the BackendPolicy resource may be used to define the protocol. If the AppProtocol field is available, this annotation should not be used. The AppProtocol field, when populated, takes precedence over the annotation in the BackendPolicy resource. For custom backends, it is encouraged to add a semantically-equivalent field in the Custom Resource Definition. \n Support: Core"
+                            description: "ServiceName refers to the name of the Service to forward matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n The protocol to use should be specified with the AppProtocol field on Service resources. This field was introduced in Kubernetes 1.18. If using an earlier version of Kubernetes, a `networking.x-k8s.io/app-protocol` annotation on the BackendPolicy resource may be used to define the protocol. If the AppProtocol field is available, this annotation should not be used. The AppProtocol field, when populated, takes precedence over the annotation in the BackendPolicy resource. For custom backends, it is encouraged to add a semantically-equivalent field in the Custom Resource Definition. \n Support: Core"
                             maxLength: 253
                             type: string
                           weight:
@@ -317,22 +328,20 @@ spec:
                             maximum: 1000000
                             minimum: 0
                             type: integer
-                        required:
-                        - port
                         type: object
-                      maxItems: 4
+                      maxItems: 16
                       type: array
                     matches:
                       default:
                       - path:
                           type: Prefix
                           value: /
-                      description: "Matches define conditions used for matching the rule against incoming HTTP requests. Each match is independent, i.e. this rule will be matched if **any** one of the matches is satisfied. \n For example, take the following matches configuration: \n ``` matches: - path:     value: \"/foo\"   headers:     values:       version: \"2\" - path:     value: \"/v2/foo\" ``` \n For a request to match against this rule, a request should satisfy EITHER of the two conditions: \n - path prefixed with `/foo` AND contains the header `version: \"2\"` - path prefix of `/v2/foo` \n See the documentation for HTTPRouteMatch on how to specify multiple match conditions that should be ANDed together. \n If no matches are specified, the default is a prefix path match on \"/\", which has the effect of matching every HTTP request. \n A client request may match multiple HTTP route rules. Matching precedence MUST be determined in order of the following criteria, continuing on ties: * The longest matching hostname. * The longest matching path. * The largest number of header matches * The oldest Route based on creation timestamp. For example, a Route with   a creation timestamp of \"2020-09-08 01:02:03\" is given precedence over   a Route with a creation timestamp of \"2020-09-08 01:02:04\". * The Route appearing first in alphabetical order (namespace/name) for   example, foo/bar is given precedence over foo/baz."
+                      description: "Matches define conditions used for matching the rule against incoming HTTP requests. Each match is independent, i.e. this rule will be matched if **any** one of the matches is satisfied. \n For example, take the following matches configuration: \n ``` matches: - path:     value: \"/foo\"   headers:     values:       version: \"2\" - path:     value: \"/v2/foo\" ``` \n For a request to match against this rule, a request should satisfy EITHER of the two conditions: \n - path prefixed with `/foo` AND contains the header `version: \"2\"` - path prefix of `/v2/foo` \n See the documentation for HTTPRouteMatch on how to specify multiple match conditions that should be ANDed together. \n If no matches are specified, the default is a prefix path match on \"/\", which has the effect of matching every HTTP request. \n A client request may match multiple HTTP route rules. Matching precedence MUST be determined in order of the following criteria, continuing on ties: \n * The longest matching hostname. * The longest matching path. * The largest number of header matches * The oldest Route based on creation timestamp. For example, a Route with   a creation timestamp of \"2020-09-08 01:02:03\" is given precedence over   a Route with a creation timestamp of \"2020-09-08 01:02:04\". * The Route appearing first in alphabetical order (namespace/name) for   example, foo/bar is given precedence over foo/baz."
                       items:
                         description: "HTTPRouteMatch defines the predicate used to match requests to a given action. Multiple match types are ANDed together, i.e. the match will evaluate to true only if all conditions are satisfied. \n For example, the match below will match a HTTP request only if its path starts with `/foo` AND it contains the `version: \"1\"` header: \n ``` match:   path:     value: \"/foo\"   headers:     values:       version: \"1\" ```"
                         properties:
                           extensionRef:
-                            description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior. For example, resource \"myroutematcher\" in group \"networking.acme.io\". If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: custom"
+                            description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior. For example, resource \"myroutematcher\" in group \"networking.acme.io\". If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
                             properties:
                               group:
                                 description: Group is the group of the referent.
@@ -359,7 +368,7 @@ spec:
                             properties:
                               type:
                                 default: Exact
-                                description: "Type specifies how to match against the value of the header. \n Support: core (Exact) Support: custom (RegularExpression, ImplementationSpecific) \n Since RegularExpression PathType has custom conformance, implementations can support POSIX, PCRE or any other dialects of regular expressions. Please read the implementation's documentation to determine the supported dialect. \n HTTP Header name matching MUST be case-insensitive (RFC 2616 - section 4.2)."
+                                description: "Type specifies how to match against the value of the header. \n Support: Core (Exact) \n Support: Custom (RegularExpression, ImplementationSpecific) \n Since RegularExpression PathType has custom conformance, implementations can support POSIX, PCRE or any other dialects of regular expressions. Please read the implementation's documentation to determine the supported dialect. \n HTTP Header name matching MUST be case-insensitive (RFC 2616 - section 4.2)."
                                 enum:
                                 - Exact
                                 - RegularExpression
@@ -381,7 +390,7 @@ spec:
                             properties:
                               type:
                                 default: Prefix
-                                description: "Type specifies how to match against the path Value. \n Support: core (Exact, Prefix) Support: custom (RegularExpression, ImplementationSpecific) \n Since RegularExpression PathType has custom conformance, implementations can support POSIX, PCRE or any other dialects of regular expressions. Please read the implementation's documentation to determine the supported dialect."
+                                description: "Type specifies how to match against the path Value. \n Support: Core (Exact, Prefix) \n Support: Custom (RegularExpression, ImplementationSpecific) \n Since RegularExpression PathType has custom conformance, implementations can support POSIX, PCRE or any other dialects of regular expressions. Please read the implementation's documentation to determine the supported dialect."
                                 enum:
                                 - Exact
                                 - Prefix
@@ -400,13 +409,12 @@ spec:
                       type: array
                   type: object
                 maxItems: 16
-                minItems: 1
                 type: array
               tls:
-                description: "TLS defines the TLS certificate to use for Hostnames defined in this Route. This configuration only takes effect if the AllowRouteOverride field is set to true in the associated Gateway resource. \n Collisions can happen if multiple HTTPRoutes define a TLS certificate for the same hostname. In such a case, conflict resolution guiding principles apply, specificallly, if hostnames are same and two different certificates are specified then the certificate in the oldest resource wins. \n Please note that HTTP Route-selection takes place after the TLS Handshake (ClientHello). Due to this, TLS certificate defined here will take precedence even if the request has the potential to match multiple routes (in case multiple HTTPRoutes share the same hostname). \n Support: Core"
+                description: "TLS defines the TLS certificate to use for Hostnames defined in this Route. This configuration only takes effect if the AllowRouteOverride field is set to true in the associated Gateway resource. \n Collisions can happen if multiple HTTPRoutes define a TLS certificate for the same hostname. In such a case, conflict resolution guiding principles apply, specifically, if hostnames are same and two different certificates are specified then the certificate in the oldest resource wins. \n Please note that HTTP Route-selection takes place after the TLS Handshake (ClientHello). Due to this, TLS certificate defined here will take precedence even if the request has the potential to match multiple routes (in case multiple HTTPRoutes share the same hostname). \n Support: Core"
                 properties:
                   certificateRef:
-                    description: 'CertificateRef refers to a Kubernetes object that contains a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this RouteTLSConfig is associated with. If an entry in this list omits or specifies the empty string for both the group and kind, the resource defaults to "secrets". An implementation may support other resources (for example, resource "mycertificates" in group "networking.acme.io"). Support: Core (Kubernetes Secrets) Support: Implementation-specific (Other resource types)'
+                    description: "CertificateRef refers to a Kubernetes object that contains a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this RouteTLSConfig is associated with. If an entry in this list omits or specifies the empty string for both the group and kind, the resource defaults to \"secrets\". An implementation may support other resources (for example, resource \"mycertificates\" in group \"networking.acme.io\"). \n Support: Core (Kubernetes Secrets) \n Support: Implementation-specific (Other resource types)"
                     properties:
                       group:
                         description: Group is the group of the referent.
@@ -431,19 +439,17 @@ spec:
                 required:
                 - certificateRef
                 type: object
-            required:
-            - rules
             type: object
           status:
-            description: HTTPRouteStatus defines the observed state of HTTPRoute.
+            description: Status defines the current state of HTTPRoute.
             properties:
               gateways:
-                description: "Gateways is a list of the Gateways that are associated with the route, and the status of the route with respect to each of these Gateways. When a Gateway selects this route, the controller that manages the Gateway should add an entry to this list when the controller first sees the route and should update the entry as appropriate when the route is modified. \n A maximum of 100 Gateways will be represented in this list. If this list is full, there may be additional Gateways using this Route that are not included in the list."
+                description: "Gateways is a list of Gateways that are associated with the route, and the status of the route with respect to each Gateway. When a Gateway selects this route, the controller that manages the Gateway must add an entry to this list when the controller first sees the route and should update the entry as appropriate when the route is modified. \n A maximum of 100 Gateways will be represented in this list. If this list is full, there may be additional Gateways using this Route that are not included in the list. An empty list means the route has not been admitted by any Gateway."
                 items:
                   description: RouteGatewayStatus describes the status of a route with respect to an associated Gateway.
                   properties:
                     conditions:
-                      description: Conditions describes the status of the route with respect to the Gateway.  For example, the "Admitted" condition indicates whether the route has been admitted or rejected by the Gateway, and why.  Note that the route's availability is also subject to the Gateway's own status conditions and listener status.
+                      description: Conditions describes the status of the route with respect to the Gateway. The "Admitted" condition must always be specified by controllers to indicate whether the route has been admitted or rejected by the Gateway, and why. Note that the route's availability is also subject to the Gateway's own status conditions and listener status.
                       items:
                         description: "Condition contains details for one aspect of the current state of this API Resource. --- This struct is intended for direct use as an array at the field path .status.conditions.  For example, type FooStatus struct{     // Represents the observations of a foo's current state.     // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"     // +patchMergeKey=type     // +patchStrategy=merge     // +listType=map     // +listMapKey=type     Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"` \n     // other fields }"
                         properties:

@@ -33,6 +33,8 @@ type ServersTransportSpec struct {
 	MaxIdleConnsPerHost int `json:"maxIdleConnsPerHost,omitempty"`
 	// Timeouts for requests forwarded to the backend servers.
 	ForwardingTimeouts *ForwardingTimeouts `json:"forwardingTimeouts,omitempty"`
+	// Disable HTTP/2 for connections with backend servers.
+	DisableHTTP2 bool `json:"disableHTTP2,omitempty"`
 }
 
 // +k8s:deepcopy-gen=true

@@ -52,6 +52,15 @@
     metav1 = "k8s.io/apimachinery/pkg/apis/meta/v1"
     kubeerror = "k8s.io/apimachinery/pkg/api/errors"
 
+  [linters-settings.gomoddirectives]
+    replace-allow-list = [
+      "github.com/abbot/go-http-auth",
+      "github.com/go-check/check",
+      "github.com/gorilla/mux",
+      "github.com/mailgun/minheap",
+      "github.com/mailgun/multibuf",
+    ]
+
 [linters]
   enable-all = true
   disable = [

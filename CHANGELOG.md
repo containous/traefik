@@ -1,3 +1,19 @@
+## [v2.4.8](https://github.com/traefik/traefik/tree/v2.4.8) (2021-03-22)
+[All Commits](https://github.com/traefik/traefik/compare/v2.4.7...v2.4.8)
+
+**Bug fixes:**
+- **[acme]** Update go-acme/lego to v4.3.1 ([#7980](https://github.com/traefik/traefik/pull/7980) by [ldez](https://github.com/ldez))
+- **[acme]** Update go-acme/lego to v4.3.0 ([#7975](https://github.com/traefik/traefik/pull/7975) by [ldez](https://github.com/ldez))
+- **[k8s,k8s/gatewayapi]** Update to gateway-api v0.2.0 ([#7943](https://github.com/traefik/traefik/pull/7943) by [jbdoumenjou](https://github.com/jbdoumenjou))
+- **[pilot,webui]** Adding an option to (de)activate Pilot integration into the Traefik dashboard ([#7994](https://github.com/traefik/traefik/pull/7994) by [tomMoulard](https://github.com/tomMoulard))
+- **[rules]** Raise errors for non-ASCII domain names in a router&#39;s rules ([#7986](https://github.com/traefik/traefik/pull/7986) by [rtribotte](https://github.com/rtribotte))
+- **[server]** Update pires/go-proxyproto to v0.5.0 ([#7948](https://github.com/traefik/traefik/pull/7948) by [mschneider82](https://github.com/mschneider82))
+
+**Documentation:**
+- **[middleware]** Improve basic auth middleware httpasswd example ([#7992](https://github.com/traefik/traefik/pull/7992) by [d3473r](https://github.com/d3473r))
+- **[middleware]** Add missing `traefik.` prefix across sample config ([#7990](https://github.com/traefik/traefik/pull/7990) by [deepyaman](https://github.com/deepyaman))
+- **[middleware]** Remove a no longer needed note ([#7979](https://github.com/traefik/traefik/pull/7979) by [cmcga1125](https://github.com/cmcga1125))
+
 ## [v2.4.7](https://github.com/traefik/traefik/tree/v2.4.7) (2021-03-08)
 [All Commits](https://github.com/traefik/traefik/compare/v2.4.6...v2.4.7)
 

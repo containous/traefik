@@ -127,6 +127,10 @@ docs:
 docs-serve:
 	make -C ./docs docs-serve
 
+## Pull image for doc building
+docs-pull-images:
+	make -C ./docs docs-pull-images
+
 ## Generate CRD clientset
 generate-crd:
 	./script/update-generated-crd-code.sh

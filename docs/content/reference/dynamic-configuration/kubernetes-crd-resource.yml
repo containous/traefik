@@ -214,3 +214,4 @@ spec:
     dialTimeout: 42s
     responseHeaderTimeout: 42s
     idleConnTimeout: 42s
+  disableHTTP2: true

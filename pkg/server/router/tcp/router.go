@@ -258,28 +258,36 @@ func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string
 			logger.Debugf("Adding route %s on TCP", domain)
 			switch {
 			case routerConfig.TLS != nil:
+				if !rules.IsASCII(domain) {
+					asciiError := fmt.Errorf("invalid domain name value %q, non-ASCII characters are not allowed", domain)
+					routerConfig.AddError(asciiError, true)
+					logger.Debug(asciiError)
+					continue
+				}
+
 				if routerConfig.TLS.Passthrough {
 					router.AddRoute(domain, handler)
-				} else {
-					tlsOptionsName := routerConfig.TLS.Options
-
-					if len(tlsOptionsName) == 0 {
-						tlsOptionsName = defaultTLSConfigName
-					}
-
-					if tlsOptionsName != defaultTLSConfigName {
-						tlsOptionsName = provider.GetQualifiedName(ctxRouter, tlsOptionsName)
-					}
-
-					tlsConf, err := m.tlsManager.Get(defaultTLSStoreName, tlsOptionsName)
-					if err != nil {
-						routerConfig.AddError(err, true)
-						logger.Debug(err)
-						continue
-					}
-
-					router.AddRouteTLS(domain, handler, tlsConf)
+					continue
 				}
+
+				tlsOptionsName := routerConfig.TLS.Options
+
+				if len(tlsOptionsName) == 0 {
+					tlsOptionsName = defaultTLSConfigName
+				}
+
+				if tlsOptionsName != defaultTLSConfigName {
+					tlsOptionsName = provider.GetQualifiedName(ctxRouter, tlsOptionsName)
+				}
+
+				tlsConf, err := m.tlsManager.Get(defaultTLSStoreName, tlsOptionsName)
+				if err != nil {
+					routerConfig.AddError(err, true)
+					logger.Debug(err)
+					continue
+				}
+
+				router.AddRouteTLS(domain, handler, tlsConf)
 			case domain == "*":
 				router.AddCatchAllNoTLS(handler)
 			default:

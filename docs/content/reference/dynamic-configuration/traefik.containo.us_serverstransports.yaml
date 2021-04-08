@@ -37,6 +37,9 @@ spec:
                 items:
                   type: string
                 type: array
+              disableHTTP2:
+                description: Disable HTTP/2 for connections with backend servers.
+                type: boolean
               forwardingTimeouts:
                 description: Timeouts for requests forwarded to the backend servers.
                 properties:

@@ -227,3 +227,69 @@ func TestMTLS(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 }
+
+func TestDisableHTTP2(t *testing.T) {
+	testCases := []struct {
+		desc          string
+		disableHTTP2  bool
+		serverHTTP2   bool
+		expectedProto string
+	}{
+		{
+			desc:          "HTTP1 capable client with HTTP1 server",
+			disableHTTP2:  true,
+			expectedProto: "HTTP/1.1",
+		},
+		{
+			desc:          "HTTP1 capable client with HTTP2 server",
+			disableHTTP2:  true,
+			serverHTTP2:   true,
+			expectedProto: "HTTP/1.1",
+		},
+		{
+			desc:          "HTTP2 capable client with HTTP1 server",
+			expectedProto: "HTTP/1.1",
+		},
+		{
+			desc:          "HTTP2 capable client with HTTP2 server",
+			serverHTTP2:   true,
+			expectedProto: "HTTP/2.0",
+		},
+	}
+
+	for _, test := range testCases {
+		test := test
+		t.Run(test.desc, func(t *testing.T) {
+			t.Parallel()
+
+			srv := httptest.NewUnstartedServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+				rw.WriteHeader(http.StatusOK)
+			}))
+
+			srv.EnableHTTP2 = test.serverHTTP2
+			srv.StartTLS()
+
+			rtManager := NewRoundTripperManager()
+
+			dynamicConf := map[string]*dynamic.ServersTransport{
+				"test": {
+					DisableHTTP2:       test.disableHTTP2,
+					InsecureSkipVerify: true,
+				},
+			}
+
+			rtManager.Update(dynamicConf)
+
+			tr, err := rtManager.Get("test")
+			require.NoError(t, err)
+
+			client := http.Client{Transport: tr}
+
+			resp, err := client.Get(srv.URL)
+			require.NoError(t, err)
+
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			assert.Equal(t, test.expectedProto, resp.Proto)
+		})
+	}
+}

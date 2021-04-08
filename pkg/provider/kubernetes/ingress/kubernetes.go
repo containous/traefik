@@ -23,9 +23,9 @@ import (
 	"github.com/traefik/traefik/v2/pkg/safe"
 	"github.com/traefik/traefik/v2/pkg/tls"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	networkingv1beta1 "k8s.io/api/networking/v1beta1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 const (
@@ -226,17 +226,17 @@ func (p *Provider) loadConfigurationFromIngresses(ctx context.Context, client Cl
 			log.FromContext(ctx).Errorf("Error configuring TLS: %v", err)
 		}
 
-		if len(ingress.Spec.Rules) == 0 && ingress.Spec.Backend != nil {
+		if len(ingress.Spec.Rules) == 0 && ingress.Spec.DefaultBackend != nil {
 			if _, ok := conf.HTTP.Services["default-backend"]; ok {
 				log.FromContext(ctx).Error("The default backend already exists.")
 				continue
 			}
 
-			service, err := loadService(client, ingress.Namespace, *ingress.Spec.Backend)
+			service, err := loadService(client, ingress.Namespace, *ingress.Spec.DefaultBackend)
 			if err != nil {
 				log.FromContext(ctx).
-					WithField("serviceName", ingress.Spec.Backend.ServiceName).
-					WithField("servicePort", ingress.Spec.Backend.ServicePort.String()).
+					WithField("serviceName", ingress.Spec.DefaultBackend.Service.Name).
+					WithField("servicePort", ingress.Spec.DefaultBackend.Service.Port.String()).
 					Errorf("Cannot create service: %v", err)
 				continue
 			}
@@ -272,13 +272,19 @@ func (p *Provider) loadConfigurationFromIngresses(ctx context.Context, client Cl
 				service, err := loadService(client, ingress.Namespace, pa.Backend)
 				if err != nil {
 					log.FromContext(ctx).
-						WithField("serviceName", pa.Backend.ServiceName).
-						WithField("servicePort", pa.Backend.ServicePort.String()).
+						WithField("serviceName", pa.Backend.Service.Name).
+						WithField("servicePort", pa.Backend.Service.Port.String()).
 						Errorf("Cannot create service: %v", err)
 					continue
 				}
 
-				serviceName := provider.Normalize(ingress.Namespace + "-" + pa.Backend.ServiceName + "-" + pa.Backend.ServicePort.String())
+				portString := pa.Backend.Service.Port.Name
+
+				if len(pa.Backend.Service.Port.Name) == 0 {
+					portString = fmt.Sprint(pa.Backend.Service.Port.Number)
+				}
+
+				serviceName := provider.Normalize(ingress.Namespace + "-" + pa.Backend.Service.Name + "-" + portString)
 				conf.HTTP.Services[serviceName] = service
 
 				routerKey := strings.TrimPrefix(provider.Normalize(ingress.Name+"-"+ingress.Namespace+"-"+rule.Host+pa.Path), "-")
@@ -316,7 +322,7 @@ func (p *Provider) loadConfigurationFromIngresses(ctx context.Context, client Cl
 	return conf
 }
 
-func (p *Provider) updateIngressStatus(ing *networkingv1beta1.Ingress, k8sClient Client) error {
+func (p *Provider) updateIngressStatus(ing *networkingv1.Ingress, k8sClient Client) error {
 	// Only process if an EndpointIngress has been configured.
 	if p.IngressEndpoint == nil {
 		return nil
@@ -355,7 +361,7 @@ func (p *Provider) updateIngressStatus(ing *networkingv1beta1.Ingress, k8sClient
 	return k8sClient.UpdateIngressStatus(ing, service.Status.LoadBalancer.Ingress)
 }
 
-func (p *Provider) shouldProcessIngress(ingress *networkingv1beta1.Ingress, ingressClasses []*networkingv1beta1.IngressClass) bool {
+func (p *Provider) shouldProcessIngress(ingress *networkingv1.Ingress, ingressClasses []*networkingv1beta1.IngressClass) bool {
 	// configuration through the new kubernetes ingressClass
 	if ingress.Spec.IngressClassName != nil {
 		for _, ic := range ingressClasses {
@@ -379,7 +385,7 @@ func buildHostRule(host string) string {
 	return "Host(`" + host + "`)"
 }
 
-func getCertificates(ctx context.Context, ingress *networkingv1beta1.Ingress, k8sClient Client, tlsConfigs map[string]*tls.CertAndStores) error {
+func getCertificates(ctx context.Context, ingress *networkingv1.Ingress, k8sClient Client, tlsConfigs map[string]*tls.CertAndStores) error {
 	for _, t := range ingress.Spec.TLS {
 		if t.SecretName == "" {
 			log.FromContext(ctx).Debugf("Skipping TLS sub-section: No secret name provided")
@@ -464,8 +470,8 @@ func getTLSConfig(tlsConfigs map[string]*tls.CertAndStores) []*tls.CertAndStores
 	return configs
 }
 
-func loadService(client Client, namespace string, backend networkingv1beta1.IngressBackend) (*dynamic.Service, error) {
-	service, exists, err := client.GetService(namespace, backend.ServiceName)
+func loadService(client Client, namespace string, backend networkingv1.IngressBackend) (*dynamic.Service, error) {
+	service, exists, err := client.GetService(namespace, backend.Service.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -478,8 +484,7 @@ func loadService(client Client, namespace string, backend networkingv1beta1.Ingr
 	var portSpec corev1.ServicePort
 	var match bool
 	for _, p := range service.Spec.Ports {
-		if (backend.ServicePort.Type == intstr.Int && backend.ServicePort.IntVal == p.Port) ||
-			(backend.ServicePort.Type == intstr.String && backend.ServicePort.StrVal == p.Name) {
+		if backend.Service.Port.Number == p.Port || (backend.Service.Port.Name == p.Name && len(p.Name) > 0) {
 			portName = p.Name
 			portSpec = p
 			match = true
@@ -520,7 +525,7 @@ func loadService(client Client, namespace string, backend networkingv1beta1.Ingr
 		return svc, nil
 	}
 
-	endpoints, endpointsExists, endpointsErr := client.GetEndpoints(namespace, backend.ServiceName)
+	endpoints, endpointsExists, endpointsErr := client.GetEndpoints(namespace, backend.Service.Name)
 	if endpointsErr != nil {
 		return nil, endpointsErr
 	}
@@ -584,7 +589,7 @@ func makeRouterKeyWithHash(key, rule string) (string, error) {
 	return dupKey, nil
 }
 
-func loadRouter(rule networkingv1beta1.IngressRule, pa networkingv1beta1.HTTPIngressPath, rtConfig *RouterConfig, serviceName string) *dynamic.Router {
+func loadRouter(rule networkingv1.IngressRule, pa networkingv1.HTTPIngressPath, rtConfig *RouterConfig, serviceName string) *dynamic.Router {
 	var rules []string
 	if len(rule.Host) > 0 {
 		rules = []string{buildHostRule(rule.Host)}
@@ -593,11 +598,11 @@ func loadRouter(rule networkingv1beta1.IngressRule, pa networkingv1beta1.HTTPIng
 	if len(pa.Path) > 0 {
 		matcher := defaultPathMatcher
 
-		if pa.PathType == nil || *pa.PathType == "" || *pa.PathType == networkingv1beta1.PathTypeImplementationSpecific {
+		if pa.PathType == nil || *pa.PathType == "" || *pa.PathType == networkingv1.PathTypeImplementationSpecific {
 			if rtConfig != nil && rtConfig.Router != nil && rtConfig.Router.PathMatcher != "" {
 				matcher = rtConfig.Router.PathMatcher
 			}
-		} else if *pa.PathType == networkingv1beta1.PathTypeExact {
+		} else if *pa.PathType == networkingv1.PathTypeExact {
 			matcher = "Path"
 		}
 

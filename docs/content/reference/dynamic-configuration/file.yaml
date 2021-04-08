@@ -327,6 +327,7 @@ http:
         dialTimeout: 42s
         responseHeaderTimeout: 42s
         idleConnTimeout: 42s
+      disableHTTP2: true
     ServersTransport1:
       serverName: foobar
       insecureSkipVerify: true
@@ -343,6 +344,7 @@ http:
         dialTimeout: 42s
         responseHeaderTimeout: 42s
         idleConnTimeout: 42s
+      disableHTTP2: true
 tcp:
   routers:
     TCPRouter0:

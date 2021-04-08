@@ -235,6 +235,12 @@ func (c *Configuration) SetEffectiveConfiguration() {
 		c.Global.SendAnonymousUsage = true
 	}
 
+	// Create Pilot struct to apply default value on undefined configuration.
+	if c.Pilot == nil {
+		c.Pilot = &Pilot{}
+		c.Pilot.SetDefaults()
+	}
+
 	// Disable Gateway API provider if not enabled in experimental
 	if c.Experimental == nil || !c.Experimental.KubernetesGateway {
 		c.Providers.KubernetesGateway = nil

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/gorilla/mux"
 	"github.com/traefik/traefik/v2/pkg/log"
@@ -102,6 +103,10 @@ func pathPrefix(route *mux.Route, paths ...string) error {
 
 func host(route *mux.Route, hosts ...string) error {
 	for i, host := range hosts {
+		if !IsASCII(host) {
+			return fmt.Errorf("invalid value %q for \"Host\" matcher, non-ASCII characters are not allowed", host)
+		}
+
 		hosts[i] = strings.ToLower(host)
 	}
 
@@ -152,6 +157,10 @@ func host(route *mux.Route, hosts ...string) error {
 func hostRegexp(route *mux.Route, hosts ...string) error {
 	router := route.Subrouter()
 	for _, host := range hosts {
+		if !IsASCII(host) {
+			return fmt.Errorf("invalid value %q for HostRegexp matcher, non-ASCII characters are not allowed", host)
+		}
+
 		tmpRt := router.Host(host)
 		if tmpRt.GetError() != nil {
 			return tmpRt.GetError()
@@ -249,4 +258,15 @@ func checkRule(rule *tree) error {
 		}
 	}
 	return nil
+}
+
+// IsASCII checks if the given string contains only ASCII characters.
+func IsASCII(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] >= utf8.RuneSelf {
+			return false
+		}
+	}
+
+	return true
 }

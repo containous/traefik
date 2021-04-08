@@ -72,6 +72,37 @@ func TestRuntimeConfiguration(t *testing.T) {
 			expectedError: 0,
 		},
 		{
+			desc: "Non-ASCII domain error",
+			tcpServiceConfig: map[string]*runtime.TCPServiceInfo{
+				"foo-service": {
+					TCPService: &dynamic.TCPService{
+						LoadBalancer: &dynamic.TCPServersLoadBalancer{
+							Servers: []dynamic.TCPServer{
+								{
+									Port:    "8085",
+									Address: "127.0.0.1:8085",
+								},
+							},
+						},
+					},
+				},
+			},
+			tcpRouterConfig: map[string]*runtime.TCPRouterInfo{
+				"foo": {
+					TCPRouter: &dynamic.TCPRouter{
+						EntryPoints: []string{"web"},
+						Service:     "foo-service",
+						Rule:        "HostSNI(`bàr.foo`)",
+						TLS: &dynamic.RouterTCPTLSConfig{
+							Passthrough: false,
+							Options:     "foo",
+						},
+					},
+				},
+			},
+			expectedError: 1,
+		},
+		{
 			desc: "HTTP routers with same domain but different TLS options",
 			httpServiceConfig: map[string]*runtime.ServiceInfo{
 				"foo-service": {

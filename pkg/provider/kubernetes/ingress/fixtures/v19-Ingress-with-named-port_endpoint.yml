@@ -1,0 +1,12 @@
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: service1
+  namespace: testing
+
+subsets:
+  - addresses:
+      - ip: 10.10.0.1
+    ports:
+      - name: foobar
+        port: 4711

@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.0
+    controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
   name: gateways.networking.x-k8s.io
 spec:
@@ -36,7 +36,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: "GatewaySpec defines the desired state of Gateway. \n Not all possible combinations of options specified in the Spec are valid. Some invalid configurations can be caught synchronously via a webhook, but there are many cases that will require asynchronous signaling via the GatewayStatus block."
+            description: Spec defines the desired state of Gateway.
             properties:
               addresses:
                 description: "Addresses requested for this gateway. This is optional and behavior can depend on the GatewayClass. If a value is set in the spec and the requested address is invalid, the GatewayClass MUST indicate this in the associated entry in GatewayStatus.Addresses. \n If no Addresses are specified, the GatewayClass may schedule the Gateway in an implementation-defined manner, assigning an appropriate set of Addresses. \n The GatewayClass MUST bind all Listeners to every GatewayAddress that it assigns to the Gateway. \n Support: Core"
@@ -45,13 +45,13 @@ spec:
                   properties:
                     type:
                       default: IPAddress
-                      description: "Type of the Address. This is either \"IPAddress\" or \"NamedAddress\". \n Support: Extended"
+                      description: "Type of the address. \n Support: Extended"
                       enum:
                       - IPAddress
                       - NamedAddress
                       type: string
                     value:
-                      description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the values will depend on `Type` and support by the controller.'
+                      description: "Value of the address. The validity of the values will depend on the type and support by the controller. \n Examples: `1.2.3.4`, `128::1`, `my-ip-address`."
                       maxLength: 253
                       minLength: 1
                       type: string
@@ -71,7 +71,7 @@ spec:
                   description: Listener embodies the concept of a logical endpoint where a Gateway can accept network connections. Each listener in a Gateway must have a unique combination of Hostname, Port, and Protocol. This will be enforced by a validating webhook.
                   properties:
                     hostname:
-                      description: "Hostname specifies the virtual hostname to match for protocol types that define this concept. When unspecified or \"*\", all hostnames are matched. This field can be omitted for protocols that don't require hostname based matching. \n Hostname is the fully qualified domain name of a network host, as defined by RFC 3986. Note the following deviations from the \"host\" part of the URI as defined in the RFC: \n 1. IP literals are not allowed. 2. The `:` delimiter is not respected because ports are not allowed. \n Hostname can be \"precise\" which is a domain name without the terminating dot of a network host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain name prefixed with a single wildcard label (e.g. \"*.example.com\"). The wildcard character '*' must appear by itself as the first DNS label and matches only a single label. \n Support: Core"
+                      description: "Hostname specifies the virtual hostname to match for protocol types that define this concept. When unspecified, \"\", or `*`, all hostnames are matched. This field can be omitted for protocols that don't require hostname based matching. \n Hostname is the fully qualified domain name of a network host, as defined by RFC 3986. Note the following deviations from the \"host\" part of the URI as defined in the RFC: \n 1. IP literals are not allowed. 2. The `:` delimiter is not respected because ports are not allowed. \n Hostname can be \"precise\" which is a domain name without the terminating dot of a network host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain name prefixed with a single wildcard label (e.g. `*.example.com`). The wildcard character `*` must appear by itself as the first DNS label and matches only a single label. \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       type: string
@@ -94,7 +94,7 @@ spec:
                           minLength: 1
                           type: string
                         kind:
-                          description: "Kind is the kind of the route resource to select. \n Kind MUST correspond to kinds of routes that are compatible with the application protocol specified in the Listener's Protocol field. \n If an implementation does not support or recognize this resource type, it SHOULD raise a \"ConditionInvalidRoutes\" condition for the affected Listener. \n Support: Core"
+                          description: "Kind is the kind of the route resource to select. \n Kind MUST correspond to kinds of routes that are compatible with the application protocol specified in the Listener's Protocol field. \n If an implementation does not support or recognize this resource type, it SHOULD set the \"ResolvedRefs\" condition to false for this listener with the \"InvalidRoutesRef\" reason. \n Support: Core"
                           type: string
                         namespaces:
                           default:
@@ -102,6 +102,7 @@ spec:
                           description: "Namespaces indicates in which namespaces Routes should be selected for this Gateway. This is restricted to the namespace of this Gateway by default. \n Support: Core"
                           properties:
                             from:
+                              default: Same
                               description: "From indicates where Routes will be selected for this Gateway. Possible values are: * All: Routes in all namespaces may be used by this Gateway. * Selector: Routes in namespaces selected by the selector may be used by   this Gateway. * Same: Only Routes in the same namespace may be used by this Gateway. \n Support: Core"
                               enum:
                               - All
@@ -140,7 +141,7 @@ spec:
                               type: object
                           type: object
                         selector:
-                          description: "Selector specifies a set of route labels used for selecting routes to associate with the Gateway. If RouteSelector is defined, only routes matching the RouteSelector are associated with the Gateway. An empty RouteSelector matches all routes. \n Support: Core"
+                          description: "Selector specifies a set of route labels used for selecting routes to associate with the Gateway. If this Selector is defined, only routes matching the Selector are associated with the Gateway. An empty Selector matches all routes. \n Support: Core"
                           properties:
                             matchExpressions:
                               description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
@@ -176,7 +177,7 @@ spec:
                       description: "TLS is the TLS configuration for the Listener. This field is required if the Protocol field is \"HTTPS\" or \"TLS\" and ignored otherwise. \n The association of SNIs to Certificate defined in GatewayTLSConfig is defined based on the Hostname field for this listener. \n The GatewayClass MUST use the longest matching SNI out of all available certificates for any TLS handshake. \n Support: Core"
                       properties:
                         certificateRef:
-                          description: 'CertificateRef is the reference to Kubernetes object that contain a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this GatewayTLSConfig is associated with. If an entry in this list omits or specifies the empty string for both the group and the resource, the resource defaults to "secrets". An implementation may support other resources (for example, resource "mycertificates" in group "networking.acme.io"). Support: Core (Kubernetes Secrets) Support: Implementation-specific (Other resource types)'
+                          description: "CertificateRef is the reference to Kubernetes object that contain a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this GatewayTLSConfig is associated with. \n This field is required when mode is set to \"Terminate\" (default) and optional otherwise. \n If an entry in this list omits or specifies the empty string for both the group and the resource, the resource defaults to \"secrets\". An implementation may support other resources (for example, resource \"mycertificates\" in group \"networking.acme.io\"). \n Support: Core (Kubernetes Secrets) \n Support: Implementation-specific (Other resource types)"
                           properties:
                             group:
                               description: Group is the group of the referent.
@@ -199,7 +200,8 @@ spec:
                           - name
                           type: object
                         mode:
-                          description: 'Mode defines the TLS behavior for the TLS session initiated by the client. There are two possible modes: - Terminate: The TLS session between the downstream client   and the Gateway is terminated at the Gateway. - Passthrough: The TLS session is NOT terminated by the Gateway. This   implies that the Gateway can''t decipher the TLS stream except for   the ClientHello message of the TLS protocol.   CertificateRef field is ignored in this mode.'
+                          default: Terminate
+                          description: "Mode defines the TLS behavior for the TLS session initiated by the client. There are two possible modes: - Terminate: The TLS session between the downstream client   and the Gateway is terminated at the Gateway. This mode requires   certificateRef to be set. - Passthrough: The TLS session is NOT terminated by the Gateway. This   implies that the Gateway can't decipher the TLS stream except for   the ClientHello message of the TLS protocol.   CertificateRef field is ignored in this mode. \n Support: Core"
                           enum:
                           - Terminate
                           - Passthrough
@@ -207,12 +209,12 @@ spec:
                         options:
                           additionalProperties:
                             type: string
-                          description: "Options are a list of key/value pairs to give extended options to the provider. \n There variation among providers as to how ciphersuites are expressed. If there is a common subset for expressing ciphers then it will make sense to loft that as a core API construct. \n Support: Implementation-specific."
+                          description: "Options are a list of key/value pairs to give extended options to the provider. \n There variation among providers as to how ciphersuites are expressed. If there is a common subset for expressing ciphers then it will make sense to loft that as a core API construct. \n Support: Implementation-specific"
                           type: object
                         routeOverride:
                           default:
                             certificate: Deny
-                          description: "RouteOverride dictates if TLS settings can be configured via Routes or not. \n CertificateRef must be defined even if `routeOverride.certificate` is set to 'Allow' as it will be used as the default certificate for the listener."
+                          description: "RouteOverride dictates if TLS settings can be configured via Routes or not. \n CertificateRef must be defined even if `routeOverride.certificate` is set to 'Allow' as it will be used as the default certificate for the listener. \n Support: Core"
                           properties:
                             certificate:
                               default: Deny
@@ -221,8 +223,6 @@ spec:
                               - Allow
                               - Deny
                               type: string
-                          required:
-                          - certificate
                           type: object
                       type: object
                   required:
@@ -245,7 +245,7 @@ spec:
                 reason: NotReconciled
                 status: "False"
                 type: Scheduled
-            description: GatewayStatus defines the observed state of Gateway.
+            description: Status defines the current state of Gateway.
             properties:
               addresses:
                 description: "Addresses lists the IP addresses that have actually been bound to the Gateway. These addresses may differ from the addresses in the Spec, e.g. if the Gateway automatically assigns an address from a reserved pool. \n These addresses should all be of type \"IPAddress\"."
@@ -254,13 +254,13 @@ spec:
                   properties:
                     type:
                       default: IPAddress
-                      description: "Type of the Address. This is either \"IPAddress\" or \"NamedAddress\". \n Support: Extended"
+                      description: "Type of the address. \n Support: Extended"
                       enum:
                       - IPAddress
                       - NamedAddress
                       type: string
                     value:
-                      description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the values will depend on `Type` and support by the controller.'
+                      description: "Value of the address. The validity of the values will depend on the type and support by the controller. \n Examples: `1.2.3.4`, `128::1`, `my-ip-address`."
                       maxLength: 253
                       minLength: 1
                       type: string

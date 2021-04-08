@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: service1
+  namespace: testing
+
+spec:
+  ports:
+    - name: foobar
+      port: 4711
+  clusterIP: 10.0.0.1
+

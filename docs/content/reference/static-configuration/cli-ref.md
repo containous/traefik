@@ -303,6 +303,9 @@ Prefix to use for metrics collection. (Default: ```traefik```)
 `--metrics.statsd.pushinterval`:  
 StatsD push interval. (Default: ```10```)
 
+`--pilot.dashboard`:  
+Enable Traefik Pilot in the dashboard. (Default: ```true```)
+
 `--pilot.token`:  
 Traefik Pilot token.
 

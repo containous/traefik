@@ -705,6 +705,37 @@ spec:
     maxIdleConnsPerHost: 7
 ```
 
+#### `disableHTTP2`
+
+_Optional, Default=false_
+
+`disableHTTP2` disables HTTP/2 for connections with backend servers.
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.serversTransports.mytransport]
+  disableHTTP2 = true
+```
+
+```yaml tab="File (YAML)"
+## Dynamic configuration
+http:
+  serversTransports:
+    mytransport:
+      disableHTTP2: true
+```
+
+```yaml tab="Kubernetes"
+apiVersion: traefik.containo.us/v1alpha1
+kind: ServersTransport
+metadata:
+  name: mytransport
+  namespace: default
+
+spec:
+    disableHTTP2: true
+```
+
 #### `forwardingTimeouts`
 
 `forwardingTimeouts` is about a number of timeouts relevant to when forwarding requests to the backend servers.

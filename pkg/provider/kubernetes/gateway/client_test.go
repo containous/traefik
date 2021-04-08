@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/service-apis/apis/v1alpha1"
+	"sigs.k8s.io/gateway-api/apis/v1alpha1"
 )
 
 func TestStatusEquals(t *testing.T) {

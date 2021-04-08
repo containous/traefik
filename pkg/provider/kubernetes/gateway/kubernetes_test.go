@@ -9,7 +9,7 @@ import (
 	"github.com/traefik/traefik/v2/pkg/config/dynamic"
 	"github.com/traefik/traefik/v2/pkg/provider"
 	"github.com/traefik/traefik/v2/pkg/tls"
-	"sigs.k8s.io/service-apis/apis/v1alpha1"
+	"sigs.k8s.io/gateway-api/apis/v1alpha1"
 )
 
 var _ provider.Provider = (*Provider)(nil)

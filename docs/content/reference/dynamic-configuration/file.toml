@@ -275,6 +275,7 @@
       insecureSkipVerify = true
       rootCAs = ["foobar", "foobar"]
       maxIdleConnsPerHost = 42
+      disableHTTP2 = true
 
       [[http.serversTransports.ServersTransport0.certificates]]
         certFile = "foobar"
@@ -292,6 +293,7 @@
       insecureSkipVerify = true
       rootCAs = ["foobar", "foobar"]
       maxIdleConnsPerHost = 42
+      disableHTTP2 = true
 
       [[http.serversTransports.ServersTransport1.certificates]]
         certFile = "foobar"

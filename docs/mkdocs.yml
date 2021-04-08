@@ -173,7 +173,6 @@ nav:
       - 'Data Collection': 'contributing/data-collection.md'
       - 'Advocating': 'contributing/advocating.md'
       - 'Maintainers': 'contributing/maintainers.md'
-#  - 'Glossary': 'glossary.md'
   - 'References':
       - 'Static Configuration':
           - 'Overview': 'reference/static-configuration/overview.md'

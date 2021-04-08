@@ -75,8 +75,6 @@ http:
 In the following example, requests are proxied with an extra `X-Script-Name` header while their `X-Custom-Request-Header` header gets stripped,
 and responses are stripped of their `X-Custom-Response-Header` header.
 
-Please note that it is not possible to remove headers through the use of labels (Docker, Rancher, Marathon, ...) for now.
-
 ```yaml tab="Docker"
 labels:
   - "traefik.http.middlewares.testheader.headers.customrequestheaders.X-Script-Name=test"

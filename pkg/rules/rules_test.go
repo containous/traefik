@@ -61,6 +61,16 @@ func Test_addRoute(t *testing.T) {
 			},
 		},
 		{
+			desc:          "Non-ASCII Host",
+			rule:          "Host(`locàlhost`)",
+			expectedError: true,
+		},
+		{
+			desc:          "Non-ASCII HostRegexp",
+			rule:          "HostRegexp(`locàlhost`)",
+			expectedError: true,
+		},
+		{
 			desc: "HostHeader equivalent to Host",
 			rule: "HostHeader(`localhost`)",
 			expected: map[string]int{
