@@ -16,11 +16,7 @@ import (
 	"github.com/traefik/traefik/v2/pkg/log"
 )
 
-const (
-	typeName = "SpnegoOut"
-)
-
-// SpnegoOut is a component to make outgoing SPNEGO calls
+// SpnegoOut is a component to make outgoing SPNEGO calls.
 type SpnegoOut struct {
 	next         http.Handler
 	config       *dynamic.SpnegoOutService
@@ -28,7 +24,7 @@ type SpnegoOut struct {
 	spnOverrides map[string]string
 }
 
-// New cretes an SpnegoOut service
+// New cretes an SpnegoOut service.
 func New(ctx context.Context, next http.Handler, service *dynamic.SpnegoOutService, name string) (http.Handler, error) {
 	logger := log.FromContext(ctx)
 	logger.Debug("Creating SpnegoOut service")
@@ -57,8 +53,8 @@ func (s *SpnegoOut) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		spn = value
 	}
 
-	// SetSPNEGOHeader fails if the ticket is expired
-	// call refreshTicket() only once if when it fails
+	// SetSPNEGOHeader fails if the ticket is expired.
+	// call refreshTicket() only once if when it fails.
 	for i := 0; i < 2; i++ {
 		if s.client != nil {
 			err := spnego.SetSPNEGOHeader(s.client, req, spn)
@@ -67,7 +63,10 @@ func (s *SpnegoOut) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			}
 			logger.Warnf("Error setting SPNEGO Header. Refreshing ticket. err: %+v", err)
 		}
-		s.refreshTicket(logger)
+		err := s.refreshTicket(logger)
+		if err != nil {
+			logger.Errorf("SpnegOut.refreshTicket failed. err: %+v", err)
+		}
 	}
 
 	s.next.ServeHTTP(rw, req)
@@ -108,7 +107,8 @@ func (s *SpnegoOut) refreshTicket(logger log.Logger) error {
 	}
 	c.LibDefaults.NoAddresses = true
 
-	if s.config.KeytabPath != "" {
+	switch {
+	case s.config.KeytabPath != "":
 		logger.Debugf("Using Keytab %s", s.config.KeytabPath)
 		user := s.config.User
 		if user == "" {
@@ -123,7 +123,7 @@ func (s *SpnegoOut) refreshTicket(logger log.Logger) error {
 			return err
 		}
 		cl = client.NewWithKeytab(user, realm, kt, c)
-	} else if s.config.CcachePath != "" {
+	case s.config.CcachePath != "":
 		logger.Debugf("Using Ccache %s", s.config.CcachePath)
 		ccache, err = credentials.LoadCCache(s.config.CcachePath)
 		if err != nil {
@@ -133,7 +133,7 @@ func (s *SpnegoOut) refreshTicket(logger log.Logger) error {
 		if err != nil {
 			return err
 		}
-	} else {
+	default:
 		msg := "Either KeytabPath or CcachePath must be specified"
 		logger.Error(msg)
 		return errors.New(msg)

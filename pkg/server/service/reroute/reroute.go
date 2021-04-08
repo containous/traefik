@@ -9,17 +9,13 @@ import (
 	"github.com/traefik/traefik/v2/pkg/log"
 )
 
-const (
-	typeName = "Reroute"
-)
-
-// Reroute is a component to make outgoing SPNEGO calls
+// Reroute is a component to make outgoing SPNEGO calls.
 type Reroute struct {
 	next   http.Handler
 	config *dynamic.RerouteService
 }
 
-// New cretes a Reroute service
+// New cretes a Reroute service.
 func New(ctx context.Context, next http.Handler, service *dynamic.RerouteService, name string) (http.Handler, error) {
 	logger := log.FromContext(ctx)
 	logger.Debug("Creating Reroute service")
@@ -35,11 +31,13 @@ func New(ctx context.Context, next http.Handler, service *dynamic.RerouteService
 }
 
 func (r *Reroute) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	path := req.URL.Path
-	if len(path) > 0 && path[0] != '/' {
-		path = "/" + path
+	var path string
+	if len(req.URL.Path) > 0 && req.URL.Path[0] != '/' {
+		path = "/" + req.URL.Path
+	} else {
+		path = req.URL.Path
 	}
-	comps := strings.Split(req.URL.Path, "/")
+	comps := strings.Split(path, "/")
 
 	if len(r.config.Scheme) > 0 {
 		req.URL.Scheme = r.config.Scheme

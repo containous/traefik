@@ -123,7 +123,7 @@ type Cookie struct {
 
 // +k8s:deepcopy-gen=true
 
-// RerouteService reroutes outgoing requests using URL segments of incoming requets
+// RerouteService reroutes outgoing requests using URL segments of incoming requets.
 type RerouteService struct {
 	Scheme             string              `json:"scheme,omitempty" toml:"scheme,omitempty" yaml:"scheme,omitempty" export:"true"`
 	TargetHostSegment  int                 `json:"targetHostSegment,omitempty" toml:"targetHostSegment,omitempty" yaml:"targetHostSegment,omitempty" export:"true"`
@@ -136,7 +136,7 @@ type RerouteService struct {
 
 // +k8s:deepcopy-gen=true
 
-// SpnegoOutService enables SPNEGO in outgoing requests to access Kerberos protected sites
+// SpnegoOutService enables SPNEGO in outgoing requests to access Kerberos protected sites.
 type SpnegoOutService struct {
 	User               string              `json:"user,omitempty" toml:"user,omitempty" yaml:"user,omitempty" export:"true"`
 	Realm              string              `json:"realm,omitempty" toml:"realm,omitempty" yaml:"realm,omitempty" export:"true"`
