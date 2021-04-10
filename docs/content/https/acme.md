@@ -140,7 +140,7 @@ Please check the [configuration examples below](#configuration-examples) for mor
 
 Traefik automatically tracks the expiry date of ACME certificates it generates.
 
-If there are less than 30 days remaining before the certificate expires, Traefik will attempt to renew it automatically.
+By default, if there are less than 30 days remaining before the certificate expires, Traefik will attempt to renew it automatically. [This amount of time is configurable](#renewbeforeexpiry).
 
 !!! info ""
     Certificates that are no longer used may still be renewed, as Traefik does not currently check if the certificate is being used before renewing.
@@ -524,6 +524,34 @@ docker run -v "/my/host/acme:/etc/traefik/acme" traefik
 
 !!! warning
     For concurrency reasons, this file cannot be shared across multiple instances of Traefik.
+
+### `renewBeforeExpiry`
+
+_Optional, Default=720_
+
+The number of hours left on a certificate before its expiry to renew it.
+
+```toml tab="File (TOML)"
+[certificatesResolvers.myresolver.acme]
+  # ...
+  renewBeforeExpiry = 720
+  # ...
+```
+
+```yaml tab="File (YAML)"
+certificatesResolvers:
+  myresolver:
+    acme:
+      # ...
+      renewBeforeExpiry: 720
+      # ...
+```
+
+```bash tab="CLI"
+# ...
+--certificatesresolvers.myresolver.acme.renewBeforeExpiry=720
+# ...
+```
 
 ### `preferredChain`
 

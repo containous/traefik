@@ -351,6 +351,7 @@
     [certificatesResolvers.CertificateResolver0.acme]
       email = "foobar"
       caServer = "foobar"
+      renewBeforeExpiry = 42
       preferredChain = "foobar"
       storage = "foobar"
       keyType = "foobar"
@@ -369,6 +370,7 @@
     [certificatesResolvers.CertificateResolver1.acme]
       email = "foobar"
       caServer = "foobar"
+      renewBeforeExpiry = 42
       preferredChain = "foobar"
       storage = "foobar"
       keyType = "foobar"

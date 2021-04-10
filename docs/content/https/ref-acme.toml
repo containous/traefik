@@ -22,6 +22,14 @@
   #
   # caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
 
+  # The number of hours left on a certificate before its expiry to renew it.
+  # By default, 30 days.
+  #
+  # Optional
+  # Default: 720
+  #
+  # renewBeforeExpiry = 720
+
   # Preferred chain to use.
   #
   # If the CA offers multiple certificate chains, prefer the chain with an issuer matching this Subject Common Name.
