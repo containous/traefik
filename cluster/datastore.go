@@ -76,6 +76,19 @@ func NewDataStore(ctx context.Context, kvSource staert.KvSource, object Object, 
 
 func (d *Datastore) watchChanges() error {
 	stopCh := make(chan struct{})
+
+	existsKey, err := d.kv.Exists(d.lockKey, nil)
+	if err != nil {
+		return fmt.Errorf("error check exists key %s: %v", d.lockKey, err)
+	}
+
+	if !existsKey {
+		err := d.kv.Put(d.lockKey, []byte{}, nil)
+		if err != nil {
+			return fmt.Errorf("error store key %s: %v", d.lockKey, err)
+		}
+	}
+
 	kvCh, err := d.kv.Watch(d.lockKey, stopCh, nil)
 	if err != nil {
 		return fmt.Errorf("error while watching key %s: %v", d.lockKey, err)
