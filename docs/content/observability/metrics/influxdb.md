@@ -213,3 +213,29 @@ metrics:
 ```bash tab="CLI"
 --metrics.influxdb.pushInterval=10s
 ```
+
+#### `tags`
+
+_Optional, Default=""_
+
+Additional tags written with all metrics.
+
+```toml tab="File (TOML)"
+[metrics]
+  [metrics.influxDB.tags]
+    foo=bar
+    environment=production
+```
+
+```yaml tab="File (YAML)"
+metrics:
+  influxDB:
+    tags:
+      foo: bar
+      environment: production
+```
+
+```bash tab="CLI"
+--metrics.influxdb.tags.foo=bar
+--metrics.influxdb.tags.environment=production
+```

@@ -114,7 +114,7 @@ func initInfluxDBClient(ctx context.Context, config *types.InfluxDB) *influx.Inf
 	}
 
 	return influx.New(
-		map[string]string{},
+		config.Tags,
 		influxdb.BatchPointsConfig{
 			Database:        config.Database,
 			RetentionPolicy: config.RetentionPolicy,
