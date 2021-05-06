@@ -155,6 +155,17 @@ func (m *Manager) Get(storeName, configName string) (*tls.Config, error) {
 			return nil, fmt.Errorf("strict SNI enabled - No certificate found for domain: %q, closing connection", domainToCheck)
 		}
 
+		if m.configs[configName].SniFallback != "" {
+			// if a fallback name is configured, try to get that certificate.
+			fallbackHello := clientHello
+			fallbackHello.ServerName = m.configs[configName].SniFallback
+			fallbackCertificate := store.GetBestCertificate(fallbackHello)
+			if fallbackCertificate != nil {
+				return fallbackCertificate, nil
+			}
+			log.WithoutContext().Debugf("Requested fallback certificate %s not found", fallbackHello.ServerName)
+		}
+
 		log.WithoutContext().Debugf("Serving default certificate for request: %q", domainToCheck)
 		return store.DefaultCertificate, nil
 	}
