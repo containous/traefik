@@ -32,6 +32,7 @@
       timeout = 42
     [entryPoints.EntryPoint0.http3]
       enabled = true
+      advertisedAs = "foobar"
     [entryPoints.EntryPoint0.http]
       middlewares = ["foobar", "foobar"]
       [entryPoints.EntryPoint0.http.redirections]

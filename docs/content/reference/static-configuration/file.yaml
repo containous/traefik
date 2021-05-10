@@ -34,6 +34,7 @@ entryPoints:
       - foobar
     http3:
       enabled: true
+      advertisedAs: foobar
     udp:
       timeout: 42
     http:

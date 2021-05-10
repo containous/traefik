@@ -102,6 +102,7 @@ They can be defined by using a file (TOML or YAML) or CLI arguments.
         address = ":8888" # same as ":8888/tcp"
         [entryPoints.name.http3]
           enabled = true
+          advertisedAs = ":8888"
         [entryPoints.name.transport]
           [entryPoints.name.transport.lifeCycle]
             requestAcceptGraceTimeout = 42
@@ -125,6 +126,7 @@ They can be defined by using a file (TOML or YAML) or CLI arguments.
         address: ":8888" # same as ":8888/tcp"
         http3:
           enabled: true
+          advertisedAs: ":8888"
         transport:
           lifeCycle:
             requestAcceptGraceTimeout: 42
@@ -149,6 +151,7 @@ They can be defined by using a file (TOML or YAML) or CLI arguments.
     ## Static configuration
     --entryPoints.name.address=:8888 # same as :8888/tcp
     --entryPoints.name.http3.enabled=true
+    --entryPoints.name.http3.advertisedAs=:8888
     --entryPoints.name.transport.lifeCycle.requestAcceptGraceTimeout=42
     --entryPoints.name.transport.lifeCycle.graceTimeOut=42
     --entryPoints.name.transport.respondingTimeouts.readTimeout=42
@@ -229,6 +232,9 @@ If both TCP and UDP are wanted for the same port, two entryPoints definitions ar
 You can only enable HTTP3 on a TCP entrypoint.
 Enabling HTTP3 will automatically add the correct headers for the connection upgrade to HTTP3.
 
+`http3.advertisedAs` defines what address to advertise as the HTTP3 authority.
+It defaults to the entrypoint's address. It can be used to override the authority in the `alt-svc` header, for example if the exposed port of the endpoint is different from where Traefik is listening.
+
 ??? info "HTTP3 uses UDP+TLS"
 
     As HTTP3 uses UDP, you can't have a TCP entrypoint with HTTP3 on the same port as a UDP entrypoint.
@@ -245,6 +251,7 @@ Enabling HTTP3 will automatically add the correct headers for the connection upg
 
     [entryPoints.name.http3]
       enabled = true
+      advertisedAs = ":443"
     ```
 
     ```yaml tab="File (YAML)"
@@ -255,10 +262,11 @@ Enabling HTTP3 will automatically add the correct headers for the connection upg
       name:
         http3:
           enabled: true
+          advertisedAs: ":443"
     ```
 
     ```bash tab="CLI"
-    --experimental.http3=true --entrypoints.name.http3.enabled=true
+    --experimental.http3=true --entrypoints.name.http3.enabled=true --entrypoints.name.http3.advertisedAs=:443
     ```
 
 ### Forwarded Headers

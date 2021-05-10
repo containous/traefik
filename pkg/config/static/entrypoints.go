@@ -75,6 +75,7 @@ type RedirectEntryPoint struct {
 // HTTP3Config is the HTTP3 configuration of an entry point.
 type HTTP3Config struct {
 	Enabled      bool   `description:"Enable HTTP3." json:"enabled,omitempty" toml:"enabled,omitempty" yaml:"enabled,omitempty" export:"true"`
+	AdvertisedAs string `description:"Advertised HTTP3." json:"advertisedAs,omitempty" toml:"advertisedAs,omitempty" yaml:"advertisedAs,omitempty" export:"true"`
 }
 
 // SetDefaults sets the default values.
