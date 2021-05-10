@@ -32,7 +32,8 @@ entryPoints:
       trustedIPs:
       - foobar
       - foobar
-    enableHTTP3: true
+    http3:
+      enabled: true
     udp:
       timeout: 42
     http:

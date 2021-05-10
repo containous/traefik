@@ -16,7 +16,7 @@ type EntryPoint struct {
 	ProxyProtocol    *ProxyProtocol        `description:"Proxy-Protocol configuration." json:"proxyProtocol,omitempty" toml:"proxyProtocol,omitempty" yaml:"proxyProtocol,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
 	ForwardedHeaders *ForwardedHeaders     `description:"Trust client forwarding headers." json:"forwardedHeaders,omitempty" toml:"forwardedHeaders,omitempty" yaml:"forwardedHeaders,omitempty" export:"true"`
 	HTTP             HTTPConfig            `description:"HTTP configuration." json:"http,omitempty" toml:"http,omitempty" yaml:"http,omitempty" export:"true"`
-	EnableHTTP3      bool                  `description:"Enable HTTP3." json:"enableHTTP3,omitempty" toml:"enableHTTP3,omitempty" yaml:"enableHTTP3,omitempty" export:"true"`
+	HTTP3            HTTP3Config           `description:"HTTP3 configuration." json:"http3,omitempty" toml:"http3,omitempty" yaml:"http3,omitempty" export:"true"`
 	UDP              *UDPConfig            `description:"UDP configuration." json:"udp,omitempty" toml:"udp,omitempty" yaml:"udp,omitempty"`
 }
 
@@ -70,6 +70,11 @@ type RedirectEntryPoint struct {
 	Scheme    string `description:"Scheme used for the redirection." json:"scheme,omitempty" toml:"scheme,omitempty" yaml:"scheme,omitempty" export:"true"`
 	Permanent bool   `description:"Applies a permanent redirection." json:"permanent,omitempty" toml:"permanent,omitempty" yaml:"permanent,omitempty" export:"true"`
 	Priority  int    `description:"Priority of the generated router." json:"priority,omitempty" toml:"priority,omitempty" yaml:"priority,omitempty" export:"true"`
+}
+
+// HTTP3Config is the HTTP3 configuration of an entry point.
+type HTTP3Config struct {
+	Enabled      bool   `description:"Enable HTTP3." json:"enabled,omitempty" toml:"enabled,omitempty" yaml:"enabled,omitempty" export:"true"`
 }
 
 // SetDefaults sets the default values.

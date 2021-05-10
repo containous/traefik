@@ -100,7 +100,8 @@ They can be defined by using a file (TOML or YAML) or CLI arguments.
     [entryPoints]
       [entryPoints.name]
         address = ":8888" # same as ":8888/tcp"
-        enableHTTP3 = true
+        [entryPoints.name.http3]
+          enabled = true
         [entryPoints.name.transport]
           [entryPoints.name.transport.lifeCycle]
             requestAcceptGraceTimeout = 42
@@ -122,7 +123,8 @@ They can be defined by using a file (TOML or YAML) or CLI arguments.
     entryPoints:
       name:
         address: ":8888" # same as ":8888/tcp"
-        enableHTTP3: true
+        http3:
+          enabled: true
         transport:
           lifeCycle:
             requestAcceptGraceTimeout: 42
@@ -146,7 +148,7 @@ They can be defined by using a file (TOML or YAML) or CLI arguments.
     ```bash tab="CLI"
     ## Static configuration
     --entryPoints.name.address=:8888 # same as :8888/tcp
-    --entryPoints.name.http3=true
+    --entryPoints.name.http3.enabled=true
     --entryPoints.name.transport.lifeCycle.requestAcceptGraceTimeout=42
     --entryPoints.name.transport.lifeCycle.graceTimeOut=42
     --entryPoints.name.transport.respondingTimeouts.readTimeout=42
@@ -221,9 +223,9 @@ If both TCP and UDP are wanted for the same port, two entryPoints definitions ar
     
     Full details for how to specify `address` can be found in [net.Listen](https://golang.org/pkg/net/#Listen) (and [net.Dial](https://golang.org/pkg/net/#Dial)) of the doc for go.
 
-### EnableHTTP3
+### HTTP3
 
-`enableHTTP3` defines that you want to enable HTTP3 on this `address`.
+`http3.enabled` defines that you want to enable HTTP3 on this `address`.
 You can only enable HTTP3 on a TCP entrypoint.
 Enabling HTTP3 will automatically add the correct headers for the connection upgrade to HTTP3.
 
@@ -241,8 +243,8 @@ Enabling HTTP3 will automatically add the correct headers for the connection upg
     [experimental]
       http3 = true
     
-    [entryPoints.name]
-      enableHTTP3 = true
+    [entryPoints.name.http3]
+      enabled = true
     ```
     
     ```yaml tab="File (YAML)"
@@ -251,11 +253,12 @@ Enabling HTTP3 will automatically add the correct headers for the connection upg
     
     entryPoints:
       name:
-        enableHTTP3: true
+        http3:
+          enabled: true
     ```
     
     ```bash tab="CLI"
-    --experimental.http3=true --entrypoints.name.enablehttp3=true
+    --experimental.http3=true --entrypoints.name.http3.enabled=true
     ```
 
 ### Forwarded Headers

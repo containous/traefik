@@ -102,7 +102,7 @@ Entry points definition. (Default: ```false```)
 `TRAEFIK_ENTRYPOINTS_<NAME>_ADDRESS`:  
 Entry point address.
 
-`TRAEFIK_ENTRYPOINTS_<NAME>_ENABLEHTTP3`:  
+`TRAEFIK_ENTRYPOINTS_<NAME>_HTTP3_ENABLED`:  
 Enable HTTP3. (Default: ```false```)
 
 `TRAEFIK_ENTRYPOINTS_<NAME>_FORWARDEDHEADERS_INSECURE`:  

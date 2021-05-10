@@ -14,7 +14,6 @@
 [entryPoints]
   [entryPoints.EntryPoint0]
     address = "foobar"
-    enableHTTP3 = true
     [entryPoints.EntryPoint0.transport]
       [entryPoints.EntryPoint0.transport.lifeCycle]
         requestAcceptGraceTimeout = 42
@@ -31,6 +30,8 @@
       trustedIPs = ["foobar", "foobar"]
     [entryPoints.EntryPoint0.udp]
       timeout = 42
+    [entryPoints.EntryPoint0.http3]
+      enabled = true
     [entryPoints.EntryPoint0.http]
       middlewares = ["foobar", "foobar"]
       [entryPoints.EntryPoint0.http.redirections]
