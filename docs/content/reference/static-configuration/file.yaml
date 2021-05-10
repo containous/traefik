@@ -422,4 +422,3 @@ experimental:
     moduleName: foobar
   http3: true
   kubernetesGateway: true
-
