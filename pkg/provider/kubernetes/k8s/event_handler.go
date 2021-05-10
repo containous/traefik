@@ -1,7 +1,6 @@
 package k8s
 
 import (
-	"github.com/traefik/traefik/v2/pkg/log"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -54,7 +53,6 @@ func objChanged(oldObj, newObj interface{}) bool {
 		}
 	}
 
-	log.WithoutContext().Debugf("endpoint %s has no changes, ignoring", newObj.(*corev1.Endpoints).Name)
 	return false
 }
 
