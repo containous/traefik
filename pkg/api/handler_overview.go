@@ -212,6 +212,10 @@ func getProviders(conf static.Configuration) []string {
 			if !field.IsNil() {
 				providers = append(providers, v.Type().Field(i).Name)
 			}
+		} else if field.Kind() == reflect.Map && field.Type().Elem() == reflect.TypeOf(static.PluginConf{}) {
+			for _, value := range field.MapKeys() {
+				providers = append(providers, "plugin-"+value.String())
+			}
 		}
 	}
 

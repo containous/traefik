@@ -217,6 +217,9 @@ func TestHandler_Overview(t *testing.T) {
 					KubernetesCRD:     &crd.Provider{},
 					Rest:              &rest.Provider{},
 					Rancher:           &rancher.Provider{},
+					Plugin: map[string]static.PluginConf{
+						"test": map[string]interface{}{},
+					},
 				},
 			},
 			confDyn: runtime.Configuration{},

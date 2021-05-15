@@ -190,6 +190,8 @@ type Providers struct {
 	ZooKeeper *zk.Provider     `description:"Enable ZooKeeper backend with default settings." json:"zooKeeper,omitempty" toml:"zooKeeper,omitempty" yaml:"zooKeeper,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
 	Redis     *redis.Provider  `description:"Enable Redis backend with default settings." json:"redis,omitempty" toml:"redis,omitempty" yaml:"redis,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
 	HTTP      *http.Provider   `description:"Enable HTTP backend with default settings." json:"http,omitempty" toml:"http,omitempty" yaml:"http,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
+
+	Plugin map[string]PluginConf `description:"" json:"plugin,omitempty" toml:"plugin,omitempty" yaml:"plugin,omitempty"`
 }
 
 // SetEffectiveConfiguration adds missing configuration parameters derived from existing ones.

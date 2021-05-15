@@ -123,7 +123,7 @@ shell: build-dev-image
 docs:
 	make -C ./docs docs
 
-## Serve the documentation site localy
+## Serve the documentation site locally
 docs-serve:
 	make -C ./docs docs-serve
 
@@ -134,6 +134,10 @@ docs-pull-images:
 ## Generate CRD clientset
 generate-crd:
 	./script/update-generated-crd-code.sh
+
+## Generate code from dynamic configuration https://github.com/traefik/genconf
+generate-genconf:
+	go run ./cmd/internal/gen/
 
 ## Create packages for the release
 release-packages: generate-webui build-dev-image

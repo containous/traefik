@@ -347,12 +347,12 @@ func (b *Builder) buildConstructor(ctx context.Context, middlewareName string) (
 
 		pluginType, rawPluginConfig, err := findPluginConfig(config.Plugin)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("plugin: %w", err)
 		}
 
 		plug, err := b.pluginBuilder.Build(pluginType, rawPluginConfig, middlewareName)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("plugin: %w", err)
 		}
 
 		middleware = func(next http.Handler) (http.Handler, error) {

@@ -15,7 +15,7 @@ type PluginsBuilder interface {
 
 func findPluginConfig(rawConfig map[string]dynamic.PluginConf) (string, map[string]interface{}, error) {
 	if len(rawConfig) != 1 {
-		return "", nil, errors.New("plugin: invalid configuration: no configuration or too many plugin definition")
+		return "", nil, errors.New("invalid configuration: no configuration or too many plugin definition")
 	}
 
 	var pluginType string
@@ -27,11 +27,11 @@ func findPluginConfig(rawConfig map[string]dynamic.PluginConf) (string, map[stri
 	}
 
 	if pluginType == "" {
-		return "", nil, errors.New("plugin: missing plugin type")
+		return "", nil, errors.New("missing plugin type")
 	}
 
 	if len(rawPluginConfig) == 0 {
-		return "", nil, fmt.Errorf("plugin: missing plugin configuration: %s", pluginType)
+		return "", nil, fmt.Errorf("missing plugin configuration: %s", pluginType)
 	}
 
 	return pluginType, rawPluginConfig, nil

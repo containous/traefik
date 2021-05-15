@@ -20,7 +20,7 @@
               <div class="text-subtitle2">PROVIDER</div>
               <div class="block-right-text">
                 <q-avatar class="provider-logo">
-                  <q-icon :name="`img:statics/providers/${middleware.provider}.svg`" />
+                  <q-icon :name="`img:${getProviderLogoPath(middleware.provider)}`" />
                 </q-avatar>
                 <div class="block-right-text-label">{{middleware.provider}}</div>
               </div>
@@ -1106,6 +1106,15 @@ export default {
         }
       }
       return exData
+    },
+    getProviderLogoPath (provider) {
+      const name = provider.name.toLowerCase()
+
+      if (name.includes('plugin-')) {
+        return 'statics/providers/plugin.svg'
+      }
+
+      return `statics/providers/${name}.svg`
     }
   },
   filters: {

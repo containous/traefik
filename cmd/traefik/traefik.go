@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/json"
+	"fmt"
 	stdlog "log"
 	"net/http"
 	"os"
@@ -233,6 +234,20 @@ func setupServer(staticConfiguration *static.Configuration) (*server.Server, err
 	pluginBuilder, err := createPluginBuilder(staticConfiguration)
 	if err != nil {
 		return nil, err
+	}
+
+	// Providers plugins
+
+	for s, i := range staticConfiguration.Providers.Plugin {
+		p, err := pluginBuilder.BuildProvider(s, i)
+		if err != nil {
+			return nil, fmt.Errorf("plugin: failed to build provider: %w", err)
+		}
+
+		err = providerAggregator.AddProvider(p)
+		if err != nil {
+			return nil, fmt.Errorf("plugin: failed to add provider: %w", err)
+		}
 	}
 
 	// Metrics
