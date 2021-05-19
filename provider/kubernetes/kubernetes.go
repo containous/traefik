@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"bufio"
 	"bytes"
+	"encoding/pem"
 	"errors"
 	"flag"
 	"fmt"
@@ -835,6 +836,19 @@ func getCertificateBlocks(secret *corev1.Secret, namespace, secretName string) (
 			namespace, secretName, strings.Join(missingEntries, ", "))
 	}
 
+	if !isPem(tlsCrtData) {
+		missingEntries = append(missingEntries, "tls.crt")
+	}
+
+	if !isPem(tlsKeyData) {
+		missingEntries = append(missingEntries, "tls.key")
+	}
+
+	if len(missingEntries) > 0 {
+		return "", "", fmt.Errorf("secret %s/%s does not contain PEM formatted TLS data entries: %s",
+			namespace, secretName, strings.Join(missingEntries, ","))
+	}
+
 	return cert, key, nil
 }
 
@@ -1268,4 +1282,18 @@ func getPassTLSClientCert(i *extensionsv1beta1.Ingress) *types.TLSClientHeaders 
 func templateSafeString(value string) error {
 	_, err := strconv.Unquote(`"` + value + `"`)
 	return err
+}
+
+func isPem(data []byte) bool {
+	for {
+		block, rest := pem.Decode(data)
+		if block == nil {
+			return false
+		}
+		if len(rest) == 0 {
+			break
+		}
+		data = rest
+	}
+	return true
 }

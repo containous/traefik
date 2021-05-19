@@ -1915,8 +1915,8 @@ func TestGetTLS(t *testing.T) {
 							Namespace: "testing",
 						},
 						Data: map[string][]byte{
-							"tls.crt": []byte("tls-crt"),
-							"tls.key": []byte("tls-key"),
+							"tls.crt": []byte("-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----\n"),
+							"tls.key": []byte("-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"),
 						},
 					},
 					{
@@ -1925,8 +1925,8 @@ func TestGetTLS(t *testing.T) {
 							Namespace: "testing",
 						},
 						Data: map[string][]byte{
-							"tls.crt": []byte("tls-crt"),
-							"tls.key": []byte("tls-key"),
+							"tls.crt": []byte("-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----\n"),
+							"tls.key": []byte("-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"),
 						},
 					},
 				},
@@ -1934,14 +1934,14 @@ func TestGetTLS(t *testing.T) {
 			result: map[string]*tls.Configuration{
 				"testing/test-secret": {
 					Certificate: &tls.Certificate{
-						CertFile: tls.FileOrContent("tls-crt"),
-						KeyFile:  tls.FileOrContent("tls-key"),
+						CertFile: tls.FileOrContent("-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----\n"),
+						KeyFile:  tls.FileOrContent("-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"),
 					},
 				},
 				"testing/test-secret2": {
 					Certificate: &tls.Certificate{
-						CertFile: tls.FileOrContent("tls-crt"),
-						KeyFile:  tls.FileOrContent("tls-key"),
+						CertFile: tls.FileOrContent("-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----\n"),
+						KeyFile:  tls.FileOrContent("-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"),
 					},
 				},
 			},
@@ -1968,8 +1968,8 @@ func TestGetTLS(t *testing.T) {
 							Namespace: "testing",
 						},
 						Data: map[string][]byte{
-							"tls.crt": []byte("tls-crt"),
-							"tls.key": []byte("tls-key"),
+							"tls.crt": []byte("-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----\n"),
+							"tls.key": []byte("-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"),
 						},
 					},
 				},
@@ -1978,11 +1978,59 @@ func TestGetTLS(t *testing.T) {
 				"testing/test-secret": {
 					EntryPoints: []string{"api-secure", "https"},
 					Certificate: &tls.Certificate{
-						CertFile: tls.FileOrContent("tls-crt"),
-						KeyFile:  tls.FileOrContent("tls-key"),
+						CertFile: tls.FileOrContent("-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----\n"),
+						KeyFile:  tls.FileOrContent("-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----\n"),
 					},
 				},
 			},
+		},
+		{
+			desc: "load bad certificate",
+			ingress: buildIngress(
+				iNamespace("testing"),
+				iAnnotation(annotationKubernetesFrontendEntryPoints, "https,api-secure"),
+				iRules(iRule(iHost("example.com"))),
+				iTLSes(iTLS("test-secret")),
+			),
+			client: clientMock{
+				secrets: []*corev1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "test-secret",
+							Namespace: "testing",
+						},
+						Data: map[string][]byte{
+							"tls.crt": []byte("invalid"),
+							"tls.key": []byte("invalid"),
+						},
+					},
+				},
+			},
+			errResult: "secret testing/test-secret does not contain PEM formatted TLS data entries: tls.crt,tls.key",
+		},
+		{
+			desc: "load nested bad certificate",
+			ingress: buildIngress(
+				iNamespace("testing"),
+				iAnnotation(annotationKubernetesFrontendEntryPoints, "https,api-secure"),
+				iRules(iRule(iHost("example.com"))),
+				iTLSes(iTLS("test-secret")),
+			),
+			client: clientMock{
+				secrets: []*corev1.Secret{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name:      "test-secret",
+							Namespace: "testing",
+						},
+						Data: map[string][]byte{
+							"tls.crt": []byte("-----BEGIN CERTIFICATE-----\n-----END CERTIFICATE-----\n-----BEGIN CERTIFICATE-----\n\x00\x00\x00-----END CERTIFICATE-----\n"),
+							"tls.key": []byte("-----BEGIN PRIVATE KEY-----\n-----END PRIVATE KEY-----"),
+						},
+					},
+				},
+			},
+			errResult: "secret testing/test-secret does not contain PEM formatted TLS data entries: tls.crt",
 		},
 	}
 
