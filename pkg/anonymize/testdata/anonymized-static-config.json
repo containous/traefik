@@ -427,6 +427,7 @@
         "preferredChain": "foobar",
         "storage": "Storage",
         "keyType": "MyKeyType",
+        "expirationCheckInterval": 42,
         "dnsChallenge": {
           "provider": "DNSProvider",
           "delayBeforeCheck": "42ns",

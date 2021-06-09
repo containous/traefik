@@ -30,6 +30,14 @@
   #
   # renewBeforeExpiry = 720
 
+  # Frequency in which Traefik will check if a certificate is due for renewal, expressed in hours.
+  # By default, 1 hour.
+  #
+  # Optional
+  # Default: 1
+  #
+  # expirationCheckInterval = 1
+
   # Preferred chain to use.
   #
   # If the CA offers multiple certificate chains, prefer the chain with an issuer matching this Subject Common Name.

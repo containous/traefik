@@ -553,6 +553,34 @@ certificatesResolvers:
 # ...
 ```
 
+### `expirationCheckInterval`
+
+_Optional, Default=1_
+
+Frequency in which Traefik will check if a certificate is due for renewal, expressed in hours.
+
+```toml tab="File (TOML)"
+[certificatesResolvers.myresolver.acme]
+  # ...
+  expirationCheckInterval = 1
+  # ...
+```
+
+```yaml tab="File (YAML)"
+certificatesResolvers:
+  myresolver:
+    acme:
+      # ...
+      expirationCheckInterval: 1
+      # ...
+```
+
+```bash tab="CLI"
+# ...
+--certificatesresolvers.myresolver.acme.expirationCheckInterval=1
+# ...
+```
+
 ### `preferredChain`
 
 _Optional, Default=""_

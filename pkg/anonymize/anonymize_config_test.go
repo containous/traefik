@@ -924,12 +924,13 @@ func TestDo_staticConfiguration(t *testing.T) {
 	config.CertificatesResolvers = map[string]static.CertificateResolver{
 		"CertificateResolver0": {
 			ACME: &acme.Configuration{
-				Email:             "acme Email",
-				CAServer:          "CAServer",
-				RenewBeforeExpiry: 42,
-				PreferredChain:    "foobar",
-				Storage:           "Storage",
-				KeyType:           "MyKeyType",
+				Email:                   "acme Email",
+				CAServer:                "CAServer",
+				RenewBeforeExpiry:       42,
+				ExpirationCheckInterval: 42,
+				PreferredChain:          "foobar",
+				Storage:                 "Storage",
+				KeyType:                 "MyKeyType",
 				DNSChallenge: &acme.DNSChallenge{
 					Provider:                "DNSProvider",
 					DelayBeforeCheck:        42,
