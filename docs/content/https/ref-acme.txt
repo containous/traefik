@@ -28,12 +28,12 @@
 # Default: 720
 --certificatesresolvers.myresolver.acme.renewBeforeExpiry=720
 
-# Frequency in which Traefik will check if a certificate is due for renewal, expressed in hours.
-# By default, 1 hour.
+# Frequency in which Traefik will check if issued certificates are due for renewal, expressed in hours.
+# By default, 24 hours.
 #
 # Optional
-# Default: 1
---certificatesresolvers.myresolver.acme.expirationCheckInterval=1
+# Default: 24
+--certificatesresolvers.myresolver.acme.expirationCheckInterval=24
 
 # Preferred chain to use.
 #

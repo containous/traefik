@@ -53,7 +53,7 @@ func (a *Configuration) SetDefaults() {
 	a.Storage = "acme.json"
 	a.KeyType = "RSA4096"
 	a.RenewBeforeExpiry = 720
-	a.ExpirationCheckInterval = 1
+	a.ExpirationCheckInterval = 24
 }
 
 // CertAndStore allows mapping a TLS certificate to a TLS store.

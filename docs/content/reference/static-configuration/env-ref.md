@@ -91,7 +91,7 @@ KeyType used for generating certificate private key. Allow value 'EC256', 'EC384
 Number of hours left on a certificate before its expiry to renew it. (Default: ```720```)
 
 `TRAEFIK_CERTIFICATERESOLVERS_<NAME>_ACME_EXPIRATIONCHECKINTERVAL`:
-Frequency in which Traefik will check if a certificate is due for renewal, expressed in hours. (Default: ```1```)
+Frequency in which Traefik will check if issued certificates are due for renewal, expressed in hours. (Default: ```24```)
 
 `TRAEFIK_CERTIFICATESRESOLVERS_<NAME>_ACME_PREFERREDCHAIN`:  
 Preferred chain to use.
