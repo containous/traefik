@@ -557,7 +557,7 @@ certificatesResolvers:
 
 _Optional, Default=1_
 
-Frequency in which Traefik will check if a certificate is due for renewal, expressed in hours.
+Frequency in which Traefik will check if issued certificates are due for renewal, expressed in hours.
 
 ```toml tab="File (TOML)"
 [certificatesResolvers.myresolver.acme]

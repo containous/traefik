@@ -652,11 +652,11 @@ func (p *Provider) renewCertificates(ctx context.Context) {
 		if err != nil || crt == nil || crt.NotAfter.Before(time.Now().Add(time.Duration(p.Configuration.RenewBeforeExpiry)*time.Hour)) {
 			client, err := p.getClient()
 			if err != nil {
-				logger.Infof("Error renewing certificate from ACME CA (%v) : %+v, %v", p.Configuration.CAServer, cert.Domain, err)
+				logger.Infof("Error renewing certificate from ACME CA (%s) : %+v, %v", p.Configuration.CAServer, cert.Domain, err)
 				continue
 			}
 
-			logger.Infof("Renewing certificate from ACME CA (%v): %+v", p.Configuration.CAServer, cert.Domain)
+			logger.Infof("Renewing certificate from ACME CA (%s): %+v", p.Configuration.CAServer, cert.Domain)
 
 			renewedCert, err := client.Certificate.Renew(certificate.Resource{
 				Domain:      cert.Domain.Main,
@@ -664,7 +664,7 @@ func (p *Provider) renewCertificates(ctx context.Context) {
 				Certificate: cert.Certificate.Certificate,
 			}, true, oscpMustStaple, p.PreferredChain)
 			if err != nil {
-				logger.Errorf("Error renewing certificate from ACME CA (%v): %v, %v", p.Configuration.CAServer, cert.Domain, err)
+				logger.Errorf("Error renewing certificate from ACME CA (%s): %v, %v", p.Configuration.CAServer, cert.Domain, err)
 				continue
 			}
 
