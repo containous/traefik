@@ -527,14 +527,14 @@ docker run -v "/my/host/acme:/etc/traefik/acme" traefik
 
 ### `renewBeforeExpiry`
 
-_Optional, Default=720_
+_Optional, Default=720h_
 
-The number of hours left on a certificate before its expiry to renew it.
+Time remaining before the certificate expiration when Traefik will try to renew it.
 
 ```toml tab="File (TOML)"
 [certificatesResolvers.myresolver.acme]
   # ...
-  renewBeforeExpiry = 720
+  renewBeforeExpiry = "720h"
   # ...
 ```
 
@@ -543,26 +543,26 @@ certificatesResolvers:
   myresolver:
     acme:
       # ...
-      renewBeforeExpiry: 720
+      renewBeforeExpiry: "720h"
       # ...
 ```
 
 ```bash tab="CLI"
 # ...
---certificatesresolvers.myresolver.acme.renewBeforeExpiry=720
+--certificatesresolvers.myresolver.acme.renewBeforeExpiry=720h
 # ...
 ```
 
 ### `expirationCheckInterval`
 
-_Optional, Default=24_
+_Optional, Default=24h_
 
-Frequency in which Traefik will check if issued certificates are due for renewal, expressed in hours.
+Frequency in which Traefik will check if the certificate is due for renewal.
 
 ```toml tab="File (TOML)"
 [certificatesResolvers.myresolver.acme]
   # ...
-  expirationCheckInterval = 24
+  expirationCheckInterval = "24h"
   # ...
 ```
 
@@ -571,13 +571,13 @@ certificatesResolvers:
   myresolver:
     acme:
       # ...
-      expirationCheckInterval: 24
+      expirationCheckInterval: "24h"
       # ...
 ```
 
 ```bash tab="CLI"
 # ...
---certificatesresolvers.myresolver.acme.expirationCheckInterval=24
+--certificatesresolvers.myresolver.acme.expirationCheckInterval=24h
 # ...
 ```
 

@@ -33,14 +33,14 @@ var oscpMustStaple = false
 
 // Configuration holds ACME configuration provided by users.
 type Configuration struct {
-	Email                   string `description:"Email address used for registration." json:"email,omitempty" toml:"email,omitempty" yaml:"email,omitempty"`
-	CAServer                string `description:"CA server to use." json:"caServer,omitempty" toml:"caServer,omitempty" yaml:"caServer,omitempty"`
-	RenewBeforeExpiry       int    `description:"Number of hours left on a certificate before we renew it." json:"renewBeforeExpiry,omitempty" toml:"renewBeforeExpiry,omitempty" yaml:"renewBeforeExpiry,omitempty" export:"true"`
-	PreferredChain          string `description:"Preferred chain to use." json:"preferredChain,omitempty" toml:"preferredChain,omitempty" yaml:"preferredChain,omitempty" export:"true"`
-	Storage                 string `description:"Storage to use." json:"storage,omitempty" toml:"storage,omitempty" yaml:"storage,omitempty" export:"true"`
-	KeyType                 string `description:"KeyType used for generating certificate private key. Allow value 'EC256', 'EC384', 'RSA2048', 'RSA4096', 'RSA8192'." json:"keyType,omitempty" toml:"keyType,omitempty" yaml:"keyType,omitempty" export:"true"`
-	EAB                     *EAB   `description:"External Account Binding to use." json:"eab,omitempty" toml:"eab,omitempty" yaml:"eab,omitempty"`
-	ExpirationCheckInterval int    `description:"Frequency in which Traefik will check if certificate is due for renewal expressed in hours." json:"expirationCheckInterval,omitempty" toml:"expirationCheckInterval,omitempty" yaml:"expirationCheckInterval,omitempty" export:"true"`
+	Email                   string        `description:"Email address used for registration." json:"email,omitempty" toml:"email,omitempty" yaml:"email,omitempty"`
+	CAServer                string        `description:"CA server to use." json:"caServer,omitempty" toml:"caServer,omitempty" yaml:"caServer,omitempty"`
+	RenewBeforeExpiry       time.Duration `description:"Time remaining before the certificate expiration when Traefik will try to renew it." json:"renewBeforeExpiry,omitempty" toml:"renewBeforeExpiry,omitempty" yaml:"renewBeforeExpiry,omitempty" export:"true"`
+	PreferredChain          string        `description:"Preferred chain to use." json:"preferredChain,omitempty" toml:"preferredChain,omitempty" yaml:"preferredChain,omitempty" export:"true"`
+	Storage                 string        `description:"Storage to use." json:"storage,omitempty" toml:"storage,omitempty" yaml:"storage,omitempty" export:"true"`
+	KeyType                 string        `description:"KeyType used for generating certificate private key. Allow value 'EC256', 'EC384', 'RSA2048', 'RSA4096', 'RSA8192'." json:"keyType,omitempty" toml:"keyType,omitempty" yaml:"keyType,omitempty" export:"true"`
+	EAB                     *EAB          `description:"External Account Binding to use." json:"eab,omitempty" toml:"eab,omitempty" yaml:"eab,omitempty"`
+	ExpirationCheckInterval time.Duration `description:"Frequency in which Traefik will check if the certificate is due for renewal." json:"expirationCheckInterval,omitempty" toml:"expirationCheckInterval,omitempty" yaml:"expirationCheckInterval,omitempty" export:"true"`
 
 	DNSChallenge  *DNSChallenge  `description:"Activate DNS-01 Challenge." json:"dnsChallenge,omitempty" toml:"dnsChallenge,omitempty" yaml:"dnsChallenge,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
 	HTTPChallenge *HTTPChallenge `description:"Activate HTTP-01 Challenge." json:"httpChallenge,omitempty" toml:"httpChallenge,omitempty" yaml:"httpChallenge,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
@@ -52,8 +52,8 @@ func (a *Configuration) SetDefaults() {
 	a.CAServer = lego.LEDirectoryProduction
 	a.Storage = "acme.json"
 	a.KeyType = "RSA4096"
-	a.RenewBeforeExpiry = 720
-	a.ExpirationCheckInterval = 24
+	a.RenewBeforeExpiry = 30 * 24 * time.Hour
+	a.ExpirationCheckInterval = 24 * time.Hour
 }
 
 // CertAndStore allows mapping a TLS certificate to a TLS store.
@@ -193,7 +193,7 @@ func (p *Provider) Provide(configurationChan chan<- dynamic.Message, pool *safe.
 
 	p.renewCertificates(ctx)
 
-	ticker := time.NewTicker(time.Duration(p.Configuration.ExpirationCheckInterval) * time.Hour)
+	ticker := time.NewTicker(p.Configuration.ExpirationCheckInterval)
 	pool.GoCtx(func(ctxPool context.Context) {
 		for {
 			select {
@@ -648,8 +648,8 @@ func (p *Provider) renewCertificates(ctx context.Context) {
 	for _, cert := range p.certificates {
 		crt, err := getX509Certificate(ctx, &cert.Certificate)
 		// If there's an error, we assume the cert is broken, and needs update
-		// <= renewBeforeExpiry hours left, renew certificate
-		if err != nil || crt == nil || crt.NotAfter.Before(time.Now().Add(time.Duration(p.Configuration.RenewBeforeExpiry)*time.Hour)) {
+		// <= renewBeforeExpiry renew certificate duration
+		if err != nil || crt == nil || crt.NotAfter.Before(time.Now().Add(p.Configuration.RenewBeforeExpiry)) {
 			client, err := p.getClient()
 			if err != nil {
 				logger.Infof("Error renewing certificate from ACME CA (%s) : %+v, %v", p.Configuration.CAServer, cert.Domain, err)

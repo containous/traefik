@@ -351,8 +351,8 @@
     [certificatesResolvers.CertificateResolver0.acme]
       email = "foobar"
       caServer = "foobar"
-      renewBeforeExpiry = 42
-      expirationCheckInterval = 42
+      renewBeforeExpiry = "42h"
+      expirationCheckInterval = "42h"
       preferredChain = "foobar"
       storage = "foobar"
       keyType = "foobar"
@@ -371,8 +371,8 @@
     [certificatesResolvers.CertificateResolver1.acme]
       email = "foobar"
       caServer = "foobar"
-      renewBeforeExpiry = 42
-      expirationCheckInterval = 42
+      renewBeforeExpiry = "42h"
+      expirationCheckInterval = "42h"
       preferredChain = "foobar"
       storage = "foobar"
       keyType = "foobar"

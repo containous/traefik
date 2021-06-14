@@ -88,10 +88,10 @@ HTTP challenge EntryPoint
 KeyType used for generating certificate private key. Allow value 'EC256', 'EC384', 'RSA2048', 'RSA4096', 'RSA8192'. (Default: ```RSA4096```)
 
 `TRAEFIK_CERTIFICATESRESOLVERS_<NAME>_ACME_RENEWBEFOREEXPIRY`:
-Number of hours left on a certificate before its expiry to renew it. (Default: ```720```)
+Time remaining before the certificate expiration when Traefik will try to renew it. (Default: ```720h0m0s```)
 
-`TRAEFIK_CERTIFICATERESOLVERS_<NAME>_ACME_EXPIRATIONCHECKINTERVAL`:
-Frequency in which Traefik will check if issued certificates are due for renewal, expressed in hours. (Default: ```24```)
+`TRAEFIK_CERTIFICATESRESOLVERS_<NAME>_ACME_EXPIRATIONCHECKINTERVAL`:
+Frequency in which Traefik will check if certificate is due for renewal. (Default: ```24h0m0s```)
 
 `TRAEFIK_CERTIFICATESRESOLVERS_<NAME>_ACME_PREFERREDCHAIN`:  
 Preferred chain to use.

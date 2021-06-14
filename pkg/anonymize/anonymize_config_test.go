@@ -926,8 +926,8 @@ func TestDo_staticConfiguration(t *testing.T) {
 			ACME: &acme.Configuration{
 				Email:                   "acme Email",
 				CAServer:                "CAServer",
-				RenewBeforeExpiry:       42,
-				ExpirationCheckInterval: 42,
+				RenewBeforeExpiry:       42 * time.Hour,
+				ExpirationCheckInterval: 42 * time.Hour,
 				PreferredChain:          "foobar",
 				Storage:                 "Storage",
 				KeyType:                 "MyKeyType",

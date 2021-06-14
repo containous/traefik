@@ -24,21 +24,21 @@ certificatesResolvers:
       #
       # caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
 
-      # The number of hours left on a certificate before its expiry to renew it.
+      # Time remaining before the certificate expiration when Traefik will try to renew it.
       # By default, 30 days.
       #
       # Optional
-      # Default: 720
+      # Default: "720h"
       #
-      # renewBeforeExpiry: 720
+      # renewBeforeExpiry: "720h"
 
-      # Frequency in which Traefik will check if issued certificates are due for renewal, expressed in hours.
+      # Frequency in which Traefik will check if certificate is due for renewal.
       # By default, 24 hours.
       #
       # Optional
-      # Default: 24
+      # Default: "24h"
       #
-      # expirationCheckInterval: 24
+      # expirationCheckInterval: "24h"
 
       # Preferred chain to use.
       #

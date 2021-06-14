@@ -423,11 +423,11 @@
       "acme": {
         "email": "xxxx",
         "caServer": "xxxx",
-        "renewBeforeExpiry": 42,
+        "renewBeforeExpiry": "42h",
         "preferredChain": "foobar",
         "storage": "Storage",
         "keyType": "MyKeyType",
-        "expirationCheckInterval": 42,
+        "expirationCheckInterval": "42h",
         "dnsChallenge": {
           "provider": "DNSProvider",
           "delayBeforeCheck": "42ns",
