@@ -40,16 +40,21 @@ const (
 	entryPointReqDurationName  = metricEntryPointPrefix + "request_duration_seconds"
 	entryPointOpenConnsName    = metricEntryPointPrefix + "open_connections"
 
-	// service level.
+	// router level.
+	metricRouterPrefix     = MetricNamePrefix + "router_"
+	routerReqsTotalName    = metricRouterPrefix + "requests_total"
+	routerReqsTLSTotalName = metricRouterPrefix + "requests_tls_total"
+	routerReqDurationName  = metricRouterPrefix + "request_duration_seconds"
+	routerOpenConnsName    = metricRouterPrefix + "open_connections"
 
-	// MetricServicePrefix prefix of all service metric names.
-	MetricServicePrefix     = MetricNamePrefix + "service_"
-	serviceReqsTotalName    = MetricServicePrefix + "requests_total"
-	serviceReqsTLSTotalName = MetricServicePrefix + "requests_tls_total"
-	serviceReqDurationName  = MetricServicePrefix + "request_duration_seconds"
-	serviceOpenConnsName    = MetricServicePrefix + "open_connections"
-	serviceRetriesTotalName = MetricServicePrefix + "retries_total"
-	serviceServerUpName     = MetricServicePrefix + "server_up"
+	// service level.
+	metricServicePrefix     = MetricNamePrefix + "service_"
+	serviceReqsTotalName    = metricServicePrefix + "requests_total"
+	serviceReqsTLSTotalName = metricServicePrefix + "requests_tls_total"
+	serviceReqDurationName  = metricServicePrefix + "request_duration_seconds"
+	serviceOpenConnsName    = metricServicePrefix + "open_connections"
+	serviceRetriesTotalName = metricServicePrefix + "retries_total"
+	serviceServerUpName     = metricServicePrefix + "server_up"
 )
 
 // promState holds all metric state internally and acts as the only Collector we register for Prometheus.
@@ -140,6 +145,7 @@ func initStandardRegistry(config *types.Prometheus) Registry {
 
 	reg := &standardRegistry{
 		epEnabled:                      config.AddEntryPointsLabels,
+		routerEnabled:                  config.AddRoutersLabels,
 		svcEnabled:                     config.AddServicesLabels,
 		configReloadsCounter:           configReloads,
 		configReloadsFailureCounter:    configReloadsFailures,
@@ -178,6 +184,37 @@ func initStandardRegistry(config *types.Prometheus) Registry {
 		reg.entryPointReqsTLSCounter = entryPointReqsTLS
 		reg.entryPointReqDurationHistogram, _ = NewHistogramWithScale(entryPointReqDurations, time.Second)
 		reg.entryPointOpenConnsGauge = entryPointOpenConns
+	}
+
+	if config.AddRoutersLabels {
+		routerReqs := newCounterFrom(promState.collectors, stdprometheus.CounterOpts{
+			Name: routerReqsTotalName,
+			Help: "How many HTTP requests are processed on a router, partitioned by service, status code, protocol, and method.",
+		}, []string{"code", "method", "protocol", "router", "service"})
+		routerReqsTLS := newCounterFrom(promState.collectors, stdprometheus.CounterOpts{
+			Name: routerReqsTLSTotalName,
+			Help: "How many HTTP requests with TLS are processed on a router, partitioned by service, TLS Version, and TLS cipher Used.",
+		}, []string{"tls_version", "tls_cipher", "router", "service"})
+		routerReqDurations := newHistogramFrom(promState.collectors, stdprometheus.HistogramOpts{
+			Name:    routerReqDurationName,
+			Help:    "How long it took to process the request on a router, partitioned by service, status code, protocol, and method.",
+			Buckets: buckets,
+		}, []string{"code", "method", "protocol", "router", "service"})
+		routerOpenConns := newGaugeFrom(promState.collectors, stdprometheus.GaugeOpts{
+			Name: routerOpenConnsName,
+			Help: "How many open connections exist on a router, partitioned by service, method, and protocol.",
+		}, []string{"method", "protocol", "router", "service"})
+
+		promState.describers = append(promState.describers, []func(chan<- *stdprometheus.Desc){
+			routerReqs.cv.Describe,
+			routerReqsTLS.cv.Describe,
+			routerReqDurations.hv.Describe,
+			routerOpenConns.gv.Describe,
+		}...)
+		reg.routerReqsCounter = routerReqs
+		reg.routerReqsTLSCounter = routerReqsTLS
+		reg.routerReqDurationHistogram, _ = NewHistogramWithScale(routerReqDurations, time.Second)
+		reg.routerOpenConnsGauge = routerOpenConns
 	}
 
 	if config.AddServicesLabels {

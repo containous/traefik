@@ -7,6 +7,11 @@ import (
 	"github.com/vulcand/predicate"
 )
 
+const (
+	and = "and"
+	or  = "or"
+)
+
 type treeBuilder func() *tree
 
 // ParseDomains extract domains from rule.
@@ -60,7 +65,7 @@ func lower(slice []string) []string {
 
 func parseDomain(tree *tree) []string {
 	switch tree.matcher {
-	case "and", "or":
+	case and, or:
 		return append(parseDomain(tree.ruleLeft), parseDomain(tree.ruleRight)...)
 	case "Host", "HostSNI":
 		return tree.value
@@ -72,7 +77,7 @@ func parseDomain(tree *tree) []string {
 func andFunc(left, right treeBuilder) treeBuilder {
 	return func() *tree {
 		return &tree{
-			matcher:   "and",
+			matcher:   and,
 			ruleLeft:  left(),
 			ruleRight: right(),
 		}
@@ -82,10 +87,33 @@ func andFunc(left, right treeBuilder) treeBuilder {
 func orFunc(left, right treeBuilder) treeBuilder {
 	return func() *tree {
 		return &tree{
-			matcher:   "or",
+			matcher:   or,
 			ruleLeft:  left(),
 			ruleRight: right(),
 		}
+	}
+}
+
+func invert(t *tree) *tree {
+	switch t.matcher {
+	case or:
+		t.matcher = and
+		t.ruleLeft = invert(t.ruleLeft)
+		t.ruleRight = invert(t.ruleRight)
+	case and:
+		t.matcher = or
+		t.ruleLeft = invert(t.ruleLeft)
+		t.ruleRight = invert(t.ruleRight)
+	default:
+		t.not = !t.not
+	}
+
+	return t
+}
+
+func notFunc(elem treeBuilder) treeBuilder {
+	return func() *tree {
+		return invert(elem())
 	}
 }
 
@@ -112,6 +140,7 @@ func newParser() (predicate.Parser, error) {
 		Operators: predicate.Operators{
 			AND: andFunc,
 			OR:  orFunc,
+			NOT: notFunc,
 		},
 		Functions: parserFuncs,
 	})

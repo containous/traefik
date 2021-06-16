@@ -20,6 +20,8 @@ rules:
       - gatewayclasses
       - gateways
       - httproutes
+      - tcproutes
+      - tlsroutes
     verbs:
       - get
       - list
@@ -30,6 +32,8 @@ rules:
       - gatewayclasses/status
       - gateways/status
       - httproutes/status
+      - tcproutes/status
+      - tlsroutes/status
     verbs:
       - update
 

@@ -147,6 +147,8 @@ spec:
       services:
         - name: whoamitcp
           port: 8080
+      middlewares:
+        - name: ipwhitelist
   tls:
     secretName: foosecret
     passthrough: false
@@ -214,3 +216,4 @@ spec:
     dialTimeout: 42s
     responseHeaderTimeout: 42s
     idleConnTimeout: 42s
+  disableHTTP2: true

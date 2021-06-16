@@ -12,6 +12,8 @@ import (
 type Registry interface {
 	// IsEpEnabled shows whether metrics instrumentation is enabled on entry points.
 	IsEpEnabled() bool
+	// IsRouterEnabled shows whether metrics instrumentation is enabled on routers.
+	IsRouterEnabled() bool
 	// IsSvcEnabled shows whether metrics instrumentation is enabled on services.
 	IsSvcEnabled() bool
 
@@ -29,6 +31,12 @@ type Registry interface {
 	EntryPointReqsTLSCounter() metrics.Counter
 	EntryPointReqDurationHistogram() ScalableHistogram
 	EntryPointOpenConnsGauge() metrics.Gauge
+
+	// router metrics
+	RouterReqsCounter() metrics.Counter
+	RouterReqsTLSCounter() metrics.Counter
+	RouterReqDurationHistogram() ScalableHistogram
+	RouterOpenConnsGauge() metrics.Gauge
 
 	// service metrics
 	ServiceReqsCounter() metrics.Counter
@@ -58,6 +66,10 @@ func NewMultiRegistry(registries []Registry) Registry {
 	var entryPointReqsTLSCounter []metrics.Counter
 	var entryPointReqDurationHistogram []ScalableHistogram
 	var entryPointOpenConnsGauge []metrics.Gauge
+	var routerReqsCounter []metrics.Counter
+	var routerReqsTLSCounter []metrics.Counter
+	var routerReqDurationHistogram []ScalableHistogram
+	var routerOpenConnsGauge []metrics.Gauge
 	var serviceReqsCounter []metrics.Counter
 	var serviceReqsTLSCounter []metrics.Counter
 	var serviceReqDurationHistogram []ScalableHistogram
@@ -93,6 +105,18 @@ func NewMultiRegistry(registries []Registry) Registry {
 		if r.EntryPointOpenConnsGauge() != nil {
 			entryPointOpenConnsGauge = append(entryPointOpenConnsGauge, r.EntryPointOpenConnsGauge())
 		}
+		if r.RouterReqsCounter() != nil {
+			routerReqsCounter = append(routerReqsCounter, r.RouterReqsCounter())
+		}
+		if r.RouterReqsTLSCounter() != nil {
+			routerReqsTLSCounter = append(routerReqsTLSCounter, r.RouterReqsTLSCounter())
+		}
+		if r.RouterReqDurationHistogram() != nil {
+			routerReqDurationHistogram = append(routerReqDurationHistogram, r.RouterReqDurationHistogram())
+		}
+		if r.RouterOpenConnsGauge() != nil {
+			routerOpenConnsGauge = append(routerOpenConnsGauge, r.RouterOpenConnsGauge())
+		}
 		if r.ServiceReqsCounter() != nil {
 			serviceReqsCounter = append(serviceReqsCounter, r.ServiceReqsCounter())
 		}
@@ -116,6 +140,7 @@ func NewMultiRegistry(registries []Registry) Registry {
 	return &standardRegistry{
 		epEnabled:                      len(entryPointReqsCounter) > 0 || len(entryPointReqDurationHistogram) > 0 || len(entryPointOpenConnsGauge) > 0,
 		svcEnabled:                     len(serviceReqsCounter) > 0 || len(serviceReqDurationHistogram) > 0 || len(serviceOpenConnsGauge) > 0 || len(serviceRetriesCounter) > 0 || len(serviceServerUpGauge) > 0,
+		routerEnabled:                  len(routerReqsCounter) > 0 || len(routerReqDurationHistogram) > 0 || len(routerOpenConnsGauge) > 0,
 		configReloadsCounter:           multi.NewCounter(configReloadsCounter...),
 		configReloadsFailureCounter:    multi.NewCounter(configReloadsFailureCounter...),
 		lastConfigReloadSuccessGauge:   multi.NewGauge(lastConfigReloadSuccessGauge...),
@@ -125,6 +150,10 @@ func NewMultiRegistry(registries []Registry) Registry {
 		entryPointReqsTLSCounter:       multi.NewCounter(entryPointReqsTLSCounter...),
 		entryPointReqDurationHistogram: NewMultiHistogram(entryPointReqDurationHistogram...),
 		entryPointOpenConnsGauge:       multi.NewGauge(entryPointOpenConnsGauge...),
+		routerReqsCounter:              multi.NewCounter(routerReqsCounter...),
+		routerReqsTLSCounter:           multi.NewCounter(routerReqsTLSCounter...),
+		routerReqDurationHistogram:     NewMultiHistogram(routerReqDurationHistogram...),
+		routerOpenConnsGauge:           multi.NewGauge(routerOpenConnsGauge...),
 		serviceReqsCounter:             multi.NewCounter(serviceReqsCounter...),
 		serviceReqsTLSCounter:          multi.NewCounter(serviceReqsTLSCounter...),
 		serviceReqDurationHistogram:    NewMultiHistogram(serviceReqDurationHistogram...),
@@ -136,6 +165,7 @@ func NewMultiRegistry(registries []Registry) Registry {
 
 type standardRegistry struct {
 	epEnabled                      bool
+	routerEnabled                  bool
 	svcEnabled                     bool
 	configReloadsCounter           metrics.Counter
 	configReloadsFailureCounter    metrics.Counter
@@ -146,6 +176,10 @@ type standardRegistry struct {
 	entryPointReqsTLSCounter       metrics.Counter
 	entryPointReqDurationHistogram ScalableHistogram
 	entryPointOpenConnsGauge       metrics.Gauge
+	routerReqsCounter              metrics.Counter
+	routerReqsTLSCounter           metrics.Counter
+	routerReqDurationHistogram     ScalableHistogram
+	routerOpenConnsGauge           metrics.Gauge
 	serviceReqsCounter             metrics.Counter
 	serviceReqsTLSCounter          metrics.Counter
 	serviceReqDurationHistogram    ScalableHistogram
@@ -156,6 +190,10 @@ type standardRegistry struct {
 
 func (r *standardRegistry) IsEpEnabled() bool {
 	return r.epEnabled
+}
+
+func (r *standardRegistry) IsRouterEnabled() bool {
+	return r.routerEnabled
 }
 
 func (r *standardRegistry) IsSvcEnabled() bool {
@@ -196,6 +234,22 @@ func (r *standardRegistry) EntryPointReqDurationHistogram() ScalableHistogram {
 
 func (r *standardRegistry) EntryPointOpenConnsGauge() metrics.Gauge {
 	return r.entryPointOpenConnsGauge
+}
+
+func (r *standardRegistry) RouterReqsCounter() metrics.Counter {
+	return r.routerReqsCounter
+}
+
+func (r *standardRegistry) RouterReqsTLSCounter() metrics.Counter {
+	return r.routerReqsTLSCounter
+}
+
+func (r *standardRegistry) RouterReqDurationHistogram() ScalableHistogram {
+	return r.routerReqDurationHistogram
+}
+
+func (r *standardRegistry) RouterOpenConnsGauge() metrics.Gauge {
+	return r.routerOpenConnsGauge
 }
 
 func (r *standardRegistry) ServiceReqsCounter() metrics.Counter {

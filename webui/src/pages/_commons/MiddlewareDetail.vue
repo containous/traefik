@@ -96,6 +96,7 @@ export default {
   },
   computed: {
     ...mapGetters('http', { http_middlewareByName: 'middlewareByName' }),
+    ...mapGetters('tcp', { tcp_middlewareByName: 'middlewareByName' }),
     protocol () {
       return this.$route.meta.protocol
     },
@@ -111,6 +112,7 @@ export default {
   },
   methods: {
     ...mapActions('http', { http_getMiddlewareByName: 'getMiddlewareByName', http_getRouterByName: 'getRouterByName' }),
+    ...mapActions('tcp', { tcp_getMiddlewareByName: 'getMiddlewareByName', tcp_getRouterByName: 'getRouterByName' }),
     refreshAll () {
       if (this.middlewareByName.loading) {
         return
@@ -160,6 +162,7 @@ export default {
   beforeDestroy () {
     clearInterval(this.timeOutGetAll)
     this.$store.commit('http/getMiddlewareByNameClear')
+    this.$store.commit('tcp/getMiddlewareByNameClear')
   }
 }
 </script>

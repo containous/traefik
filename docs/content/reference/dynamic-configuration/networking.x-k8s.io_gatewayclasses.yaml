@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.0
+    controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
   name: gatewayclasses.networking.x-k8s.io
 spec:
@@ -25,7 +25,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: "GatewayClass describes a class of Gateways available to the user for creating Gateway resources. \n GatewayClass is a Cluster level resource. \n Support: Core."
+        description: "GatewayClass describes a class of Gateways available to the user for creating Gateway resources. \n GatewayClass is a Cluster level resource."
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
@@ -36,14 +36,14 @@ spec:
           metadata:
             type: object
           spec:
-            description: Spec for this GatewayClass.
+            description: Spec defines the desired state of GatewayClass.
             properties:
               controller:
                 description: "Controller is a domain/path string that indicates the controller that is managing Gateways of this class. \n Example: \"acme.io/gateway-controller\". \n This field is not mutable and cannot be empty. \n The format of this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names). \n Support: Core"
                 maxLength: 253
                 type: string
               parametersRef:
-                description: "ParametersRef is a controller-specific resource containing the configuration parameters corresponding to this class. This is optional if the controller does not require any additional configuration. \n Parameters resources are implementation specific custom resources. These resources must be cluster-scoped. \n If the referent cannot be found, the GatewayClass's \"InvalidParameters\" status condition will be true. \n Support: Custom"
+                description: "ParametersRef is a reference to a resource that contains the configuration parameters corresponding to the GatewayClass. This is optional if the controller does not require any additional configuration. \n ParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap, or an implementation-specific custom resource. The resource can be cluster-scoped or namespace-scoped. \n If the referent cannot be found, the GatewayClass's \"InvalidParameters\" status condition will be true. \n Support: Custom"
                 properties:
                   group:
                     description: Group is the group of the referent.
@@ -60,6 +60,18 @@ spec:
                     maxLength: 253
                     minLength: 1
                     type: string
+                  namespace:
+                    description: Namespace is the namespace of the referent. This field is required when scope is set to "Namespace" and ignored when scope is set to "Cluster".
+                    maxLength: 253
+                    minLength: 1
+                    type: string
+                  scope:
+                    default: Cluster
+                    description: Scope represents if the referent is a Cluster or Namespace scoped resource. This may be set to "Cluster" or "Namespace".
+                    enum:
+                    - Cluster
+                    - Namespace
+                    type: string
                 required:
                 - group
                 - kind
@@ -74,9 +86,9 @@ spec:
               - lastTransitionTime: "1970-01-01T00:00:00Z"
                 message: Waiting for controller
                 reason: Waiting
-                status: Unknown
-                type: InvalidParameters
-            description: Status of the GatewayClass.
+                status: "False"
+                type: Admitted
+            description: Status defines the current state of GatewayClass.
             properties:
               conditions:
                 default:
@@ -85,7 +97,7 @@ spec:
                   reason: Waiting
                   status: "False"
                   type: Admitted
-                description: Conditions is the current status from the controller for this GatewayClass.
+                description: "Conditions is the current status from the controller for this GatewayClass. \n Controllers should prefer to publish conditions using values of GatewayClassConditionType for the type of each Condition."
                 items:
                   description: "Condition contains details for one aspect of the current state of this API Resource. --- This struct is intended for direct use as an array at the field path .status.conditions.  For example, type FooStatus struct{     // Represents the observations of a foo's current state.     // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"     // +patchMergeKey=type     // +patchStrategy=merge     // +listType=map     // +listMapKey=type     Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"` \n     // other fields }"
                   properties:

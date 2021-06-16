@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.0
+    controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
   name: ingressroutetcps.traefik.containo.us
 spec:
@@ -22,15 +22,20 @@ spec:
         description: IngressRouteTCP is an Ingress CRD specification.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
           spec:
-            description: IngressRouteTCPSpec is a specification for a IngressRouteTCPSpec resource.
+            description: IngressRouteTCPSpec is a specification for a IngressRouteTCPSpec
+              resource.
             properties:
               entryPoints:
                 items:
@@ -42,6 +47,21 @@ spec:
                   properties:
                     match:
                       type: string
+                    middlewares:
+                      description: Middlewares contains references to MiddlewareTCP
+                        resources.
+                      items:
+                        description: ObjectReference is a generic reference to a Traefik
+                          resource.
+                        properties:
+                          name:
+                            type: string
+                          namespace:
+                            type: string
+                        required:
+                        - name
+                        type: object
+                      type: array
                     services:
                       items:
                         description: ServiceTCP defines an upstream to proxy traffic.
@@ -75,7 +95,10 @@ spec:
                   type: object
                 type: array
               tls:
-                description: "TLSTCP contains the TLS certificates configuration of the routes. To enable Let's Encrypt, use an empty TLS struct, e.g. in YAML: \n \t tls: {} # inline format \n \t tls: \t   secretName: # block format"
+                description: "TLSTCP contains the TLS certificates configuration of
+                  the routes. To enable Let's Encrypt, use an empty TLS struct, e.g.
+                  in YAML: \n \t tls: {} # inline format \n \t tls: \t   secretName:
+                  # block format"
                 properties:
                   certResolver:
                     type: string
@@ -92,7 +115,8 @@ spec:
                       type: object
                     type: array
                   options:
-                    description: Options is a reference to a TLSOption, that specifies the parameters of the TLS connection.
+                    description: Options is a reference to a TLSOption, that specifies
+                      the parameters of the TLS connection.
                     properties:
                       name:
                         type: string
@@ -104,10 +128,12 @@ spec:
                   passthrough:
                     type: boolean
                   secretName:
-                    description: SecretName is the name of the referenced Kubernetes Secret to specify the certificate details.
+                    description: SecretName is the name of the referenced Kubernetes
+                      Secret to specify the certificate details.
                     type: string
                   store:
-                    description: Store is a reference to a TLSStore, that specifies the parameters of the TLS store.
+                    description: Store is a reference to a TLSStore, that specifies
+                      the parameters of the TLS store.
                     properties:
                       name:
                         type: string

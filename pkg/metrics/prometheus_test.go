@@ -104,11 +104,11 @@ func TestPrometheus(t *testing.T) {
 	// Reset state of global promState.
 	defer promState.reset()
 
-	prometheusRegistry := RegisterPrometheus(context.Background(), &types.Prometheus{AddEntryPointsLabels: true, AddServicesLabels: true})
+	prometheusRegistry := RegisterPrometheus(context.Background(), &types.Prometheus{AddEntryPointsLabels: true, AddRoutersLabels: true, AddServicesLabels: true})
 	defer promRegistry.Unregister(promState)
 
-	if !prometheusRegistry.IsEpEnabled() || !prometheusRegistry.IsSvcEnabled() {
-		t.Errorf("PrometheusRegistry should return true for IsEnabled()")
+	if !prometheusRegistry.IsEpEnabled() || !prometheusRegistry.IsRouterEnabled() || !prometheusRegistry.IsSvcEnabled() {
+		t.Errorf("PrometheusRegistry should return true for IsEnabled(), IsRouterEnabled() and IsSvcEnabled()")
 	}
 
 	prometheusRegistry.ConfigReloadsCounter().Add(1)
@@ -135,8 +135,29 @@ func TestPrometheus(t *testing.T) {
 		Set(1)
 
 	prometheusRegistry.
+		RouterReqsCounter().
+		With("router", "demo", "service", "service1", "code", strconv.Itoa(http.StatusOK), "method", http.MethodGet, "protocol", "http").
+		Add(1)
+	prometheusRegistry.
+		RouterReqsTLSCounter().
+		With("router", "demo", "service", "service1", "tls_version", "foo", "tls_cipher", "bar").
+		Add(1)
+	prometheusRegistry.
+		RouterReqDurationHistogram().
+		With("router", "demo", "service", "service1", "code", strconv.Itoa(http.StatusOK), "method", http.MethodGet, "protocol", "http").
+		Observe(10000)
+	prometheusRegistry.
+		RouterOpenConnsGauge().
+		With("router", "demo", "service", "service1", "method", http.MethodGet, "protocol", "http").
+		Set(1)
+
+	prometheusRegistry.
 		ServiceReqsCounter().
 		With("service", "service1", "code", strconv.Itoa(http.StatusOK), "method", http.MethodGet, "protocol", "http").
+		Add(1)
+	prometheusRegistry.
+		ServiceReqsTLSCounter().
+		With("service", "service1", "tls_version", "foo", "tls_cipher", "bar").
 		Add(1)
 	prometheusRegistry.
 		ServiceReqDurationHistogram().
@@ -219,6 +240,48 @@ func TestPrometheus(t *testing.T) {
 			assert: buildGaugeAssert(t, entryPointOpenConnsName, 1),
 		},
 		{
+			name: routerReqsTotalName,
+			labels: map[string]string{
+				"code":     "200",
+				"method":   http.MethodGet,
+				"protocol": "http",
+				"service":  "service1",
+				"router":   "demo",
+			},
+			assert: buildCounterAssert(t, routerReqsTotalName, 1),
+		},
+		{
+			name: routerReqsTLSTotalName,
+			labels: map[string]string{
+				"service":     "service1",
+				"router":      "demo",
+				"tls_version": "foo",
+				"tls_cipher":  "bar",
+			},
+			assert: buildCounterAssert(t, routerReqsTLSTotalName, 1),
+		},
+		{
+			name: routerReqDurationName,
+			labels: map[string]string{
+				"code":     "200",
+				"method":   http.MethodGet,
+				"protocol": "http",
+				"service":  "service1",
+				"router":   "demo",
+			},
+			assert: buildHistogramAssert(t, routerReqDurationName, 1),
+		},
+		{
+			name: routerOpenConnsName,
+			labels: map[string]string{
+				"method":   http.MethodGet,
+				"protocol": "http",
+				"service":  "service1",
+				"router":   "demo",
+			},
+			assert: buildGaugeAssert(t, routerOpenConnsName, 1),
+		},
+		{
 			name: serviceReqsTotalName,
 			labels: map[string]string{
 				"code":     "200",
@@ -227,6 +290,15 @@ func TestPrometheus(t *testing.T) {
 				"service":  "service1",
 			},
 			assert: buildCounterAssert(t, serviceReqsTotalName, 1),
+		},
+		{
+			name: serviceReqsTLSTotalName,
+			labels: map[string]string{
+				"service":     "service1",
+				"tls_version": "foo",
+				"tls_cipher":  "bar",
+			},
+			assert: buildCounterAssert(t, serviceReqsTLSTotalName, 1),
 		},
 		{
 			name: serviceReqDurationName,

@@ -126,6 +126,9 @@ const propsByType = {
   },
   'http-middlewares': {
     columns: columnsByResource.middlewares
+  },
+  'tcp-middlewares': {
+    columns: columnsByResource.middlewares
   }
 }
 

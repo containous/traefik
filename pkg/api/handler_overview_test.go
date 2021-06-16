@@ -171,6 +171,31 @@ func TestHandler_Overview(t *testing.T) {
 						Status: runtime.StatusDisabled,
 					},
 				},
+				TCPMiddlewares: map[string]*runtime.TCPMiddlewareInfo{
+					"ipwhitelist1@myprovider": {
+						TCPMiddleware: &dynamic.TCPMiddleware{
+							IPWhiteList: &dynamic.TCPIPWhiteList{
+								SourceRange: []string{"127.0.0.1/32"},
+							},
+						},
+						Status: runtime.StatusEnabled,
+					},
+					"ipwhitelist2@myprovider": {
+						TCPMiddleware: &dynamic.TCPMiddleware{
+							IPWhiteList: &dynamic.TCPIPWhiteList{
+								SourceRange: []string{"127.0.0.1/32"},
+							},
+						},
+					},
+					"ipwhitelist3@myprovider": {
+						TCPMiddleware: &dynamic.TCPMiddleware{
+							IPWhiteList: &dynamic.TCPIPWhiteList{
+								SourceRange: []string{"127.0.0.1/32"},
+							},
+						},
+						Status: runtime.StatusDisabled,
+					},
+				},
 				TCPRouters: map[string]*runtime.TCPRouterInfo{
 					"tcpbar@myprovider": {
 						TCPRouter: &dynamic.TCPRouter{
@@ -217,6 +242,9 @@ func TestHandler_Overview(t *testing.T) {
 					KubernetesCRD:     &crd.Provider{},
 					Rest:              &rest.Provider{},
 					Rancher:           &rancher.Provider{},
+					Plugin: map[string]static.PluginConf{
+						"test": map[string]interface{}{},
+					},
 				},
 			},
 			confDyn: runtime.Configuration{},

@@ -117,7 +117,7 @@ func LogRequest(span opentracing.Span, r *http.Request) {
 func LogResponseCode(span opentracing.Span, code int) {
 	if span != nil {
 		ext.HTTPStatusCode.Set(span, uint16(code))
-		if code >= 400 {
+		if code >= http.StatusInternalServerError {
 			ext.Error.Set(span, true)
 		}
 	}

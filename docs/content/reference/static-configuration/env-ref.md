@@ -231,6 +231,9 @@ Enable metrics on entry points. (Default: ```true```)
 `TRAEFIK_METRICS_DATADOG_ADDRESS`:  
 Datadog's address. (Default: ```localhost:8125```)
 
+`TRAEFIK_METRICS_DATADOG_ADDROUTERSLABELS`:  
+Enable metrics on routers. (Default: ```false```)
+
 `TRAEFIK_METRICS_DATADOG_ADDSERVICESLABELS`:  
 Enable metrics on services. (Default: ```true```)
 
@@ -245,6 +248,9 @@ Enable metrics on entry points. (Default: ```true```)
 
 `TRAEFIK_METRICS_INFLUXDB_ADDRESS`:  
 InfluxDB address. (Default: ```localhost:8089```)
+
+`TRAEFIK_METRICS_INFLUXDB_ADDROUTERSLABELS`:  
+Enable metrics on routers. (Default: ```false```)
 
 `TRAEFIK_METRICS_INFLUXDB_ADDSERVICESLABELS`:  
 Enable metrics on services. (Default: ```true```)
@@ -273,6 +279,9 @@ Prometheus metrics exporter type. (Default: ```false```)
 `TRAEFIK_METRICS_PROMETHEUS_ADDENTRYPOINTSLABELS`:  
 Enable metrics on entry points. (Default: ```true```)
 
+`TRAEFIK_METRICS_PROMETHEUS_ADDROUTERSLABELS`:  
+Enable metrics on routers. (Default: ```false```)
+
 `TRAEFIK_METRICS_PROMETHEUS_ADDSERVICESLABELS`:  
 Enable metrics on services. (Default: ```true```)
 
@@ -294,6 +303,9 @@ Enable metrics on entry points. (Default: ```true```)
 `TRAEFIK_METRICS_STATSD_ADDRESS`:  
 StatsD address. (Default: ```localhost:8125```)
 
+`TRAEFIK_METRICS_STATSD_ADDROUTERSLABELS`:  
+Enable metrics on routers. (Default: ```false```)
+
 `TRAEFIK_METRICS_STATSD_ADDSERVICESLABELS`:  
 Enable metrics on services. (Default: ```true```)
 
@@ -302,6 +314,9 @@ Prefix to use for metrics collection. (Default: ```traefik```)
 
 `TRAEFIK_METRICS_STATSD_PUSHINTERVAL`:  
 StatsD push interval. (Default: ```10```)
+
+`TRAEFIK_PILOT_DASHBOARD`:  
+Enable Traefik Pilot in the dashboard. (Default: ```true```)
 
 `TRAEFIK_PILOT_TOKEN`:  
 Traefik Pilot token.
@@ -608,6 +623,9 @@ Kubernetes bearer token (not needed for in-cluster client).
 
 `TRAEFIK_PROVIDERS_KUBERNETESINGRESS`:  
 Enable Kubernetes backend with default settings. (Default: ```false```)
+
+`TRAEFIK_PROVIDERS_KUBERNETESINGRESS_ALLOWEMPTYSERVICES`:  
+Allow creation of services without endpoints. (Default: ```false```)
 
 `TRAEFIK_PROVIDERS_KUBERNETESINGRESS_CERTAUTHFILEPATH`:  
 Kubernetes certificate authority file path (not needed for in-cluster client).

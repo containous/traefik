@@ -201,7 +201,6 @@ func TestDo_dynamicConfiguration(t *testing.T) {
 					AccessControlAllowCredentials:     true,
 					AccessControlAllowHeaders:         []string{"foo"},
 					AccessControlAllowMethods:         []string{"foo"},
-					AccessControlAllowOrigin:          "foo",
 					AccessControlAllowOriginList:      []string{"foo"},
 					AccessControlAllowOriginListRegex: []string{"foo"},
 					AccessControlExposeHeaders:        []string{"foo"},

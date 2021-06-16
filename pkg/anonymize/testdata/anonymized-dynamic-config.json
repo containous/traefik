@@ -144,7 +144,6 @@
           "accessControlAllowMethods": [
             "foo"
           ],
-          "accessControlAllowOrigin": "xxxx",
           "accessControlAllowOriginList": [
             "xxxx"
           ],

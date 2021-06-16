@@ -17,13 +17,14 @@ const (
 
 // Configuration holds the information about the currently running traefik instance.
 type Configuration struct {
-	Routers     map[string]*RouterInfo     `json:"routers,omitempty"`
-	Middlewares map[string]*MiddlewareInfo `json:"middlewares,omitempty"`
-	Services    map[string]*ServiceInfo    `json:"services,omitempty"`
-	TCPRouters  map[string]*TCPRouterInfo  `json:"tcpRouters,omitempty"`
-	TCPServices map[string]*TCPServiceInfo `json:"tcpServices,omitempty"`
-	UDPRouters  map[string]*UDPRouterInfo  `json:"udpRouters,omitempty"`
-	UDPServices map[string]*UDPServiceInfo `json:"udpServices,omitempty"`
+	Routers        map[string]*RouterInfo        `json:"routers,omitempty"`
+	Middlewares    map[string]*MiddlewareInfo    `json:"middlewares,omitempty"`
+	TCPMiddlewares map[string]*TCPMiddlewareInfo `json:"tcpMiddlewares,omitempty"`
+	Services       map[string]*ServiceInfo       `json:"services,omitempty"`
+	TCPRouters     map[string]*TCPRouterInfo     `json:"tcpRouters,omitempty"`
+	TCPServices    map[string]*TCPServiceInfo    `json:"tcpServices,omitempty"`
+	UDPRouters     map[string]*UDPRouterInfo     `json:"udpRouters,omitempty"`
+	UDPServices    map[string]*UDPServiceInfo    `json:"udpServices,omitempty"`
 }
 
 // NewConfig returns a Configuration initialized with the given conf. It never returns nil.
@@ -72,6 +73,13 @@ func NewConfig(conf dynamic.Configuration) *Configuration {
 			runtimeConfig.TCPServices = make(map[string]*TCPServiceInfo, len(conf.TCP.Services))
 			for k, v := range conf.TCP.Services {
 				runtimeConfig.TCPServices[k] = &TCPServiceInfo{TCPService: v, Status: StatusEnabled}
+			}
+		}
+
+		if len(conf.TCP.Middlewares) > 0 {
+			runtimeConfig.TCPMiddlewares = make(map[string]*TCPMiddlewareInfo, len(conf.TCP.Middlewares))
+			for k, v := range conf.TCP.Middlewares {
+				runtimeConfig.TCPMiddlewares[k] = &TCPMiddlewareInfo{TCPMiddleware: v, Status: StatusEnabled}
 			}
 		}
 	}
@@ -175,6 +183,15 @@ func (c *Configuration) PopulateUsedBy() {
 		}
 
 		sort.Strings(c.TCPServices[k].UsedBy)
+	}
+
+	for midName, mid := range c.TCPMiddlewares {
+		// lazily initialize Status in case caller forgot to do it
+		if mid.Status == "" {
+			mid.Status = StatusEnabled
+		}
+
+		sort.Strings(c.TCPMiddlewares[midName].UsedBy)
 	}
 
 	for routerName, routerInfo := range c.UDPRouters {

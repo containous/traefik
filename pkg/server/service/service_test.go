@@ -120,6 +120,7 @@ func TestGetLoadBalancerServiceHandler(t *testing.T) {
 		serviceName      string
 		service          *dynamic.ServersLoadBalancer
 		responseModifier func(*http.Response) error
+		cookieRawValue   string
 
 		expected []ExpectedResult
 	}{
@@ -258,6 +259,34 @@ func TestGetLoadBalancerServiceHandler(t *testing.T) {
 				},
 			},
 		},
+		{
+			desc:        "Cookie value is backward compatible",
+			serviceName: "test",
+			service: &dynamic.ServersLoadBalancer{
+				Sticky: &dynamic.Sticky{
+					Cookie: &dynamic.Cookie{},
+				},
+				Servers: []dynamic.Server{
+					{
+						URL: server1.URL,
+					},
+					{
+						URL: server2.URL,
+					},
+				},
+			},
+			cookieRawValue: "_6f743=" + server1.URL,
+			expected: []ExpectedResult{
+				{
+					StatusCode: http.StatusOK,
+					XFrom:      "first",
+				},
+				{
+					StatusCode: http.StatusOK,
+					XFrom:      "first",
+				},
+			},
+		},
 	}
 
 	for _, test := range testCases {
@@ -269,6 +298,10 @@ func TestGetLoadBalancerServiceHandler(t *testing.T) {
 			assert.NotNil(t, handler)
 
 			req := testhelpers.MustNewRequest(http.MethodGet, "http://callme", nil)
+			if test.cookieRawValue != "" {
+				req.Header.Set("Cookie", test.cookieRawValue)
+			}
+
 			for _, expected := range test.expected {
 				recorder := httptest.NewRecorder()
 
@@ -282,6 +315,7 @@ func TestGetLoadBalancerServiceHandler(t *testing.T) {
 					req.Header.Set("Cookie", cookieHeader)
 					assert.Equal(t, expected.SecureCookie, strings.Contains(cookieHeader, "Secure"))
 					assert.Equal(t, expected.HTTPOnlyCookie, strings.Contains(cookieHeader, "HttpOnly"))
+					assert.NotContains(t, cookieHeader, "://")
 				}
 			}
 		})

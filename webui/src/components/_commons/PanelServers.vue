@@ -1,6 +1,6 @@
 <template>
   <q-card flat bordered v-bind:class="['panel-servers', {'panel-servers-dense':isDense}]">
-    <q-scroll-area :thumb-style="appThumbStyle" style="height:100%;">
+    <q-scroll-area v-if="data.loadBalancer.servers" :thumb-style="appThumbStyle" style="height:100%;">
       <q-card-section>
         <div class="row items-start no-wrap">
           <div class="col-3" v-if="showStatus">
@@ -33,6 +33,18 @@
         <q-separator />
       </div>
     </q-scroll-area>
+      <q-card-section v-else style="height: 100%">
+        <div class="row items-center" style="height: 100%">
+          <div class="col-12">
+            <div class="block-empty"></div>
+            <div class="q-pb-lg block-empty-logo">
+              <img v-if="$q.dark.isActive" alt="empty" src="~assets/middlewares-empty-dark.svg">
+              <img v-else alt="empty" src="~assets/middlewares-empty.svg">
+            </div>
+            <div class="block-empty-label">There is no<br>Server available</div>
+          </div>
+        </div>
+      </q-card-section>
   </q-card>
 </template>
 
@@ -120,6 +132,19 @@ export default {
       font-weight: 700;
       letter-spacing: normal;
       text-transform: none;
+    }
+
+    .block-empty {
+      &-logo {
+         text-align: center;
+       }
+      &-label {
+         font-size: 20px;
+         font-weight: 700;
+         color: #b8b8b8;
+         text-align: center;
+         line-height: 1.2;
+       }
     }
   }
 

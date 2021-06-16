@@ -125,7 +125,7 @@
             </div>
           </div>
 
-          <div class="col-12 col-md-4 q-mb-lg path-block" v-if="protocol === 'http'">
+          <div class="col-12 col-md-4 q-mb-lg path-block" v-if="protocol !== 'udp'">
             <div class="row no-wrap items-center q-mb-lg app-title">
               <q-icon name="eva-layers"></q-icon>
               <div class="app-title-label">Middlewares</div>
@@ -194,7 +194,7 @@ export default {
     ...mapGetters('tcp', { tcp_routerByName: 'routerByName' }),
     ...mapGetters('udp', { udp_routerByName: 'routerByName' }),
     hasMiddlewares () {
-      return this.$route.meta.protocol === 'http' && this.middlewares.length > 0
+      return this.$route.meta.protocol !== 'udp' && this.middlewares.length > 0
     },
     protocol () {
       return this.$route.meta.protocol
@@ -204,11 +204,14 @@ export default {
     },
     getRouterByName () {
       return this[`${this.protocol}_getRouterByName`]
+    },
+    getMiddlewareByName () {
+      return this[`${this.protocol}_getMiddlewareByName`]
     }
   },
   methods: {
-    ...mapActions('http', { http_getRouterByName: 'getRouterByName', getMiddlewareByName: 'getMiddlewareByName' }),
-    ...mapActions('tcp', { tcp_getRouterByName: 'getRouterByName' }),
+    ...mapActions('http', { http_getRouterByName: 'getRouterByName', http_getMiddlewareByName: 'getMiddlewareByName' }),
+    ...mapActions('tcp', { tcp_getRouterByName: 'getRouterByName', tcp_getMiddlewareByName: 'getMiddlewareByName' }),
     ...mapActions('udp', { udp_getRouterByName: 'getRouterByName' }),
     ...mapActions('entrypoints', { getEntrypointsByName: 'getByName' }),
     refreshAll () {

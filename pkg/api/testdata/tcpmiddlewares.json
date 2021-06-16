@@ -1,0 +1,39 @@
+[
+	{
+		"ipWhiteList": {
+			"sourceRange": ["127.0.0.1/32"]
+		},
+		"name": "ipwhitelist1@anotherprovider",
+		"provider": "anotherprovider",
+		"status": "enabled",
+		"type": "ipwhitelist",
+		"usedBy": [
+			"bar@myprovider"
+		]
+	},
+	{
+		"ipWhiteList": {
+			"sourceRange": ["127.0.0.1/32"]
+		},
+		"name": "ipwhitelist1@myprovider",
+		"provider": "myprovider",
+		"status": "enabled",
+		"type": "ipwhitelist",
+		"usedBy": [
+			"bar@myprovider",
+			"test@myprovider"
+		]
+	},
+	{
+		"ipWhiteList": {
+			"sourceRange": ["127.0.0.2/32"]
+		},
+		"name": "ipwhitelist2@myprovider",
+		"provider": "myprovider",
+		"status": "enabled",
+		"type": "ipwhitelist",
+		"usedBy": [
+			"test@myprovider"
+		]
+	}
+]

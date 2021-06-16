@@ -116,7 +116,7 @@ The `url` option point to a specific instance.
 !!! info ""
     Paths in the servers' `url` have no effect.
     If you want the requests to be sent to a specific path on your servers,
-    configure your [`routers`](../routers/index.md) to use a corresponding [middleware](../../middlewares/overview.md) (e.g. the [AddPrefix](../../middlewares/addprefix.md) or [ReplacePath](../../middlewares/replacepath.md)) middlewares.
+    configure your [`routers`](../routers/index.md) to use a corresponding [middleware](../../middlewares/overview.md) (e.g. the [AddPrefix](../../middlewares/http/addprefix.md) or [ReplacePath](../../middlewares/http/replacepath.md)) middlewares.
 
 ??? example "A Service with One Server -- Using the [File Provider](../../providers/file.md)"
 
@@ -167,8 +167,8 @@ For now, only round robin load balancing is supported:
 
 #### Sticky sessions
 
-When sticky sessions are enabled, a cookie is set on the initial request and response to let the client know which server handles the first response.
-On subsequent requests, to keep the session alive with the same server, the client should resend the same cookie.
+When sticky sessions are enabled, a `Set-Cookie` header is set on the initial response to let the client know which server handles the first response.
+On subsequent requests, to keep the session alive with the same server, the client should send the cookie with the value set.
 
 !!! info "Stickiness on multiple levels"
 
@@ -703,6 +703,37 @@ metadata:
 
 spec:
     maxIdleConnsPerHost: 7
+```
+
+#### `disableHTTP2`
+
+_Optional, Default=false_
+
+`disableHTTP2` disables HTTP/2 for connections with backend servers.
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.serversTransports.mytransport]
+  disableHTTP2 = true
+```
+
+```yaml tab="File (YAML)"
+## Dynamic configuration
+http:
+  serversTransports:
+    mytransport:
+      disableHTTP2: true
+```
+
+```yaml tab="Kubernetes"
+apiVersion: traefik.containo.us/v1alpha1
+kind: ServersTransport
+metadata:
+  name: mytransport
+  namespace: default
+
+spec:
+    disableHTTP2: true
 ```
 
 #### `forwardingTimeouts`

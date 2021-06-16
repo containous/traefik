@@ -17,6 +17,7 @@ func Test_addRoute(t *testing.T) {
 		desc          string
 		rule          string
 		headers       map[string]string
+		remoteAddr    string
 		expected      map[string]int
 		expectedError bool
 	}{
@@ -59,6 +60,16 @@ func Test_addRoute(t *testing.T) {
 			expected: map[string]int{
 				"http://localhost/foo": http.StatusOK,
 			},
+		},
+		{
+			desc:          "Non-ASCII Host",
+			rule:          "Host(`locàlhost`)",
+			expectedError: true,
+		},
+		{
+			desc:          "Non-ASCII HostRegexp",
+			rule:          "HostRegexp(`locàlhost`)",
+			expectedError: true,
 		},
 		{
 			desc: "HostHeader equivalent to Host",
@@ -425,10 +436,201 @@ func Test_addRoute(t *testing.T) {
 			rule:          `Host("tchouk") && Path("", "/titi")`,
 			expectedError: true,
 		},
+		{
+			desc: "Rule with not",
+			rule: `!Host("tchouk")`,
+			expected: map[string]int{
+				"http://tchouk/titi": http.StatusNotFound,
+				"http://test/powpow": http.StatusOK,
+			},
+		},
+		{
+			desc: "Rule with not on Path",
+			rule: `!Path("/titi")`,
+			expected: map[string]int{
+				"http://tchouk/titi":   http.StatusNotFound,
+				"http://tchouk/powpow": http.StatusOK,
+			},
+		},
+		{
+			desc: "Rule with not on multiple route with or",
+			rule: `!(Host("tchouk") || Host("toto"))`,
+			expected: map[string]int{
+				"http://tchouk/titi": http.StatusNotFound,
+				"http://toto/powpow": http.StatusNotFound,
+				"http://test/powpow": http.StatusOK,
+			},
+		},
+		{
+			desc: "Rule with not on multiple route with and",
+			rule: `!(Host("tchouk") && Path("/titi"))`,
+			expected: map[string]int{
+				"http://tchouk/titi": http.StatusNotFound,
+				"http://tchouk/toto": http.StatusOK,
+				"http://test/titi":   http.StatusOK,
+			},
+		},
+		{
+			desc: "Rule with not on multiple route with and and another not",
+			rule: `!(Host("tchouk") && !Path("/titi"))`,
+			expected: map[string]int{
+				"http://tchouk/titi": http.StatusOK,
+				"http://toto/titi":   http.StatusOK,
+				"http://tchouk/toto": http.StatusNotFound,
+			},
+		},
+		{
+			desc: "Rule with not on two rule",
+			rule: `!Host("tchouk") || !Path("/titi")`,
+			expected: map[string]int{
+				"http://tchouk/titi": http.StatusNotFound,
+				"http://tchouk/toto": http.StatusOK,
+				"http://test/titi":   http.StatusOK,
+			},
+		},
+		{
+			desc: "Rule case with double not",
+			rule: `!(!(Host("tchouk") && Pathprefix("/titi")))`,
+			expected: map[string]int{
+				"http://tchouk/titi":   http.StatusOK,
+				"http://tchouk/powpow": http.StatusNotFound,
+				"http://test/titi":     http.StatusNotFound,
+			},
+		},
+		{
+			desc: "Rule case with not domain",
+			rule: `!Host("tchouk") && Pathprefix("/titi")`,
+			expected: map[string]int{
+				"http://tchouk/titi":   http.StatusNotFound,
+				"http://tchouk/powpow": http.StatusNotFound,
+				"http://toto/powpow":   http.StatusNotFound,
+				"http://toto/titi":     http.StatusOK,
+			},
+		},
+		{
+			desc: "Rule with multiple host AND multiple path AND not",
+			rule: `!(Host("tchouk","pouet") && Path("/powpow", "/titi"))`,
+			expected: map[string]int{
+				"http://tchouk/toto":   http.StatusOK,
+				"http://tchouk/powpow": http.StatusNotFound,
+				"http://pouet/powpow":  http.StatusNotFound,
+				"http://tchouk/titi":   http.StatusNotFound,
+				"http://pouet/titi":    http.StatusNotFound,
+				"http://pouet/toto":    http.StatusOK,
+				"http://plopi/a":       http.StatusOK,
+			},
+		},
+		{
+			desc:          "ClientIP empty",
+			rule:          "ClientIP(``)",
+			expectedError: true,
+		},
+		{
+			desc:          "Invalid ClientIP",
+			rule:          "ClientIP(`invalid`)",
+			expectedError: true,
+		},
+		{
+			desc:       "Non matching ClientIP",
+			rule:       "ClientIP(`10.10.1.1`)",
+			remoteAddr: "10.0.0.0",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusNotFound,
+			},
+		},
+		{
+			desc:       "Non matching IPv6",
+			rule:       "ClientIP(`10::10`)",
+			remoteAddr: "::1",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusNotFound,
+			},
+		},
+		{
+			desc:       "Matching IP",
+			rule:       "ClientIP(`10.0.0.0`)",
+			remoteAddr: "10.0.0.0:8456",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusOK,
+			},
+		},
+		{
+			desc:       "Matching IPv6",
+			rule:       "ClientIP(`10::10`)",
+			remoteAddr: "10::10",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusOK,
+			},
+		},
+		{
+			desc:       "Matching IP among several IP",
+			rule:       "ClientIP(`10.0.0.1`, `10.0.0.0`)",
+			remoteAddr: "10.0.0.0",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusOK,
+			},
+		},
+		{
+			desc:       "Non Matching IP with CIDR",
+			rule:       "ClientIP(`11.0.0.0/24`)",
+			remoteAddr: "10.0.0.0",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusNotFound,
+			},
+		},
+		{
+			desc:       "Non Matching IPv6 with CIDR",
+			rule:       "ClientIP(`11::/16`)",
+			remoteAddr: "10::",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusNotFound,
+			},
+		},
+		{
+			desc:       "Matching IP with CIDR",
+			rule:       "ClientIP(`10.0.0.0/16`)",
+			remoteAddr: "10.0.0.0",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusOK,
+			},
+		},
+		{
+			desc:       "Matching IPv6 with CIDR",
+			rule:       "ClientIP(`10::/16`)",
+			remoteAddr: "10::10",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusOK,
+			},
+		},
+		{
+			desc:       "Matching IP among several CIDR",
+			rule:       "ClientIP(`11.0.0.0/16`, `10.0.0.0/16`)",
+			remoteAddr: "10.0.0.0",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusOK,
+			},
+		},
+		{
+			desc:       "Matching IP among non matching CIDR and matching IP",
+			rule:       "ClientIP(`11.0.0.0/16`, `10.0.0.0`)",
+			remoteAddr: "10.0.0.0",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusOK,
+			},
+		},
+		{
+			desc:       "Matching IP among matching CIDR and non matching IP",
+			rule:       "ClientIP(`11.0.0.0`, `10.0.0.0/16`)",
+			remoteAddr: "10.0.0.0",
+			expected: map[string]int{
+				"http://tchouk/toto": http.StatusOK,
+			},
+		},
 	}
 
 	for _, test := range testCases {
 		test := test
+
 		t.Run(test.desc, func(t *testing.T) {
 			t.Parallel()
 
@@ -450,6 +652,10 @@ func Test_addRoute(t *testing.T) {
 					w := httptest.NewRecorder()
 
 					req := testhelpers.MustNewRequest(http.MethodGet, calledURL, nil)
+
+					// Useful for the ClientIP matcher
+					req.RemoteAddr = test.remoteAddr
+
 					for key, value := range test.headers {
 						req.Header.Set(key, value)
 					}

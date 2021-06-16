@@ -69,7 +69,10 @@ func (c CertificateStore) GetAllDomains() []string {
 }
 
 // GetBestCertificate returns the best match certificate, and caches the response.
-func (c CertificateStore) GetBestCertificate(clientHello *tls.ClientHelloInfo) *tls.Certificate {
+func (c *CertificateStore) GetBestCertificate(clientHello *tls.ClientHelloInfo) *tls.Certificate {
+	if c == nil {
+		return nil
+	}
 	domainToCheck := strings.ToLower(strings.TrimSpace(clientHello.ServerName))
 	if len(domainToCheck) == 0 {
 		// If no ServerName is provided, Check for local IP address matches

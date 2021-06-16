@@ -1,0 +1,42 @@
+---
+kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-gateway-class
+spec:
+  controller: traefik.io/gateway-controller
+
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-gateway
+  namespace: default
+spec:
+  gatewayClassName: my-gateway-class
+  listeners:  # Use GatewayClass defaults for listener definition.
+    - protocol: HTTP
+      port: 9001
+      hostname: foo.example.com
+      routes:
+        kind: TLSRoute
+        namespaces:
+          from: Same
+        selector:
+          matchLabels:
+            app: tls-app
+
+---
+kind: TLSRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: tls-app-1
+  namespace: default
+  labels:
+    app: tls-app
+spec:
+  rules:
+    - forwardTo:
+        - serviceName: whoamitcp
+          port: 9000
+          weight: 1

@@ -85,7 +85,7 @@ export default {
     }
   },
   beforeDestroy () {
-    this.$store.commit('http/getAllServicesClear')
+    this.$store.commit('tcp/getAllServicesClear')
   }
 }
 </script>

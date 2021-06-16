@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.0
+    controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
   name: middlewares.traefik.containo.us
 spec:
@@ -22,10 +22,14 @@ spec:
         description: Middleware is a specification for a Middleware resource.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
@@ -99,7 +103,16 @@ spec:
                     type: array
                 type: object
               contentType:
-                description: ContentType middleware - or rather its unique `autoDetect` option - specifies whether to let the `Content-Type` header, if it has not been set by the backend, be automatically set to a value derived from the contents of the response. As a proxy, the default behavior should be to leave the header alone, regardless of what the backend did with it. However, the historic default was to always auto-detect and set the header if it was nil, and it is going to be kept that way in order to support users currently relying on it. This middleware exists to enable the correct behavior until at least the default one can be changed in a future version.
+                description: ContentType middleware - or rather its unique `autoDetect`
+                  option - specifies whether to let the `Content-Type` header, if
+                  it has not been set by the backend, be automatically set to a value
+                  derived from the contents of the response. As a proxy, the default
+                  behavior should be to leave the header alone, regardless of what
+                  the backend did with it. However, the historic default was to always
+                  auto-detect and set the header if it was nil, and it is going to
+                  be kept that way in order to support users currently relying on
+                  it. This middleware exists to enable the correct behavior until
+                  at least the default one can be changed in a future version.
                 properties:
                   autoDetect:
                     type: boolean
@@ -130,7 +143,10 @@ spec:
                         - TraefikService
                         type: string
                       name:
-                        description: Name is a reference to a Kubernetes Service object (for a load-balancer of servers), or to a TraefikService object (service load-balancer, mirroring, etc). The differentiation between the two is specified in the Kind field.
+                        description: Name is a reference to a Kubernetes Service object
+                          (for a load-balancer of servers), or to a TraefikService
+                          object (service load-balancer, mirroring, etc). The differentiation
+                          between the two is specified in the Kind field.
                         type: string
                       namespace:
                         type: string
@@ -142,7 +158,8 @@ spec:
                         - type: string
                         x-kubernetes-int-or-string: true
                       responseForwarding:
-                        description: ResponseForwarding holds configuration for the forward of the response.
+                        description: ResponseForwarding holds configuration for the
+                          forward of the response.
                         properties:
                           flushInterval:
                             type: string
@@ -155,7 +172,8 @@ spec:
                         description: Sticky holds the sticky configuration.
                         properties:
                           cookie:
-                            description: Cookie holds the sticky configuration based on cookie.
+                            description: Cookie holds the sticky configuration based
+                              on cookie.
                             properties:
                               httpOnly:
                                 type: boolean
@@ -170,7 +188,9 @@ spec:
                       strategy:
                         type: string
                       weight:
-                        description: Weight should only be specified when Name references a TraefikService object (and to be precise, one that embeds a Weighted Round Robin).
+                        description: Weight should only be specified when Name references
+                          a TraefikService object (and to be precise, one that embeds
+                          a Weighted Round Robin).
                         type: integer
                     required:
                     - name
@@ -214,42 +234,47 @@ spec:
                 description: Headers holds the custom header configuration.
                 properties:
                   accessControlAllowCredentials:
-                    description: AccessControlAllowCredentials is only valid if true. false is ignored.
+                    description: AccessControlAllowCredentials is only valid if true.
+                      false is ignored.
                     type: boolean
                   accessControlAllowHeaders:
-                    description: AccessControlAllowHeaders must be used in response to a preflight request with Access-Control-Request-Headers set.
+                    description: AccessControlAllowHeaders must be used in response
+                      to a preflight request with Access-Control-Request-Headers set.
                     items:
                       type: string
                     type: array
                   accessControlAllowMethods:
-                    description: AccessControlAllowMethods must be used in response to a preflight request with Access-Control-Request-Method set.
+                    description: AccessControlAllowMethods must be used in response
+                      to a preflight request with Access-Control-Request-Method set.
                     items:
                       type: string
                     type: array
-                  accessControlAllowOrigin:
-                    description: AccessControlAllowOrigin Can be "origin-list-or-null" or "*". From (https://www.w3.org/TR/cors/#access-control-allow-origin-response-header)
-                    type: string
                   accessControlAllowOriginList:
-                    description: AccessControlAllowOriginList is a list of allowable origins. Can also be a wildcard origin "*".
+                    description: AccessControlAllowOriginList is a list of allowable
+                      origins. Can also be a wildcard origin "*".
                     items:
                       type: string
                     type: array
                   accessControlAllowOriginListRegex:
-                    description: AccessControlAllowOriginListRegex is a list of allowable origins written following the Regular Expression syntax (https://golang.org/pkg/regexp/).
+                    description: AccessControlAllowOriginListRegex is a list of allowable
+                      origins written following the Regular Expression syntax (https://golang.org/pkg/regexp/).
                     items:
                       type: string
                     type: array
                   accessControlExposeHeaders:
-                    description: AccessControlExposeHeaders sets valid headers for the response.
+                    description: AccessControlExposeHeaders sets valid headers for
+                      the response.
                     items:
                       type: string
                     type: array
                   accessControlMaxAge:
-                    description: AccessControlMaxAge sets the time that a preflight request may be cached.
+                    description: AccessControlMaxAge sets the time that a preflight
+                      request may be cached.
                     format: int64
                     type: integer
                   addVaryHeader:
-                    description: AddVaryHeader controls if the Vary header is automatically added/updated when the AccessControlAllowOrigin is set.
+                    description: AddVaryHeader controls if the Vary header is automatically
+                      added/updated when the AccessControlAllowOriginList is set.
                     type: boolean
                   allowedHosts:
                     items:
@@ -290,16 +315,22 @@ spec:
                   referrerPolicy:
                     type: string
                   sslForceHost:
+                    description: 'Deprecated: use RedirectRegex instead.'
                     type: boolean
                   sslHost:
+                    description: 'Deprecated: use RedirectRegex instead.'
                     type: string
                   sslProxyHeaders:
                     additionalProperties:
                       type: string
                     type: object
                   sslRedirect:
+                    description: 'Deprecated: use EntryPoint redirection or RedirectScheme
+                      instead.'
                     type: boolean
                   sslTemporaryRedirect:
+                    description: 'Deprecated: use EntryPoint redirection or RedirectScheme
+                      instead.'
                     type: boolean
                   stsIncludeSubdomains:
                     type: boolean
@@ -310,13 +341,17 @@ spec:
                     type: integer
                 type: object
               inFlightReq:
-                description: InFlightReq limits the number of requests being processed and served concurrently.
+                description: InFlightReq limits the number of requests being processed
+                  and served concurrently.
                 properties:
                   amount:
                     format: int64
                     type: integer
                   sourceCriterion:
-                    description: SourceCriterion defines what criterion is used to group requests as originating from a common source. If none are set, the default is to use the request's remote address field. All fields are mutually exclusive.
+                    description: SourceCriterion defines what criterion is used to
+                      group requests as originating from a common source. If none
+                      are set, the default is to use the request's remote address
+                      field. All fields are mutually exclusive.
                     properties:
                       ipStrategy:
                         description: IPStrategy holds the ip strategy configuration.
@@ -356,10 +391,12 @@ spec:
                 description: PassTLSClientCert holds the TLS client cert headers configuration.
                 properties:
                   info:
-                    description: TLSClientCertificateInfo holds the client TLS certificate info configuration.
+                    description: TLSClientCertificateInfo holds the client TLS certificate
+                      info configuration.
                     properties:
                       issuer:
-                        description: TLSCLientCertificateDNInfo holds the client TLS certificate distinguished name info configuration. cf https://tools.ietf.org/html/rfc3739
+                        description: TLSCLientCertificateDNInfo holds the client TLS
+                          certificate distinguished name info configuration. cf https://tools.ietf.org/html/rfc3739
                         properties:
                           commonName:
                             type: boolean
@@ -387,7 +424,8 @@ spec:
                       serialNumber:
                         type: boolean
                       subject:
-                        description: TLSCLientCertificateDNInfo holds the client TLS certificate distinguished name info configuration. cf https://tools.ietf.org/html/rfc3739
+                        description: TLSCLientCertificateDNInfo holds the client TLS
+                          certificate distinguished name info configuration. cf https://tools.ietf.org/html/rfc3739
                         properties:
                           commonName:
                             type: boolean
@@ -415,7 +453,8 @@ spec:
                   x-kubernetes-preserve-unknown-fields: true
                 type: object
               rateLimit:
-                description: RateLimit holds the rate limiting configuration for a given router.
+                description: RateLimit holds the rate limiting configuration for a
+                  given router.
                 properties:
                   average:
                     format: int64
@@ -429,7 +468,10 @@ spec:
                     - type: string
                     x-kubernetes-int-or-string: true
                   sourceCriterion:
-                    description: SourceCriterion defines what criterion is used to group requests as originating from a common source. If none are set, the default is to use the request's remote address field. All fields are mutually exclusive.
+                    description: SourceCriterion defines what criterion is used to
+                      group requests as originating from a common source. If none
+                      are set, the default is to use the request's remote address
+                      field. All fields are mutually exclusive.
                     properties:
                       ipStrategy:
                         description: IPStrategy holds the ip strategy configuration.

@@ -156,6 +156,32 @@ const routes = [
           protocol: 'tcp',
           title: 'TCP Service Detail'
         }
+      },
+      {
+        path: 'middlewares',
+        name: 'tcpMiddlewares',
+        components: {
+          default: () => import('pages/tcp/Middlewares.vue'),
+          NavBar: () => import('components/_commons/ToolBar.vue')
+        },
+        props: { default: true, NavBar: true },
+        meta: {
+          protocol: 'tcp',
+          title: 'TCP Middlewares'
+        }
+      },
+      {
+        path: 'middlewares/:name',
+        name: 'tcpMiddlewareDetail',
+        components: {
+          default: () => import('pages/_commons/MiddlewareDetail.vue'),
+          NavBar: () => import('components/_commons/ToolBar.vue')
+        },
+        props: { default: true, NavBar: true },
+        meta: {
+          protocol: 'tcp',
+          title: 'TCP Middleware Detail'
+        }
       }
     ]
   },

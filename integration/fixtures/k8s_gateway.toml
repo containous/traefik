@@ -12,11 +12,17 @@
   kubernetesGateway = true
 
 [entryPoints]
+  [entryPoints.footlspassthrough]
+    address = ":9001"
+  [entryPoints.footlsterminate]
+    address = ":9002"
   [entryPoints.footcp]
     address = ":8193"
   [entryPoints.fooudp]
     address = ":8190/udp"
   [entryPoints.web]
     address = ":8180"
+  [entryPoints.websecure]
+    address = ":8443"
 
 [providers.kubernetesGateway]

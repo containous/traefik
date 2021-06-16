@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.0
+    controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
   name: traefikservices.traefik.containo.us
 spec:
@@ -19,21 +19,30 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: TraefikService is the specification for a service (that an IngressRoute refers to) that is usually not a terminal service (i.e. not a pod of servers), as opposed to a Kubernetes Service. That is to say, it usually refers to other (children) services, which themselves can be TraefikServices or Services.
+        description: TraefikService is the specification for a service (that an IngressRoute
+          refers to) that is usually not a terminal service (i.e. not a pod of servers),
+          as opposed to a Kubernetes Service. That is to say, it usually refers to
+          other (children) services, which themselves can be TraefikServices or Services.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
           spec:
-            description: ServiceSpec defines whether a TraefikService is a load-balancer of services or a mirroring service.
+            description: ServiceSpec defines whether a TraefikService is a load-balancer
+              of services or a mirroring service.
             properties:
               mirroring:
-                description: Mirroring defines a mirroring service, which is composed of a main load-balancer, and a list of mirrors.
+                description: Mirroring defines a mirroring service, which is composed
+                  of a main load-balancer, and a list of mirrors.
                 properties:
                   kind:
                     enum:
@@ -45,7 +54,8 @@ spec:
                     type: integer
                   mirrors:
                     items:
-                      description: MirrorService defines one of the mirrors of a Mirroring service.
+                      description: MirrorService defines one of the mirrors of a Mirroring
+                        service.
                       properties:
                         kind:
                           enum:
@@ -53,7 +63,10 @@ spec:
                           - TraefikService
                           type: string
                         name:
-                          description: Name is a reference to a Kubernetes Service object (for a load-balancer of servers), or to a TraefikService object (service load-balancer, mirroring, etc). The differentiation between the two is specified in the Kind field.
+                          description: Name is a reference to a Kubernetes Service
+                            object (for a load-balancer of servers), or to a TraefikService
+                            object (service load-balancer, mirroring, etc). The differentiation
+                            between the two is specified in the Kind field.
                           type: string
                         namespace:
                           type: string
@@ -67,7 +80,8 @@ spec:
                           - type: string
                           x-kubernetes-int-or-string: true
                         responseForwarding:
-                          description: ResponseForwarding holds configuration for the forward of the response.
+                          description: ResponseForwarding holds configuration for
+                            the forward of the response.
                           properties:
                             flushInterval:
                               type: string
@@ -80,7 +94,8 @@ spec:
                           description: Sticky holds the sticky configuration.
                           properties:
                             cookie:
-                              description: Cookie holds the sticky configuration based on cookie.
+                              description: Cookie holds the sticky configuration based
+                                on cookie.
                               properties:
                                 httpOnly:
                                   type: boolean
@@ -95,14 +110,19 @@ spec:
                         strategy:
                           type: string
                         weight:
-                          description: Weight should only be specified when Name references a TraefikService object (and to be precise, one that embeds a Weighted Round Robin).
+                          description: Weight should only be specified when Name references
+                            a TraefikService object (and to be precise, one that embeds
+                            a Weighted Round Robin).
                           type: integer
                       required:
                       - name
                       type: object
                     type: array
                   name:
-                    description: Name is a reference to a Kubernetes Service object (for a load-balancer of servers), or to a TraefikService object (service load-balancer, mirroring, etc). The differentiation between the two is specified in the Kind field.
+                    description: Name is a reference to a Kubernetes Service object
+                      (for a load-balancer of servers), or to a TraefikService object
+                      (service load-balancer, mirroring, etc). The differentiation
+                      between the two is specified in the Kind field.
                     type: string
                   namespace:
                     type: string
@@ -114,7 +134,8 @@ spec:
                     - type: string
                     x-kubernetes-int-or-string: true
                   responseForwarding:
-                    description: ResponseForwarding holds configuration for the forward of the response.
+                    description: ResponseForwarding holds configuration for the forward
+                      of the response.
                     properties:
                       flushInterval:
                         type: string
@@ -127,7 +148,8 @@ spec:
                     description: Sticky holds the sticky configuration.
                     properties:
                       cookie:
-                        description: Cookie holds the sticky configuration based on cookie.
+                        description: Cookie holds the sticky configuration based on
+                          cookie.
                         properties:
                           httpOnly:
                             type: boolean
@@ -142,7 +164,9 @@ spec:
                   strategy:
                     type: string
                   weight:
-                    description: Weight should only be specified when Name references a TraefikService object (and to be precise, one that embeds a Weighted Round Robin).
+                    description: Weight should only be specified when Name references
+                      a TraefikService object (and to be precise, one that embeds
+                      a Weighted Round Robin).
                     type: integer
                 required:
                 - name
@@ -160,7 +184,10 @@ spec:
                           - TraefikService
                           type: string
                         name:
-                          description: Name is a reference to a Kubernetes Service object (for a load-balancer of servers), or to a TraefikService object (service load-balancer, mirroring, etc). The differentiation between the two is specified in the Kind field.
+                          description: Name is a reference to a Kubernetes Service
+                            object (for a load-balancer of servers), or to a TraefikService
+                            object (service load-balancer, mirroring, etc). The differentiation
+                            between the two is specified in the Kind field.
                           type: string
                         namespace:
                           type: string
@@ -172,7 +199,8 @@ spec:
                           - type: string
                           x-kubernetes-int-or-string: true
                         responseForwarding:
-                          description: ResponseForwarding holds configuration for the forward of the response.
+                          description: ResponseForwarding holds configuration for
+                            the forward of the response.
                           properties:
                             flushInterval:
                               type: string
@@ -185,7 +213,8 @@ spec:
                           description: Sticky holds the sticky configuration.
                           properties:
                             cookie:
-                              description: Cookie holds the sticky configuration based on cookie.
+                              description: Cookie holds the sticky configuration based
+                                on cookie.
                               properties:
                                 httpOnly:
                                   type: boolean
@@ -200,7 +229,9 @@ spec:
                         strategy:
                           type: string
                         weight:
-                          description: Weight should only be specified when Name references a TraefikService object (and to be precise, one that embeds a Weighted Round Robin).
+                          description: Weight should only be specified when Name references
+                            a TraefikService object (and to be precise, one that embeds
+                            a Weighted Round Robin).
                           type: integer
                       required:
                       - name
@@ -210,7 +241,8 @@ spec:
                     description: Sticky holds the sticky configuration.
                     properties:
                       cookie:
-                        description: Cookie holds the sticky configuration based on cookie.
+                        description: Cookie holds the sticky configuration based on
+                          cookie.
                         properties:
                           httpOnly:
                             type: boolean

@@ -294,6 +294,14 @@ which in turn will create the resulting routers, services, handlers, etc.
     traefik.ingress.kubernetes.io/service.serversscheme: h2c
     ```
 
+??? info "`traefik.ingress.kubernetes.io/service.serverstransport`"
+
+    See [ServersTransport](../services/index.md#serverstransport) for more information.
+
+    ```yaml
+    traefik.ingress.kubernetes.io/service.serverstransport: foobar@file
+    ```
+
 ??? info "`traefik.ingress.kubernetes.io/service.passhostheader`"
 
     See [pass Host header](../services/index.md#pass-host-header) for more information.
@@ -868,7 +876,7 @@ There are 3 ways to configure Traefik to use https to communicate with pods:
 
 1. If the service port defined in the ingress spec is `443` (note that you can still use `targetPort` to use a different port on your pod).
 1. If the service port defined in the ingress spec has a name that starts with https (such as `https-api`, `https-web` or just `https`).
-1. If the ingress spec includes the annotation `traefik.ingress.kubernetes.io/service.serversscheme: https`.
+1. If the service spec includes the annotation `traefik.ingress.kubernetes.io/service.serversscheme: https`.
 
 If either of those configuration options exist, then the backend communication protocol is assumed to be TLS,
 and will connect via TLS automatically.

@@ -31,7 +31,7 @@
             </div>
             <div class="col-4">
               <q-avatar>
-                <q-icon :name="`img:statics/providers/${getProvider(service)}.svg`" />
+                <q-icon :name="`img:${getProviderLogoPath(service)}`" />
               </q-avatar>
             </div>
           </div>
@@ -61,6 +61,16 @@ export default {
       }
 
       return this.data.provider
+    },
+    getProviderLogoPath (service) {
+      const provider = this.getProvider(service)
+      const name = provider.name.toLowerCase()
+
+      if (name.includes('plugin-')) {
+        return 'statics/providers/plugin.svg'
+      }
+
+      return `statics/providers/${name}.svg`
     }
   }
 }

@@ -22,7 +22,7 @@ If they do, the router might transform the request using pieces of [middleware](
 ## Example with a File Provider
 
 Below is an example of a full configuration file for the [file provider](../providers/file.md) that forwards `http://domain/whoami/` requests to a service reachable on `http://private/whoami-service/`.
-In the process, Traefik will make sure that the user is authenticated (using the [BasicAuth middleware](../middlewares/basicauth.md)).
+In the process, Traefik will make sure that the user is authenticated (using the [BasicAuth middleware](../middlewares/http/basicauth.md)).
 
 Static configuration:
 

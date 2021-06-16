@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/json"
+	"fmt"
 	stdlog "log"
 	"net/http"
 	"os"
@@ -224,11 +225,29 @@ func setupServer(staticConfiguration *static.Configuration) (*server.Server, err
 		})
 	}
 
+	if staticConfiguration.Pilot != nil {
+		version.PilotEnabled = staticConfiguration.Pilot.Dashboard
+	}
+
 	// Plugins
 
 	pluginBuilder, err := createPluginBuilder(staticConfiguration)
 	if err != nil {
 		return nil, err
+	}
+
+	// Providers plugins
+
+	for s, i := range staticConfiguration.Providers.Plugin {
+		p, err := pluginBuilder.BuildProvider(s, i)
+		if err != nil {
+			return nil, fmt.Errorf("plugin: failed to build provider: %w", err)
+		}
+
+		err = providerAggregator.AddProvider(p)
+		if err != nil {
+			return nil, fmt.Errorf("plugin: failed to add provider: %w", err)
+		}
 	}
 
 	// Metrics
@@ -249,7 +268,7 @@ func setupServer(staticConfiguration *static.Configuration) (*server.Server, err
 
 	accessLog := setupAccessLog(staticConfiguration.AccessLog)
 	chainBuilder := middleware.NewChainBuilder(*staticConfiguration, metricsRegistry, accessLog)
-	routerFactory := server.NewRouterFactory(*staticConfiguration, managerFactory, tlsManager, chainBuilder, pluginBuilder)
+	routerFactory := server.NewRouterFactory(*staticConfiguration, managerFactory, tlsManager, chainBuilder, pluginBuilder, metricsRegistry)
 
 	// Watcher
 

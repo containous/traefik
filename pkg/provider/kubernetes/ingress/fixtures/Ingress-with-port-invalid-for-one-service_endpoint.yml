@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: service1
+  namespace: testing
+subsets:
+  - addresses:
+      - ip: 10.0.0.1
+        nodeName: admin.whoami.service1
+    ports:
+      - name: http-admin
+        port: 8079
+        protocol: TCP
+  - addresses:
+      - ip: 10.0.0.1
+        nodeName: whoami.service1
+#        targetRef:
+    ports:
+      - name: http
+        port: 8080
+        protocol: TCP

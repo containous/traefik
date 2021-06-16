@@ -7,7 +7,7 @@ SHA := $(shell git rev-parse HEAD)
 VERSION_GIT := $(if $(TAG_NAME),$(TAG_NAME),$(SHA))
 VERSION := $(if $(VERSION),$(VERSION),$(VERSION_GIT))
 
-BIND_DIR := "dist"
+BIND_DIR := dist
 
 GIT_BRANCH := $(subst heads/,,$(shell git rev-parse --abbrev-ref HEAD 2>/dev/null))
 TRAEFIK_DEV_IMAGE := traefik-dev$(if $(GIT_BRANCH),:$(subst /,-,$(GIT_BRANCH)))
@@ -123,13 +123,21 @@ shell: build-dev-image
 docs:
 	make -C ./docs docs
 
-## Serve the documentation site localy
+## Serve the documentation site locally
 docs-serve:
 	make -C ./docs docs-serve
+
+## Pull image for doc building
+docs-pull-images:
+	make -C ./docs docs-pull-images
 
 ## Generate CRD clientset
 generate-crd:
 	./script/update-generated-crd-code.sh
+
+## Generate code from dynamic configuration https://github.com/traefik/genconf
+generate-genconf:
+	go run ./cmd/internal/gen/
 
 ## Create packages for the release
 release-packages: generate-webui build-dev-image

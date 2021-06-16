@@ -66,8 +66,8 @@ with a router attached to the service `api@internal` in the
 to allow defining:
 
 - One or more security features through [middlewares](../middlewares/overview.md)
-  like authentication ([basicAuth](../middlewares/basicauth.md) , [digestAuth](../middlewares/digestauth.md),
-  [forwardAuth](../middlewares/forwardauth.md)) or [whitelisting](../middlewares/ipwhitelist.md).
+  like authentication ([basicAuth](../middlewares/http/basicauth.md) , [digestAuth](../middlewares/http/digestauth.md),
+  [forwardAuth](../middlewares/http/forwardauth.md)) or [whitelisting](../middlewares/http/ipwhitelist.md).
 
 - A [router rule](#dashboard-router-rule) for accessing the dashboard,
   through Traefik itself (sometimes referred as "Traefik-ception").

@@ -1,4 +1,5 @@
-FROM node:12.18
+FROM node:14.16
+# Current Active LTS release according to (https://nodejs.org/en/about/releases/)
 
 ENV WEBUI_DIR /src/webui
 ARG ARG_PLATFORM_URL=https://pilot.traefik.io

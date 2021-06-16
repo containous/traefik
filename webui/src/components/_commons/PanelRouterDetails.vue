@@ -14,7 +14,7 @@
             <div class="text-subtitle2">PROVIDER</div>
             <div class="block-right-text">
               <q-avatar class="provider-logo">
-                <q-icon :name="`img:statics/providers/${data.provider}.svg`" />
+                <q-icon :name="`img:${getProviderLogoPath}`" />
               </q-avatar>
               <div class="block-right-text-label">{{data.provider}}</div>
             </div>
@@ -126,6 +126,17 @@ export default {
         return 'error'
       }
       return value
+    }
+  },
+  computed: {
+    getProviderLogoPath () {
+      const name = this.data.provider.toLowerCase()
+
+      if (name.includes('plugin-')) {
+        return 'statics/providers/plugin.svg'
+      }
+
+      return `statics/providers/${name}.svg`
     }
   }
 }

@@ -40,6 +40,8 @@ type Interface interface {
 	IngressRouteUDPs() IngressRouteUDPInformer
 	// Middlewares returns a MiddlewareInformer.
 	Middlewares() MiddlewareInformer
+	// MiddlewareTCPs returns a MiddlewareTCPInformer.
+	MiddlewareTCPs() MiddlewareTCPInformer
 	// ServersTransports returns a ServersTransportInformer.
 	ServersTransports() ServersTransportInformer
 	// TLSOptions returns a TLSOptionInformer.
@@ -79,6 +81,11 @@ func (v *version) IngressRouteUDPs() IngressRouteUDPInformer {
 // Middlewares returns a MiddlewareInformer.
 func (v *version) Middlewares() MiddlewareInformer {
 	return &middlewareInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// MiddlewareTCPs returns a MiddlewareTCPInformer.
+func (v *version) MiddlewareTCPs() MiddlewareTCPInformer {
+	return &middlewareTCPInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ServersTransports returns a ServersTransportInformer.

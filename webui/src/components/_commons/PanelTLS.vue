@@ -21,7 +21,7 @@
           </div>
         </div>
       </q-card-section>
-      <q-card-section v-if="protocol == 'tcp'">
+      <q-card-section v-if="protocol === 'tcp'">
         <div class="row items-start no-wrap">
           <div class="col">
             <div class="text-subtitle2">PASSTHROUGH</div>

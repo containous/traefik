@@ -17,19 +17,29 @@ var (
 )
 
 const (
-	statsdMetricsServiceReqsName        = "service.request.total"
-	statsdMetricsServiceLatencyName     = "service.request.duration"
-	statsdRetriesTotalName              = "service.retries.total"
-	statsdConfigReloadsName             = "config.reload.total"
-	statsdConfigReloadsFailureName      = statsdConfigReloadsName + ".failure"
-	statsdLastConfigReloadSuccessName   = "config.reload.lastSuccessTimestamp"
-	statsdLastConfigReloadFailureName   = "config.reload.lastFailureTimestamp"
-	statsdEntryPointReqsName            = "entrypoint.request.total"
-	statsdEntryPointReqDurationName     = "entrypoint.request.duration"
-	statsdEntryPointOpenConnsName       = "entrypoint.connections.open"
-	statsdOpenConnsName                 = "service.connections.open"
-	statsdServerUpName                  = "service.server.up"
+	statsdConfigReloadsName           = "config.reload.total"
+	statsdConfigReloadsFailureName    = statsdConfigReloadsName + ".failure"
+	statsdLastConfigReloadSuccessName = "config.reload.lastSuccessTimestamp"
+	statsdLastConfigReloadFailureName = "config.reload.lastFailureTimestamp"
+
 	statsdTLSCertsNotAfterTimestampName = "tls.certs.notAfterTimestamp"
+
+	statsdEntryPointReqsName        = "entrypoint.request.total"
+	statsdEntryPointReqsTLSName     = "entrypoint.request.tls.total"
+	statsdEntryPointReqDurationName = "entrypoint.request.duration"
+	statsdEntryPointOpenConnsName   = "entrypoint.connections.open"
+
+	statsdRouterReqsName         = "router.request.total"
+	statsdRouterReqsTLSName      = "router.request.tls.total"
+	statsdRouterReqsDurationName = "router.request.duration"
+	statsdRouterOpenConnsName    = "router.connections.open"
+
+	statsdServiceReqsName         = "service.request.total"
+	statsdServiceReqsTLSName      = "service.request.tls.total"
+	statsdServiceReqsDurationName = "service.request.duration"
+	statsdServiceRetriesTotalName = "service.retries.total"
+	statsdServiceServerUpName     = "service.server.up"
+	statsdServiceOpenConnsName    = "service.connections.open"
 )
 
 // RegisterStatsd registers the metrics pusher if this didn't happen yet and creates a statsd Registry instance.
@@ -59,17 +69,27 @@ func RegisterStatsd(ctx context.Context, config *types.Statsd) Registry {
 	if config.AddEntryPointsLabels {
 		registry.epEnabled = config.AddEntryPointsLabels
 		registry.entryPointReqsCounter = statsdClient.NewCounter(statsdEntryPointReqsName, 1.0)
+		registry.entryPointReqsTLSCounter = statsdClient.NewCounter(statsdEntryPointReqsTLSName, 1.0)
 		registry.entryPointReqDurationHistogram, _ = NewHistogramWithScale(statsdClient.NewTiming(statsdEntryPointReqDurationName, 1.0), time.Millisecond)
 		registry.entryPointOpenConnsGauge = statsdClient.NewGauge(statsdEntryPointOpenConnsName)
 	}
 
+	if config.AddRoutersLabels {
+		registry.routerEnabled = config.AddRoutersLabels
+		registry.routerReqsCounter = statsdClient.NewCounter(statsdRouterReqsName, 1.0)
+		registry.routerReqsTLSCounter = statsdClient.NewCounter(statsdRouterReqsTLSName, 1.0)
+		registry.routerReqDurationHistogram, _ = NewHistogramWithScale(statsdClient.NewTiming(statsdRouterReqsDurationName, 1.0), time.Millisecond)
+		registry.routerOpenConnsGauge = statsdClient.NewGauge(statsdRouterOpenConnsName)
+	}
+
 	if config.AddServicesLabels {
 		registry.svcEnabled = config.AddServicesLabels
-		registry.serviceReqsCounter = statsdClient.NewCounter(statsdMetricsServiceReqsName, 1.0)
-		registry.serviceReqDurationHistogram, _ = NewHistogramWithScale(statsdClient.NewTiming(statsdMetricsServiceLatencyName, 1.0), time.Millisecond)
-		registry.serviceRetriesCounter = statsdClient.NewCounter(statsdRetriesTotalName, 1.0)
-		registry.serviceOpenConnsGauge = statsdClient.NewGauge(statsdOpenConnsName)
-		registry.serviceServerUpGauge = statsdClient.NewGauge(statsdServerUpName)
+		registry.serviceReqsCounter = statsdClient.NewCounter(statsdServiceReqsName, 1.0)
+		registry.serviceReqsTLSCounter = statsdClient.NewCounter(statsdServiceReqsTLSName, 1.0)
+		registry.serviceReqDurationHistogram, _ = NewHistogramWithScale(statsdClient.NewTiming(statsdServiceReqsDurationName, 1.0), time.Millisecond)
+		registry.serviceRetriesCounter = statsdClient.NewCounter(statsdServiceRetriesTotalName, 1.0)
+		registry.serviceOpenConnsGauge = statsdClient.NewGauge(statsdServiceOpenConnsName)
+		registry.serviceServerUpGauge = statsdClient.NewGauge(statsdServiceServerUpName)
 	}
 
 	return registry

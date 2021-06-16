@@ -59,6 +59,27 @@ metrics:
 ```bash tab="CLI"
 --metrics.datadog.addEntryPointsLabels=true
 ```
+#### `AddRoutersLabels`
+
+_Optional, Default=false_
+
+Enable metrics on routers.
+
+```toml tab="File (TOML)"
+[metrics]
+  [metrics.datadog]
+    addRoutersLabels = true
+```
+
+```yaml tab="File (YAML)"
+metrics:
+  datadog:
+    addRoutersLabels: true
+```
+
+```bash tab="CLI"
+--metrics.datadog.addrouterslabels=true
+```
 
 #### `addServicesLabels`
 

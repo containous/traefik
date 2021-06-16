@@ -3,6 +3,7 @@ whoami1:
   labels:
     - traefik.enable=true
     - traefik.http.routers.router1.rule=PathPrefix("/whoami")
+    - traefik.http.routers.router2.rule=PathPrefix("/whoami2")
 
 whoami2:
   image: traefik/whoami

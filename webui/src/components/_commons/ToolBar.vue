@@ -7,7 +7,7 @@
       <q-route-tab :to="`/${protocol}/services`" no-caps :label="`${protocolLabel} Services`">
         <q-badge v-if="servicesTotal !== 0" align="middle" :label="servicesTotal" class="q-ml-sm"/>
       </q-route-tab>
-      <q-route-tab v-if="protocol === 'http'" :to="`/${protocol}/middlewares`" no-caps :label="`${protocolLabel} Middlewares`">
+      <q-route-tab v-if="protocol !== 'udp'" :to="`/${protocol}/middlewares`" no-caps :label="`${protocolLabel} Middlewares`">
         <q-badge v-if="middlewaresTotal !== 0" align="middle" :label="middlewaresTotal" class="q-ml-sm"/>
       </q-route-tab>
     </q-tabs>

@@ -7,7 +7,10 @@ const {
   getAllRoutersFailure,
   getAllServicesRequest,
   getAllServicesSuccess,
-  getAllServicesFailure
+  getAllServicesFailure,
+  getAllMiddlewaresRequest,
+  getAllMiddlewaresSuccess,
+  getAllMiddlewaresFailure
 } = store.mutations
 
 describe('tcp mutations', function () {
@@ -192,6 +195,98 @@ describe('tcp mutations', function () {
       expect(state.allServices.loading).to.equal(false)
       expect(state.allServices.endReached).to.equal(true)
       expect(state.allServices.items.length).to.equal(3)
+    })
+  })
+
+  /* Middlewares */
+  describe('tcp middlewares mutations', function () {
+    it('getAllMiddlewaresRequest', function () {
+      const state = {
+        allMiddlewares: {
+          items: [{}, {}, {}]
+        }
+      }
+
+      getAllMiddlewaresRequest(state)
+
+      expect(state.allMiddlewares.loading).to.equal(true)
+      expect(state.allMiddlewares.items.length).to.equal(3)
+    })
+
+    it('getAllMiddlewaresSuccess page 1', function () {
+      const state = {
+        allMiddlewares: {
+          loading: true
+        }
+      }
+
+      const data = {
+        body: {
+          data: [{}, {}, {}],
+          total: 3
+        },
+        query: 'test query',
+        status: 'warning',
+        page: 1
+      }
+
+      getAllMiddlewaresSuccess(state, data)
+
+      expect(state.allMiddlewares.loading).to.equal(false)
+      expect(state.allMiddlewares.total).to.equal(3)
+      expect(state.allMiddlewares.items.length).to.equal(3)
+      expect(state.allMiddlewares.currentPage).to.equal(1)
+      expect(state.allMiddlewares.currentQuery).to.equal('test query')
+      expect(state.allMiddlewares.currentStatus).to.equal('warning')
+    })
+
+    it('getAllMiddlewaresSuccess page 2', function () {
+      const state = {
+        allMiddlewares: {
+          loading: false,
+          items: [{ id: 1 }, { id: 2 }, { id: 3 }],
+          total: 3,
+          currentPage: 1,
+          currentQuery: 'test query',
+          currentStatus: 'warning'
+        }
+      }
+
+      const data = {
+        body: {
+          data: [{ id: 4 }, { id: 5 }, { id: 6 }, { id: 7 }],
+          total: 4
+        },
+        query: 'test query',
+        status: 'warning',
+        page: 2
+      }
+
+      getAllMiddlewaresSuccess(state, data)
+
+      expect(state.allMiddlewares.loading).to.equal(false)
+      expect(state.allMiddlewares.total).to.equal(7)
+      expect(state.allMiddlewares.items.length).to.equal(7)
+      expect(state.allMiddlewares.currentPage).to.equal(2)
+      expect(state.allMiddlewares.currentQuery).to.equal('test query')
+      expect(state.allMiddlewares.currentStatus).to.equal('warning')
+    })
+
+    it('getAllMiddlewaresFailing', function () {
+      const state = {
+        allMiddlewares: {
+          items: [{}, {}, {}],
+          loading: true
+        }
+      }
+
+      const error = { message: 'invalid request: page: 3, per_page: 10' }
+
+      getAllMiddlewaresFailure(state, error)
+
+      expect(state.allMiddlewares.loading).to.equal(false)
+      expect(state.allMiddlewares.endReached).to.equal(true)
+      expect(state.allMiddlewares.items.length).to.equal(3)
     })
   })
 })

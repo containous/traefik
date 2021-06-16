@@ -100,7 +100,7 @@ func (r *RoundTripperManager) Get(name string) (http.RoundTripper, error) {
 
 // createRoundTripper creates an http.RoundTripper configured with the Transport configuration settings.
 // For the settings that can't be configured in Traefik it uses the default http.Transport settings.
-// An exception to this is the MaxIdleConns setting as we only provide the option MaxIdleConnsPerHostin Traefik at this point in time.
+// An exception to this is the MaxIdleConns setting as we only provide the option MaxIdleConnsPerHost in Traefik at this point in time.
 // Setting this value to the default of 100 could lead to confusing behavior and backwards compatibility issues.
 func createRoundTripper(cfg *dynamic.ServersTransport) (http.RoundTripper, error) {
 	if cfg == nil {
@@ -127,15 +127,6 @@ func createRoundTripper(cfg *dynamic.ServersTransport) (http.RoundTripper, error
 		WriteBufferSize:       64 * 1024,
 	}
 
-	transport.RegisterProtocol("h2c", &h2cTransportWrapper{
-		Transport: &http2.Transport{
-			DialTLS: func(netw, addr string, cfg *tls.Config) (net.Conn, error) {
-				return net.Dial(netw, addr)
-			},
-			AllowHTTP: true,
-		},
-	})
-
 	if cfg.ForwardingTimeouts != nil {
 		transport.ResponseHeaderTimeout = time.Duration(cfg.ForwardingTimeouts.ResponseHeaderTimeout)
 		transport.IdleConnTimeout = time.Duration(cfg.ForwardingTimeouts.IdleConnTimeout)
@@ -149,6 +140,20 @@ func createRoundTripper(cfg *dynamic.ServersTransport) (http.RoundTripper, error
 			Certificates:       cfg.Certificates.GetCertificates(),
 		}
 	}
+
+	// Return directly HTTP/1.1 transport when HTTP/2 is disabled
+	if cfg.DisableHTTP2 {
+		return transport, nil
+	}
+
+	transport.RegisterProtocol("h2c", &h2cTransportWrapper{
+		Transport: &http2.Transport{
+			DialTLS: func(netw, addr string, cfg *tls.Config) (net.Conn, error) {
+				return net.Dial(netw, addr)
+			},
+			AllowHTTP: true,
+		},
+	})
 
 	return newSmartRoundTripper(transport)
 }

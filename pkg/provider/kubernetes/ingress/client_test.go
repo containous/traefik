@@ -1,6 +1,7 @@
 package ingress
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -188,6 +189,105 @@ func TestClientIgnoresHelmOwnedSecrets(t *testing.T) {
 	_, found, err = client.GetSecret("default", "helm-secret")
 	require.NoError(t, err)
 	assert.False(t, found)
+}
+
+func TestClientIgnoresEmptyEndpointUpdates(t *testing.T) {
+	emptyEndpoint := &corev1.Endpoints{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "empty-endpoint",
+			Namespace:       "test",
+			ResourceVersion: "1244",
+			Annotations: map[string]string{
+				"test-annotation": "_",
+			},
+		},
+	}
+
+	filledEndpoint := &corev1.Endpoints{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "filled-endpoint",
+			Namespace:       "test",
+			ResourceVersion: "1234",
+		},
+		Subsets: []corev1.EndpointSubset{{
+			Addresses: []corev1.EndpointAddress{{
+				IP: "10.13.37.1",
+			}},
+			Ports: []corev1.EndpointPort{{
+				Name:     "testing",
+				Port:     1337,
+				Protocol: "tcp",
+			}},
+		}},
+	}
+
+	kubeClient := kubefake.NewSimpleClientset(emptyEndpoint, filledEndpoint)
+
+	discovery, _ := kubeClient.Discovery().(*fakediscovery.FakeDiscovery)
+	discovery.FakedServerVersion = &version.Info{
+		GitVersion: "v1.19",
+	}
+
+	client := newClientImpl(kubeClient)
+
+	stopCh := make(chan struct{})
+
+	eventCh, err := client.WatchAll(nil, stopCh)
+	require.NoError(t, err)
+
+	select {
+	case event := <-eventCh:
+		ep, ok := event.(*corev1.Endpoints)
+		require.True(t, ok)
+
+		assert.True(t, ep.Name == "empty-endpoint" || ep.Name == "filled-endpoint")
+	case <-time.After(50 * time.Millisecond):
+		assert.Fail(t, "expected to receive event for endpoints")
+	}
+
+	emptyEndpoint, err = kubeClient.CoreV1().Endpoints("test").Get(context.TODO(), "empty-endpoint", metav1.GetOptions{})
+	assert.NoError(t, err)
+
+	// Update endpoint annotation and resource version (apparently not done by fake client itself)
+	// to show an update that should not trigger an update event on our eventCh.
+	// This reflects the behavior of kubernetes controllers which use endpoint annotations for leader election.
+	emptyEndpoint.Annotations["test-annotation"] = "___"
+	emptyEndpoint.ResourceVersion = "1245"
+	_, err = kubeClient.CoreV1().Endpoints("test").Update(context.TODO(), emptyEndpoint, metav1.UpdateOptions{})
+	require.NoError(t, err)
+
+	select {
+	case event := <-eventCh:
+		ep, ok := event.(*corev1.Endpoints)
+		require.True(t, ok)
+
+		assert.Fail(t, "didn't expect to receive event for empty endpoint update", ep.Name)
+	case <-time.After(50 * time.Millisecond):
+	}
+
+	filledEndpoint, err = kubeClient.CoreV1().Endpoints("test").Get(context.TODO(), "filled-endpoint", metav1.GetOptions{})
+	assert.NoError(t, err)
+
+	filledEndpoint.Subsets[0].Addresses[0].IP = "10.13.37.2"
+	filledEndpoint.ResourceVersion = "1235"
+	_, err = kubeClient.CoreV1().Endpoints("test").Update(context.TODO(), filledEndpoint, metav1.UpdateOptions{})
+	require.NoError(t, err)
+
+	select {
+	case event := <-eventCh:
+		ep, ok := event.(*corev1.Endpoints)
+		require.True(t, ok)
+
+		assert.Equal(t, "filled-endpoint", ep.Name)
+	case <-time.After(50 * time.Millisecond):
+		assert.Fail(t, "expected to receive event for filled endpoint")
+	}
+
+	select {
+	case <-eventCh:
+		assert.Fail(t, "received more than one event")
+	case <-time.After(50 * time.Millisecond):
+	}
 }
 
 func TestClientUsesCorrectServerVersion(t *testing.T) {

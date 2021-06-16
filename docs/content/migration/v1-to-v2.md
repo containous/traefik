@@ -327,7 +327,7 @@ With Traefik v2 it is applied on an entry point or a [Router](../routing/routers
 To apply a redirection:
 
 - on an entry point, the [HTTP redirection](../routing/entrypoints.md#redirection) has to be configured.
-- on a router, one of the redirect middlewares, [RedirectRegex](../middlewares/redirectregex.md) or [RedirectScheme](../middlewares/redirectscheme.md), has to be configured and added to the router middlewares list.
+- on a router, one of the redirect middlewares, [RedirectRegex](../middlewares/http/redirectregex.md) or [RedirectScheme](../middlewares/http/redirectscheme.md), has to be configured and added to the router middlewares list.
 
 !!! example "Global HTTP to HTTPS redirection"
 
@@ -545,7 +545,7 @@ Use Case: Incoming requests to `http://example.org/admin` are forwarded to the w
 with the path `/admin` stripped, e.g. to `http://<IP>:<port>/`. In this case, you must:
 
 - First, configure a router named `admin` with a rule matching at least the path prefix with the `PathPrefix` keyword,
-- Then, define a middleware of type [`stripprefix`](../middlewares/stripprefix.md), which removes the prefix `/admin`, associated to the router `admin`.
+- Then, define a middleware of type [`stripprefix`](../middlewares/http/stripprefix.md), which removes the prefix `/admin`, associated to the router `admin`.
 
 !!! example "Strip Path Prefix When Forwarding to Backend"
 
@@ -660,12 +660,12 @@ with the path `/admin` stripped, e.g. to `http://<IP>:<port>/`. In this case, yo
 
 ??? question "What About Other Path Transformations?"
 
-    Instead of removing the path prefix with the [`stripprefix` middleware](../../middlewares/stripprefix/), you can also:
+    Instead of removing the path prefix with the [`stripprefix` middleware](../../middlewares/http/stripprefix/), you can also:
 
-    - Add a path prefix with the [`addprefix` middleware](../../middlewares/addprefix/)
-    - Replace the complete path of the request with the [`replacepath` middleware](../../middlewares/replacepath/)
-    - ReplaceRewrite path using Regexp with the [`replacepathregex` middleware](../../middlewares/replacepathregex/)
-    - And a lot more on the [`middlewares` page](../../middlewares/overview/)
+    - Add a path prefix with the [`addprefix` middleware](../../middlewares/http/addprefix/)
+    - Replace the complete path of the request with the [`replacepath` middleware](../../middlewares/http/replacepath/)
+    - ReplaceRewrite path using Regexp with the [`replacepathregex` middleware](../../middlewares/http/replacepathregex/)
+    - And a lot more on the [`HTTP middlewares` page](../../middlewares/http/overview/)
 
 ## ACME (LetsEncrypt)
 

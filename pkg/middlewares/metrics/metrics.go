@@ -49,6 +49,20 @@ func NewEntryPointMiddleware(ctx context.Context, next http.Handler, registry me
 	}
 }
 
+// NewRouterMiddleware creates a new metrics middleware for a Router.
+func NewRouterMiddleware(ctx context.Context, next http.Handler, registry metrics.Registry, routerName string, serviceName string) http.Handler {
+	log.FromContext(middlewares.GetLoggerCtx(ctx, nameEntrypoint, typeName)).Debug("Creating middleware")
+
+	return &metricsMiddleware{
+		next:                 next,
+		reqsCounter:          registry.RouterReqsCounter(),
+		reqsTLSCounter:       registry.RouterReqsTLSCounter(),
+		reqDurationHistogram: registry.RouterReqDurationHistogram(),
+		openConnsGauge:       registry.RouterOpenConnsGauge(),
+		baseLabels:           []string{"router", routerName, "service", serviceName},
+	}
+}
+
 // NewServiceMiddleware creates a new metrics middleware for a Service.
 func NewServiceMiddleware(ctx context.Context, next http.Handler, registry metrics.Registry, serviceName string) http.Handler {
 	log.FromContext(middlewares.GetLoggerCtx(ctx, nameService, typeName)).Debug("Creating middleware")
@@ -67,6 +81,13 @@ func NewServiceMiddleware(ctx context.Context, next http.Handler, registry metri
 func WrapEntryPointHandler(ctx context.Context, registry metrics.Registry, entryPointName string) alice.Constructor {
 	return func(next http.Handler) (http.Handler, error) {
 		return NewEntryPointMiddleware(ctx, next, registry, entryPointName), nil
+	}
+}
+
+// WrapRouterHandler Wraps metrics router to alice.Constructor.
+func WrapRouterHandler(ctx context.Context, registry metrics.Registry, routerName string, serviceName string) alice.Constructor {
+	return func(next http.Handler) (http.Handler, error) {
+		return NewRouterMiddleware(ctx, next, registry, routerName, serviceName), nil
 	}
 }
 

@@ -26,6 +26,7 @@ import (
 	"github.com/traefik/traefik/v2/pkg/server/service/loadbalancer/mirror"
 	"github.com/traefik/traefik/v2/pkg/server/service/loadbalancer/wrr"
 	"github.com/vulcand/oxy/roundrobin"
+	"github.com/vulcand/oxy/roundrobin/stickycookie"
 )
 
 const (
@@ -310,7 +311,13 @@ func (m *Manager) getLoadBalancer(ctx context.Context, serviceName string, servi
 			SameSite: convertSameSite(service.Sticky.Cookie.SameSite),
 		}
 
-		options = append(options, roundrobin.EnableStickySession(roundrobin.NewStickySessionWithOptions(cookieName, opts)))
+		// Sticky Cookie Value
+		cv, err := stickycookie.NewFallbackValue(&stickycookie.RawValue{}, &stickycookie.HashValue{})
+		if err != nil {
+			return nil, err
+		}
+
+		options = append(options, roundrobin.EnableStickySession(roundrobin.NewStickySessionWithOptions(cookieName, opts).SetCookieValue(cv)))
 
 		logger.Debugf("Sticky session cookie name: %v", cookieName)
 	}

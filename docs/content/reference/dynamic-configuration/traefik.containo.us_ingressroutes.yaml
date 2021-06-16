@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.0
+    controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
   name: ingressroutes.traefik.containo.us
 spec:
@@ -22,15 +22,20 @@ spec:
         description: IngressRoute is an Ingress CRD specification.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
           spec:
-            description: IngressRouteSpec is a specification for a IngressRouteSpec resource.
+            description: IngressRouteSpec is a specification for a IngressRouteSpec
+              resource.
             properties:
               entryPoints:
                 items:
@@ -70,7 +75,11 @@ spec:
                             - TraefikService
                             type: string
                           name:
-                            description: Name is a reference to a Kubernetes Service object (for a load-balancer of servers), or to a TraefikService object (service load-balancer, mirroring, etc). The differentiation between the two is specified in the Kind field.
+                            description: Name is a reference to a Kubernetes Service
+                              object (for a load-balancer of servers), or to a TraefikService
+                              object (service load-balancer, mirroring, etc). The
+                              differentiation between the two is specified in the
+                              Kind field.
                             type: string
                           namespace:
                             type: string
@@ -82,7 +91,8 @@ spec:
                             - type: string
                             x-kubernetes-int-or-string: true
                           responseForwarding:
-                            description: ResponseForwarding holds configuration for the forward of the response.
+                            description: ResponseForwarding holds configuration for
+                              the forward of the response.
                             properties:
                               flushInterval:
                                 type: string
@@ -95,7 +105,8 @@ spec:
                             description: Sticky holds the sticky configuration.
                             properties:
                               cookie:
-                                description: Cookie holds the sticky configuration based on cookie.
+                                description: Cookie holds the sticky configuration
+                                  based on cookie.
                                 properties:
                                   httpOnly:
                                     type: boolean
@@ -110,7 +121,9 @@ spec:
                           strategy:
                             type: string
                           weight:
-                            description: Weight should only be specified when Name references a TraefikService object (and to be precise, one that embeds a Weighted Round Robin).
+                            description: Weight should only be specified when Name
+                              references a TraefikService object (and to be precise,
+                              one that embeds a Weighted Round Robin).
                             type: integer
                         required:
                         - name
@@ -122,7 +135,10 @@ spec:
                   type: object
                 type: array
               tls:
-                description: "TLS contains the TLS certificates configuration of the routes. To enable Let's Encrypt, use an empty TLS struct, e.g. in YAML: \n \t tls: {} # inline format \n \t tls: \t   secretName: # block format"
+                description: "TLS contains the TLS certificates configuration of the
+                  routes. To enable Let's Encrypt, use an empty TLS struct, e.g. in
+                  YAML: \n \t tls: {} # inline format \n \t tls: \t   secretName:
+                  # block format"
                 properties:
                   certResolver:
                     type: string
@@ -139,7 +155,8 @@ spec:
                       type: object
                     type: array
                   options:
-                    description: Options is a reference to a TLSOption, that specifies the parameters of the TLS connection.
+                    description: Options is a reference to a TLSOption, that specifies
+                      the parameters of the TLS connection.
                     properties:
                       name:
                         type: string
@@ -149,10 +166,12 @@ spec:
                     - name
                     type: object
                   secretName:
-                    description: SecretName is the name of the referenced Kubernetes Secret to specify the certificate details.
+                    description: SecretName is the name of the referenced Kubernetes
+                      Secret to specify the certificate details.
                     type: string
                   store:
-                    description: Store is a reference to a TLSStore, that specifies the parameters of the TLS store.
+                    description: Store is a reference to a TLSStore, that specifies
+                      the parameters of the TLS store.
                     properties:
                       name:
                         type: string

@@ -57,7 +57,7 @@ Beginning with version 1.4, Traefik respects readiness check results if the Trae
     Due to the way readiness check results are currently exposed by the Marathon API, ready tasks may be taken into rotation with a small delay.
     It is on the order of one readiness check timeout interval (as configured on the application specification) and guarantees that non-ready tasks do not receive traffic prematurely.
 
-If readiness checks are not possible, a current mitigation strategy is to enable [retries](../middlewares/retry.md) and make sure that a sufficient number of healthy application tasks exist so that one retry will likely hit one of those.
+If readiness checks are not possible, a current mitigation strategy is to enable [retries](../middlewares/http/retry.md) and make sure that a sufficient number of healthy application tasks exist so that one retry will likely hit one of those.
 Apart from its probabilistic nature, the workaround comes at the price of increased latency.
 
 #### Shutdown

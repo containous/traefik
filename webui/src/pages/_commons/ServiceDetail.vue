@@ -45,7 +45,7 @@
             </div>
           </div>
 
-          <div v-if="serviceByName.item.loadBalancer && serviceByName.item.loadBalancer.servers" class="col-12 col-md-4 q-mb-lg path-block">
+          <div v-if="serviceByName.item.loadBalancer" class="col-12 col-md-4 q-mb-lg path-block">
             <div class="row no-wrap items-center q-mb-lg app-title">
               <q-icon name="eva-globe-outline"></q-icon>
               <div class="app-title-label">Servers</div>

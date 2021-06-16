@@ -1,0 +1,41 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: MiddlewareTCP
+metadata:
+  name: ipwhitelist
+  namespace: default
+spec:
+  ipWhiteList:
+    sourceRange:
+      - 127.0.0.1/32
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: MiddlewareTCP
+metadata:
+  name: ipwhitelist
+  namespace: foo
+spec:
+  ipWhiteList:
+    sourceRange:
+      - 127.0.0.1/32
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: test.route
+  namespace: default
+
+spec:
+  entryPoints:
+    - foo
+
+  routes:
+    - match: HostSNI(`foo.com`)
+      services:
+        - name: whoamitcp
+          port: 8000
+
+      middlewares:
+        - name: ipwhitelist
+        - name: ipwhitelist
+          namespace: foo

@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes/scheme"
-	"sigs.k8s.io/service-apis/apis/v1alpha1"
+	"sigs.k8s.io/gateway-api/apis/v1alpha1"
 )
 
 var _ Client = (*clientMock)(nil)
@@ -35,6 +35,8 @@ type clientMock struct {
 	gatewayClasses []*v1alpha1.GatewayClass
 	gateways       []*v1alpha1.Gateway
 	httpRoutes     []*v1alpha1.HTTPRoute
+	tcpRoutes      []*v1alpha1.TCPRoute
+	tlsRoutes      []*v1alpha1.TLSRoute
 
 	watchChan chan interface{}
 }
@@ -63,6 +65,10 @@ func newClientMock(paths ...string) clientMock {
 				c.gateways = append(c.gateways, o)
 			case *v1alpha1.HTTPRoute:
 				c.httpRoutes = append(c.httpRoutes, o)
+			case *v1alpha1.TCPRoute:
+				c.tcpRoutes = append(c.tcpRoutes, o)
+			case *v1alpha1.TLSRoute:
+				c.tlsRoutes = append(c.tlsRoutes, o)
 			default:
 				panic(fmt.Sprintf("Unknown runtime object %+v %T", o, o))
 			}
@@ -126,7 +132,7 @@ func (c clientMock) GetGateways() []*v1alpha1.Gateway {
 }
 
 func (c clientMock) GetHTTPRoutes(namespace string, selector labels.Selector) ([]*v1alpha1.HTTPRoute, error) {
-	httpRoutes := make([]*v1alpha1.HTTPRoute, len(c.httpRoutes))
+	var httpRoutes []*v1alpha1.HTTPRoute
 
 	for _, httpRoute := range c.httpRoutes {
 		if httpRoute.Namespace == namespace && selector.Matches(labels.Set(httpRoute.Labels)) {
@@ -134,6 +140,28 @@ func (c clientMock) GetHTTPRoutes(namespace string, selector labels.Selector) ([
 		}
 	}
 	return httpRoutes, nil
+}
+
+func (c clientMock) GetTCPRoutes(namespace string, selector labels.Selector) ([]*v1alpha1.TCPRoute, error) {
+	var tcpRoutes []*v1alpha1.TCPRoute
+
+	for _, tcpRoute := range c.tcpRoutes {
+		if tcpRoute.Namespace == namespace && selector.Matches(labels.Set(tcpRoute.Labels)) {
+			tcpRoutes = append(tcpRoutes, tcpRoute)
+		}
+	}
+	return tcpRoutes, nil
+}
+
+func (c clientMock) GetTLSRoutes(namespace string, selector labels.Selector) ([]*v1alpha1.TLSRoute, error) {
+	var tlsRoutes []*v1alpha1.TLSRoute
+
+	for _, tlsRoute := range c.tlsRoutes {
+		if tlsRoute.Namespace == namespace && selector.Matches(labels.Set(tlsRoute.Labels)) {
+			tlsRoutes = append(tlsRoutes, tlsRoute)
+		}
+	}
+	return tlsRoutes, nil
 }
 
 func (c clientMock) GetService(namespace, name string) (*corev1.Service, bool, error) {

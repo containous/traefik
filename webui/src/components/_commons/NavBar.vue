@@ -28,7 +28,8 @@
                 </q-menu>
               </q-btn>
             </q-tabs>
-            <platform-auth-state />
+            <platform-auth-state
+              v-if="pilotEnabled" />
           </div>
         </q-toolbar>
       </div>
@@ -58,8 +59,11 @@ export default {
         ? this.coreVersion.Version
         : this.coreVersion.Version.substring(0, 7)
     },
+    pilotEnabled () {
+      return this.coreVersion.pilotEnabled
+    },
     parsedVersion () {
-      if (this.version === undefined) {
+      if (!this.version) {
         return 'master'
       }
       if (this.version === 'dev') {

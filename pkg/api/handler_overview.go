@@ -45,8 +45,9 @@ func (h Handler) getOverview(rw http.ResponseWriter, request *http.Request) {
 			Middlewares: getHTTPMiddlewareSection(h.runtimeConfiguration.Middlewares),
 		},
 		TCP: schemeOverview{
-			Routers:  getTCPRouterSection(h.runtimeConfiguration.TCPRouters),
-			Services: getTCPServiceSection(h.runtimeConfiguration.TCPServices),
+			Routers:     getTCPRouterSection(h.runtimeConfiguration.TCPRouters),
+			Services:    getTCPServiceSection(h.runtimeConfiguration.TCPServices),
+			Middlewares: getTCPMiddlewareSection(h.runtimeConfiguration.TCPMiddlewares),
 		},
 		UDP: schemeOverview{
 			Routers:  getUDPRouterSection(h.runtimeConfiguration.UDPRouters),
@@ -160,6 +161,25 @@ func getTCPServiceSection(services map[string]*runtime.TCPServiceInfo) *section 
 	}
 }
 
+func getTCPMiddlewareSection(middlewares map[string]*runtime.TCPMiddlewareInfo) *section {
+	var countErrors int
+	var countWarnings int
+	for _, mid := range middlewares {
+		switch mid.Status {
+		case runtime.StatusDisabled:
+			countErrors++
+		case runtime.StatusWarning:
+			countWarnings++
+		}
+	}
+
+	return &section{
+		Total:    len(middlewares),
+		Warnings: countWarnings,
+		Errors:   countErrors,
+	}
+}
+
 func getUDPRouterSection(routers map[string]*runtime.UDPRouterInfo) *section {
 	var countErrors int
 	var countWarnings int
@@ -211,6 +231,10 @@ func getProviders(conf static.Configuration) []string {
 		if field.Kind() == reflect.Ptr && field.Elem().Kind() == reflect.Struct {
 			if !field.IsNil() {
 				providers = append(providers, v.Type().Field(i).Name)
+			}
+		} else if field.Kind() == reflect.Map && field.Type().Elem() == reflect.TypeOf(static.PluginConf{}) {
+			for _, value := range field.MapKeys() {
+				providers = append(providers, "plugin-"+value.String())
 			}
 		}
 	}

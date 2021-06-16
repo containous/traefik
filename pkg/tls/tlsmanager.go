@@ -15,16 +15,24 @@ import (
 	"github.com/traefik/traefik/v2/pkg/types"
 )
 
+const (
+	// DefaultTLSConfigName is the name of the default set of options for configuring TLS.
+	DefaultTLSConfigName = "default"
+	// DefaultTLSStoreName is the name of the default store of TLS certificates.
+	// Note that it actually is the only usable one for now.
+	DefaultTLSStoreName = "default"
+)
+
 // DefaultTLSOptions the default TLS options.
 var DefaultTLSOptions = Options{}
 
 // Manager is the TLS option/store/configuration factory.
 type Manager struct {
+	lock         sync.RWMutex
 	storesConfig map[string]Store
 	stores       map[string]*CertificateStore
 	configs      map[string]Options
 	certs        []*CertAndStores
-	lock         sync.RWMutex
 }
 
 // NewManager creates a new Manager.
@@ -38,6 +46,7 @@ func NewManager() *Manager {
 }
 
 // UpdateConfigs updates the TLS* configuration options.
+// It initializes the default TLS store, and the TLS store for the ACME challenges.
 func (m *Manager) UpdateConfigs(ctx context.Context, stores map[string]Store, configs map[string]Options, certs []*CertAndStores) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -46,10 +55,22 @@ func (m *Manager) UpdateConfigs(ctx context.Context, stores map[string]Store, co
 	m.storesConfig = stores
 	m.certs = certs
 
+	if m.storesConfig == nil {
+		m.storesConfig = make(map[string]Store)
+	}
+
+	if _, ok := m.storesConfig[DefaultTLSStoreName]; !ok {
+		m.storesConfig[DefaultTLSStoreName] = Store{}
+	}
+
+	if _, ok := m.storesConfig[tlsalpn01.ACMETLS1Protocol]; !ok {
+		m.storesConfig[tlsalpn01.ACMETLS1Protocol] = Store{}
+	}
+
 	m.stores = make(map[string]*CertificateStore)
 	for storeName, storeConfig := range m.storesConfig {
 		ctxStore := log.With(ctx, log.Str(log.TLSStoreName, storeName))
-		store, err := buildCertificateStore(ctxStore, storeConfig)
+		store, err := buildCertificateStore(ctxStore, storeConfig, storeName)
 		if err != nil {
 			log.FromContext(ctxStore).Errorf("Error while creating certificate store: %v", err)
 			continue
@@ -75,7 +96,12 @@ func (m *Manager) UpdateConfigs(ctx context.Context, stores map[string]Store, co
 	}
 
 	for storeName, certs := range storesCertificates {
-		m.getStore(storeName).DynamicCerts.Set(certs)
+		st, ok := m.stores[storeName]
+		if !ok {
+			st, _ = buildCertificateStore(context.Background(), Store{}, storeName)
+			m.stores[storeName] = st
+		}
+		st.DynamicCerts.Set(certs)
 	}
 }
 
@@ -87,20 +113,25 @@ func (m *Manager) Get(storeName, configName string) (*tls.Config, error) {
 	var tlsConfig *tls.Config
 	var err error
 
+	sniStrict := false
 	config, ok := m.configs[configName]
-	if !ok {
+	if ok {
+		sniStrict = config.SniStrict
+		tlsConfig, err = buildTLSConfig(config)
+	} else {
 		err = fmt.Errorf("unknown TLS options: %s", configName)
+	}
+	if err != nil {
 		tlsConfig = &tls.Config{}
 	}
 
 	store := m.getStore(storeName)
+	if store == nil {
+		err = fmt.Errorf("TLS store %s not found", storeName)
+	}
 	acmeTLSStore := m.getStore(tlsalpn01.ACMETLS1Protocol)
-
-	if err == nil {
-		tlsConfig, err = buildTLSConfig(config)
-		if err != nil {
-			tlsConfig = &tls.Config{}
-		}
+	if acmeTLSStore == nil {
+		err = fmt.Errorf("ACME TLS store %s not found", tlsalpn01.ACMETLS1Protocol)
 	}
 
 	tlsConfig.GetCertificate = func(clientHello *tls.ClientHelloInfo) (*tls.Certificate, error) {
@@ -120,7 +151,7 @@ func (m *Manager) Get(storeName, configName string) (*tls.Config, error) {
 			return bestCertificate, nil
 		}
 
-		if m.configs[configName].SniStrict {
+		if sniStrict {
 			return nil, fmt.Errorf("strict SNI enabled - No certificate found for domain: %q, closing connection", domainToCheck)
 		}
 
@@ -152,12 +183,13 @@ func (m *Manager) GetCertificates() []*x509.Certificate {
 	return certificates
 }
 
+// getStore returns the store found for storeName, or nil otherwise.
 func (m *Manager) getStore(storeName string) *CertificateStore {
-	_, ok := m.stores[storeName]
+	st, ok := m.stores[storeName]
 	if !ok {
-		m.stores[storeName], _ = buildCertificateStore(context.Background(), Store{})
+		return nil
 	}
-	return m.stores[storeName]
+	return st
 }
 
 // GetStore gets the certificate store of a given name.
@@ -168,7 +200,7 @@ func (m *Manager) GetStore(storeName string) *CertificateStore {
 	return m.getStore(storeName)
 }
 
-func buildCertificateStore(ctx context.Context, tlsStore Store) (*CertificateStore, error) {
+func buildCertificateStore(ctx context.Context, tlsStore Store, storename string) (*CertificateStore, error) {
 	certificateStore := NewCertificateStore()
 	certificateStore.DynamicCerts.Set(make(map[string]*tls.Certificate))
 
@@ -178,14 +210,21 @@ func buildCertificateStore(ctx context.Context, tlsStore Store) (*CertificateSto
 			return certificateStore, err
 		}
 		certificateStore.DefaultCertificate = cert
-	} else {
-		log.FromContext(ctx).Debug("No default certificate, generating one")
-		cert, err := generate.DefaultCertificate()
-		if err != nil {
-			return certificateStore, err
-		}
-		certificateStore.DefaultCertificate = cert
+		return certificateStore, nil
 	}
+
+	// a default cert for the ACME store does not make any sense, so generating one
+	// is a waste.
+	if storename == tlsalpn01.ACMETLS1Protocol {
+		return certificateStore, nil
+	}
+
+	log.FromContext(ctx).Debug("No default certificate, generating one")
+	cert, err := generate.DefaultCertificate()
+	if err != nil {
+		return certificateStore, err
+	}
+	certificateStore.DefaultCertificate = cert
 	return certificateStore, nil
 }
 

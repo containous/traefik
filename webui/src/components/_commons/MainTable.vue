@@ -12,7 +12,7 @@
             </th>
           </tr>
         </thead>
-        <tfoot v-if="!data.length">
+        <tfoot v-if="!data || !data.length">
           <tr>
             <td colspan="100%">
               <q-icon name="warning" style="font-size: 1.5rem"/> No data available

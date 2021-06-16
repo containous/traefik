@@ -103,3 +103,55 @@ export function getServiceByNameFailure (state, error) {
 export function getServiceByNameClear (state) {
   state.serviceByName = {}
 }
+
+// ----------------------------
+// Get All Middlewares
+// ----------------------------
+export function getAllMiddlewaresRequest (state) {
+  withPagination('request', { statePath: 'allMiddlewares' })(state)
+}
+
+export function getAllMiddlewaresSuccess (state, data) {
+  const { query = '', status = '' } = data
+  const currentState = state.allMiddlewares
+
+  const isSameContext = currentState.currentQuery === query && currentState.currentStatus === status
+
+  state.allMiddlewares = {
+    ...state.allMiddlewares,
+    currentQuery: query,
+    currentStatus: status
+  }
+
+  withPagination('success', {
+    isSameContext,
+    statePath: 'allMiddlewares'
+  })(state, data)
+}
+
+export function getAllMiddlewaresFailure (state, error) {
+  withPagination('failure', { statePath: 'allMiddlewares' })(state, error)
+}
+
+export function getAllMiddlewaresClear (state) {
+  state.allMiddlewares = {}
+}
+
+// ----------------------------
+// Get Middleware By Name
+// ----------------------------
+export function getMiddlewareByNameRequest (state) {
+  state.middlewareByName.loading = true
+}
+
+export function getMiddlewareByNameSuccess (state, body) {
+  state.middlewareByName = { item: body, loading: false }
+}
+
+export function getMiddlewareByNameFailure (state, error) {
+  state.middlewareByName = { error }
+}
+
+export function getMiddlewareByNameClear (state) {
+  state.middlewareByName = {}
+}

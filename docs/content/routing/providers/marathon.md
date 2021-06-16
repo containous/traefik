@@ -293,7 +293,7 @@ For example, to change the passHostHeader behavior, you'd add the label `"traefi
 
 You can declare pieces of middleware using labels starting with `traefik.http.middlewares.{middleware-name-of-your-choice}.`, followed by the middleware type/options.
 
-For example, to declare a middleware [`redirectscheme`](../../middlewares/redirectscheme.md) named `my-redirect`, you'd write `"traefik.http.middlewares.my-redirect.redirectscheme.scheme": "https"`.
+For example, to declare a middleware [`redirectscheme`](../../middlewares/http/redirectscheme.md) named `my-redirect`, you'd write `"traefik.http.middlewares.my-redirect.redirectscheme.scheme": "https"`.
 
 More information about available middlewares in the dedicated [middlewares section](../../middlewares/overview.md).
 

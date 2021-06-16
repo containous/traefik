@@ -231,6 +231,9 @@ Enable metrics on entry points. (Default: ```true```)
 `--metrics.datadog.address`:  
 Datadog's address. (Default: ```localhost:8125```)
 
+`--metrics.datadog.addrouterslabels`:  
+Enable metrics on routers. (Default: ```false```)
+
 `--metrics.datadog.addserviceslabels`:  
 Enable metrics on services. (Default: ```true```)
 
@@ -245,6 +248,9 @@ Enable metrics on entry points. (Default: ```true```)
 
 `--metrics.influxdb.address`:  
 InfluxDB address. (Default: ```localhost:8089```)
+
+`--metrics.influxdb.addrouterslabels`:  
+Enable metrics on routers. (Default: ```false```)
 
 `--metrics.influxdb.addserviceslabels`:  
 Enable metrics on services. (Default: ```true```)
@@ -273,6 +279,9 @@ Prometheus metrics exporter type. (Default: ```false```)
 `--metrics.prometheus.addentrypointslabels`:  
 Enable metrics on entry points. (Default: ```true```)
 
+`--metrics.prometheus.addrouterslabels`:  
+Enable metrics on routers. (Default: ```false```)
+
 `--metrics.prometheus.addserviceslabels`:  
 Enable metrics on services. (Default: ```true```)
 
@@ -294,6 +303,9 @@ Enable metrics on entry points. (Default: ```true```)
 `--metrics.statsd.address`:  
 StatsD address. (Default: ```localhost:8125```)
 
+`--metrics.statsd.addrouterslabels`:  
+Enable metrics on routers. (Default: ```false```)
+
 `--metrics.statsd.addserviceslabels`:  
 Enable metrics on services. (Default: ```true```)
 
@@ -302,6 +314,9 @@ Prefix to use for metrics collection. (Default: ```traefik```)
 
 `--metrics.statsd.pushinterval`:  
 StatsD push interval. (Default: ```10```)
+
+`--pilot.dashboard`:  
+Enable Traefik Pilot in the dashboard. (Default: ```true```)
 
 `--pilot.token`:  
 Traefik Pilot token.
@@ -608,6 +623,9 @@ Kubernetes bearer token (not needed for in-cluster client).
 
 `--providers.kubernetesingress`:  
 Enable Kubernetes backend with default settings. (Default: ```false```)
+
+`--providers.kubernetesingress.allowemptyservices`:  
+Allow creation of services without endpoints. (Default: ```false```)
 
 `--providers.kubernetesingress.certauthfilepath`:  
 Kubernetes certificate authority file path (not needed for in-cluster client).

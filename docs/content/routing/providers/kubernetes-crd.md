@@ -1482,16 +1482,20 @@ or referencing TLS options in the [`IngressRoute`](#kind-ingressroute) / [`Ingre
       sniStrict: true                               # [8]
     ```
 
-| Ref | Attribute                   | Purpose                                                                                                                                                                    |
-|-----|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [1] | `minVersion`                | Defines the [minimum TLS version](../../https/tls.md#minimum-tls-version) that is acceptable                                                                               |
-| [2] | `maxVersion`                | Defines the [maximum TLS version](../../https/tls.md#maximum-tls-version) that is acceptable                                                                               |
-| [3] | `cipherSuites`              | list of supported [cipher suites](../../https/tls.md#cipher-suites) for TLS versions up to TLS 1.2                                                                         |
-| [4] | `curvePreferences`          | List of the [elliptic curves references](../../https/tls.md#curve-preferences) that will be used in an ECDHE handshake, in preference order                                |
-| [5] | `clientAuth`                | determines the server's policy for TLS [Client Authentication](../../https/tls.md#client-authentication-mtls)                                                              |
-| [6] | `clientAuth.secretNames`    | list of names of the referenced Kubernetes [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/) (in TLSOption namespace)                                   |
-| [7] | `clientAuth.clientAuthType` | defines the client authentication type to apply. The available values are: `NoClientCert`, `RequestClientCert`, `VerifyClientCertIfGiven` and `RequireAndVerifyClientCert` |
-| [8] | `sniStrict`                 | if `true`, Traefik won't allow connections from clients connections that do not specify a server_name extension                                                            |
+| Ref | Attribute                   | Purpose                                                                                                                                                                                                                    |
+|-----|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [1] | `minVersion`                | Defines the [minimum TLS version](../../https/tls.md#minimum-tls-version) that is acceptable                                                                                                                               |
+| [2] | `maxVersion`                | Defines the [maximum TLS version](../../https/tls.md#maximum-tls-version) that is acceptable                                                                                                                               |
+| [3] | `cipherSuites`              | list of supported [cipher suites](../../https/tls.md#cipher-suites) for TLS versions up to TLS 1.2                                                                                                                         |
+| [4] | `curvePreferences`          | List of the [elliptic curves references](../../https/tls.md#curve-preferences) that will be used in an ECDHE handshake, in preference order                                                                                |
+| [5] | `clientAuth`                | determines the server's policy for TLS [Client Authentication](../../https/tls.md#client-authentication-mtls)                                                                                                              |
+| [6] | `clientAuth.secretNames`    | list of names of the referenced Kubernetes [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/) (in TLSOption namespace). The secret must contain a certificate under either a `tls.ca` or a `ca.crt` key. |
+| [7] | `clientAuth.clientAuthType` | defines the client authentication type to apply. The available values are: `NoClientCert`, `RequestClientCert`, `VerifyClientCertIfGiven` and `RequireAndVerifyClientCert`                                                 |
+| [8] | `sniStrict`                 | if `true`, Traefik won't allow connections from clients connections that do not specify a server_name extension                                                                                                            |
+
+!!! info "CA Secret"
+
+    The CA secret must contain a base64 encoded certificate under either a `tls.ca` or a `ca.crt` key.
 
 ??? example "Declaring and referencing a TLSOption"
    
@@ -1544,6 +1548,7 @@ or referencing TLS options in the [`IngressRoute`](#kind-ingressroute) / [`Ingre
       namespace: default
     
     data:
+      # Must contain a certificate under either a `tls.ca` or a `ca.crt` key.
       tls.ca: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=
     
     ---
@@ -1554,6 +1559,7 @@ or referencing TLS options in the [`IngressRoute`](#kind-ingressroute) / [`Ingre
       namespace: default
     
     data:
+      # Must contain a certificate under either a `tls.ca` or a `ca.crt` key. 
       tls.ca: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=
     ```
         
@@ -1679,13 +1685,17 @@ or referencing TLS stores in the [`IngressRoute`](#kind-ingressroute) / [`Ingres
 |-----|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [1] | `serverName`            | ServerName used to contact the server.                                                                                                               |
 | [2] | `insecureSkipVerify`    | Disable SSL certificate verification.                                                                                                                |
-| [3] | `rootCAsSecrets`        | Add cert file for self-signed certificate.                                                                                                           |
+| [3] | `rootCAsSecrets`        | Add cert file for self-signed certificate. The secret must contain a certificate under either a tls.ca or a ca.crt key.                              |
 | [4] | `certificatesSecrets`   | Certificates for mTLS.                                                                                                                               |
 | [5] | `maxIdleConnsPerHost`   | If non-zero, controls the maximum idle (keep-alive) to keep per-host. If zero, `defaultMaxIdleConnsPerHost` is used.                                 |
 | [6] | `forwardingTimeouts`    | Timeouts for requests forwarded to the backend servers.                                                                                              |
 | [7] | `dialTimeout`           | The amount of time to wait until a connection to a backend server can be established. If zero, no timeout exists.                                    |
 | [8] | `responseHeaderTimeout` | The amount of time to wait for a server's response headers after fully writing the request (including its body, if any). If zero, no timeout exists. |
 | [9] | `idleConnTimeout`       | The maximum period for which an idle HTTP keep-alive connection will remain open before closing itself.                                              |
+
+!!! info "CA Secret"
+
+    The CA secret must contain a base64 encoded certificate under either a `tls.ca` or a `ca.crt` key.
 
 ??? example "Declaring and referencing a ServersTransport"
    

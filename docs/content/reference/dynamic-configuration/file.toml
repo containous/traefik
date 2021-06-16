@@ -152,7 +152,6 @@
         accessControlAllowCredentials = true
         accessControlAllowHeaders = ["foobar", "foobar"]
         accessControlAllowMethods = ["foobar", "foobar"]
-        accessControlAllowOrigin = "foobar"
         accessControlAllowOriginList = ["foobar", "foobar"]
         accessControlAllowOriginListRegex = ["foobar", "foobar"]
         accessControlExposeHeaders = ["foobar", "foobar"]
@@ -277,6 +276,7 @@
       insecureSkipVerify = true
       rootCAs = ["foobar", "foobar"]
       maxIdleConnsPerHost = 42
+      disableHTTP2 = true
 
       [[http.serversTransports.ServersTransport0.certificates]]
         certFile = "foobar"
@@ -294,6 +294,7 @@
       insecureSkipVerify = true
       rootCAs = ["foobar", "foobar"]
       maxIdleConnsPerHost = 42
+      disableHTTP2 = true
 
       [[http.serversTransports.ServersTransport1.certificates]]
         certFile = "foobar"
@@ -311,6 +312,7 @@
   [tcp.routers]
     [tcp.routers.TCPRouter0]
       entryPoints = ["foobar", "foobar"]
+      middlewares = ["foobar", "foobar"]
       service = "foobar"
       rule = "foobar"
       [tcp.routers.TCPRouter0.tls]
@@ -327,6 +329,7 @@
           sans = ["foobar", "foobar"]
     [tcp.routers.TCPRouter1]
       entryPoints = ["foobar", "foobar"]
+      middlewares = ["foobar", "foobar"]
       service = "foobar"
       rule = "foobar"
       [tcp.routers.TCPRouter1.tls]
@@ -363,6 +366,10 @@
         [[tcp.services.TCPService02.weighted.services]]
           name = "foobar"
           weight = 42
+  [tcp.middlewares]
+    [tcp.middlewares.Middleware00]
+      [tcp.middlewares.Middleware00.ipWhiteList]
+      sourceRange = ["foobar", "foobar"]
 
 [udp]
   [udp.routers]

@@ -43,6 +43,22 @@ func newTCPServiceRepresentation(name string, si *runtime.TCPServiceInfo) tcpSer
 	}
 }
 
+type tcpMiddlewareRepresentation struct {
+	*runtime.TCPMiddlewareInfo
+	Name     string `json:"name,omitempty"`
+	Provider string `json:"provider,omitempty"`
+	Type     string `json:"type,omitempty"`
+}
+
+func newTCPMiddlewareRepresentation(name string, mi *runtime.TCPMiddlewareInfo) tcpMiddlewareRepresentation {
+	return tcpMiddlewareRepresentation{
+		TCPMiddlewareInfo: mi,
+		Name:              name,
+		Provider:          getProviderName(name),
+		Type:              strings.ToLower(extractType(mi.TCPMiddleware)),
+	}
+}
+
 func (h Handler) getTCPRouters(rw http.ResponseWriter, request *http.Request) {
 	results := make([]tcpRouterRepresentation, 0, len(h.runtimeConfiguration.TCPRouters))
 
@@ -147,6 +163,58 @@ func (h Handler) getTCPService(rw http.ResponseWriter, request *http.Request) {
 	}
 }
 
+func (h Handler) getTCPMiddlewares(rw http.ResponseWriter, request *http.Request) {
+	results := make([]tcpMiddlewareRepresentation, 0, len(h.runtimeConfiguration.Middlewares))
+
+	criterion := newSearchCriterion(request.URL.Query())
+
+	for name, mi := range h.runtimeConfiguration.TCPMiddlewares {
+		if keepTCPMiddleware(name, mi, criterion) {
+			results = append(results, newTCPMiddlewareRepresentation(name, mi))
+		}
+	}
+
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Name < results[j].Name
+	})
+
+	rw.Header().Set("Content-Type", "application/json")
+
+	pageInfo, err := pagination(request, len(results))
+	if err != nil {
+		writeError(rw, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	rw.Header().Set(nextPageHeader, strconv.Itoa(pageInfo.nextPage))
+
+	err = json.NewEncoder(rw).Encode(results[pageInfo.startIndex:pageInfo.endIndex])
+	if err != nil {
+		log.FromContext(request.Context()).Error(err)
+		writeError(rw, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (h Handler) getTCPMiddleware(rw http.ResponseWriter, request *http.Request) {
+	middlewareID := mux.Vars(request)["middlewareID"]
+
+	rw.Header().Set("Content-Type", "application/json")
+
+	middleware, ok := h.runtimeConfiguration.TCPMiddlewares[middlewareID]
+	if !ok {
+		writeError(rw, fmt.Sprintf("middleware not found: %s", middlewareID), http.StatusNotFound)
+		return
+	}
+
+	result := newTCPMiddlewareRepresentation(middlewareID, middleware)
+
+	err := json.NewEncoder(rw).Encode(result)
+	if err != nil {
+		log.FromContext(request.Context()).Error(err)
+		writeError(rw, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func keepTCPRouter(name string, item *runtime.TCPRouterInfo, criterion *searchCriterion) bool {
 	if criterion == nil {
 		return true
@@ -156,6 +224,14 @@ func keepTCPRouter(name string, item *runtime.TCPRouterInfo, criterion *searchCr
 }
 
 func keepTCPService(name string, item *runtime.TCPServiceInfo, criterion *searchCriterion) bool {
+	if criterion == nil {
+		return true
+	}
+
+	return criterion.withStatus(item.Status) && criterion.searchIn(name)
+}
+
+func keepTCPMiddleware(name string, item *runtime.TCPMiddlewareInfo, criterion *searchCriterion) bool {
 	if criterion == nil {
 		return true
 	}

@@ -200,6 +200,30 @@ func (s *TCPSuite) TestCatchAllNoTLSWithHTTPS(c *check.C) {
 	c.Assert(err, checker.IsNil)
 }
 
+func (s *TCPSuite) TestMiddlewareWhiteList(c *check.C) {
+	file := s.adaptFile(c, "fixtures/tcp/ip-whitelist.toml", struct{}{})
+	defer os.Remove(file)
+
+	cmd, display := s.traefikCmd(withConfigFile(file))
+	defer display(c)
+
+	err := cmd.Start()
+	c.Assert(err, checker.IsNil)
+	defer s.killCmd(cmd)
+
+	err = try.GetRequest("http://127.0.0.1:8080/api/rawdata", 50*time.Second, try.StatusCodeIs(http.StatusOK), try.BodyContains("HostSNI(`whoami-a.test`)"))
+	c.Assert(err, checker.IsNil)
+
+	// Traefik not passes through, ipWhitelist closes connection
+	_, err = guessWho("127.0.0.1:8093", "whoami-a.test", true)
+	c.Assert(err, checker.NotNil)
+
+	// Traefik passes through, termination handled by whoami-b
+	out, err := guessWho("127.0.0.1:8093", "whoami-b.test", true)
+	c.Assert(err, checker.IsNil)
+	c.Assert(out, checker.Contains, "whoami-b")
+}
+
 func welcome(addr string) (string, error) {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {

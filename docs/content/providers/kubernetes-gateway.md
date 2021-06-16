@@ -9,7 +9,7 @@ The Gateway API project is part of Kubernetes, working under SIG-NETWORK.
 The Kubernetes Gateway provider is a Traefik implementation of the [Gateway API](https://gateway-api.sigs.k8s.io/)
 specifications from the Kubernetes Special Interest Groups (SIGs).
 
-This provider is proposed as an experimental feature and partially supports the Service APIs [v0.1.0](https://github.com/kubernetes-sigs/service-apis/releases/tag/v0.1.0) specification.
+This provider is proposed as an experimental feature and partially supports the Gateway API [v0.2.0](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.2.0) specification.
 
 !!! warning "Enabling The Experimental Kubernetes Gateway Provider"
 
@@ -71,19 +71,19 @@ This provider is proposed as an experimental feature and partially supports the 
     --8<-- "content/reference/dynamic-configuration/kubernetes-gateway-rbac.yml"
     ```
 
-The Kubernetes Gateway API project provides several [guides](https://gateway-api.sigs.k8s.io/guides/) on how to use the APIs.
+The Kubernetes Gateway API project provides several guides on how to use the APIs.
 These guides can help you to go further than the example above.
-The [getting started guide](https://gateway-api.sigs.k8s.io/getting-started/) details how to install the CRDs from their repository.
+The [getting started guide](https://gateway-api.sigs.k8s.io/guides/getting-started/) details how to install the CRDs from their repository.
 
 !!! note ""
 
-    Keep in mind that the Traefik Gateway provider only supports the `v0.1.0`.
+    Keep in mind that the Traefik Gateway provider only supports the `v0.2.0`.
 
 For now, the Traefik Gateway Provider can be used while following the below guides:
 
-* [Simple Gateway](https://gateway-api.sigs.k8s.io/simple-gateway/)
-* [HTTP routing](https://gateway-api.sigs.k8s.io/http-routing/)
-* [TLS](https://gateway-api.sigs.k8s.io/tls/) (Partial support: only on listeners with terminate mode)
+* [Simple Gateway](https://gateway-api.sigs.k8s.io/guides/simple-gateway/)
+* [HTTP routing](https://gateway-api.sigs.k8s.io/guides/http-routing/)
+* [TLS](https://gateway-api.sigs.k8s.io/guides/tls/)
 
 ## Resource Configuration
 
@@ -91,12 +91,14 @@ When using Kubernetes Gateway API as a provider, Traefik uses Kubernetes
 [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)
 to retrieve its routing configuration.
 
-All concepts can be found in the official API concepts [documentation](https://gateway-api.sigs.k8s.io/api-overview/).
+All concepts can be found in the official API concepts [documentation](https://gateway-api.sigs.k8s.io/concepts/api-overview/).
 Traefik implements the following resources:
 
 * `GatewayClass` defines a set of Gateways that share a common configuration and behaviour.
 * `Gateway` describes how traffic can be translated to Services within the cluster.
-* `HTTPRoute` define HTTP rules for mapping requests from a Gateway to Kubernetes Services.
+* `HTTPRoute` defines HTTP rules for mapping requests from a Gateway to Kubernetes Services.
+* `TCPRoute` defines TCP rules for mapping requests from a Gateway to Kubernetes Services.
+* `TLSRoute` defines TLS rules for mapping requests from a Gateway to Kubernetes Services.
 
 ## Provider Configuration
 

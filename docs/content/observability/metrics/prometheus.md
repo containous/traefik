@@ -64,6 +64,28 @@ metrics:
 --metrics.prometheus.addEntryPointsLabels=true
 ```
 
+#### `AddRoutersLabels`
+
+_Optional, Default=false_
+
+Enable metrics on routers.
+
+```toml tab="File (TOML)"
+[metrics]
+  [metrics.prometheus]
+    addRoutersLabels = true
+```
+
+```yaml tab="File (YAML)"
+metrics:
+  prometheus:
+    addRoutersLabels: true
+```
+
+```bash tab="CLI"
+--metrics.prometheus.addrouterslabels=true
+```
+
 #### `addServicesLabels`
 
 _Optional, Default=true_

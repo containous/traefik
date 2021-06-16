@@ -114,6 +114,7 @@ providers:
     labelSelector: foobar
     ingressClass: foobar
     throttleDuration: 42s
+    allowEmptyServices: true
     ingressEndpoint:
       ip: foobar
       hostname: foobar
@@ -257,6 +258,7 @@ metrics:
     - 42
     - 42
     addEntryPointsLabels: true
+    addRoutersLabels: true
     addServicesLabels: true
     entryPoint: foobar
     manualRouting: true
@@ -264,11 +266,13 @@ metrics:
     address: foobar
     pushInterval: 42
     addEntryPointsLabels: true
+    addRoutersLabels: true
     addServicesLabels: true
   statsD:
     address: foobar
     pushInterval: 42
     addEntryPointsLabels: true
+    addRoutersLabels: true
     addServicesLabels: true
     prefix: foobar
   influxDB:
@@ -280,6 +284,7 @@ metrics:
     username: foobar
     password: foobar
     addEntryPointsLabels: true
+    addRoutersLabels: true
     addServicesLabels: true
 ping:
   entryPoint: foobar

@@ -18,10 +18,17 @@ const (
 )
 
 func handleDeprecation(ctx context.Context, cfg *dynamic.Headers) {
-	if cfg.AccessControlAllowOrigin != "" {
-		log.FromContext(ctx).Warn("accessControlAllowOrigin is deprecated, please use accessControlAllowOriginList instead.")
-		cfg.AccessControlAllowOriginList = append(cfg.AccessControlAllowOriginList, cfg.AccessControlAllowOrigin)
-		cfg.AccessControlAllowOrigin = ""
+	if cfg.SSLRedirect {
+		log.FromContext(ctx).Warn("SSLRedirect is deprecated, please use entrypoint redirection instead.")
+	}
+	if cfg.SSLTemporaryRedirect {
+		log.FromContext(ctx).Warn("SSLTemporaryRedirect is deprecated, please use entrypoint redirection instead.")
+	}
+	if cfg.SSLHost != "" {
+		log.FromContext(ctx).Warn("SSLHost is deprecated, please use RedirectRegex middleware instead.")
+	}
+	if cfg.SSLForceHost {
+		log.FromContext(ctx).Warn("SSLForceHost is deprecated, please use RedirectScheme middleware instead.")
 	}
 }
 

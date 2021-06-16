@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/gorilla/mux"
+	"github.com/traefik/traefik/v2/pkg/ip"
 	"github.com/traefik/traefik/v2/pkg/log"
 	"github.com/traefik/traefik/v2/pkg/middlewares/requestdecorator"
 	"github.com/vulcand/predicate"
@@ -15,6 +17,7 @@ var funcs = map[string]func(*mux.Route, ...string) error{
 	"Host":          host,
 	"HostHeader":    host,
 	"HostRegexp":    hostRegexp,
+	"ClientIP":      clientIP,
 	"Path":          path,
 	"PathPrefix":    pathPrefix,
 	"Method":        methods,
@@ -71,6 +74,7 @@ func (r *Router) AddRoute(rule string, priority int, handler http.Handler) error
 
 type tree struct {
 	matcher   string
+	not       bool
 	value     []string
 	ruleLeft  *tree
 	ruleRight *tree
@@ -102,6 +106,10 @@ func pathPrefix(route *mux.Route, paths ...string) error {
 
 func host(route *mux.Route, hosts ...string) error {
 	for i, host := range hosts {
+		if !IsASCII(host) {
+			return fmt.Errorf("invalid value %q for \"Host\" matcher, non-ASCII characters are not allowed", host)
+		}
+
 		hosts[i] = strings.ToLower(host)
 	}
 
@@ -149,9 +157,34 @@ func host(route *mux.Route, hosts ...string) error {
 	return nil
 }
 
+func clientIP(route *mux.Route, clientIPs ...string) error {
+	checker, err := ip.NewChecker(clientIPs)
+	if err != nil {
+		return fmt.Errorf("could not initialize IP Checker for \"ClientIP\" matcher: %w", err)
+	}
+
+	strategy := ip.RemoteAddrStrategy{}
+
+	route.MatcherFunc(func(req *http.Request, _ *mux.RouteMatch) bool {
+		ok, err := checker.Contains(strategy.GetIP(req))
+		if err != nil {
+			log.FromContext(req.Context()).Warnf("\"ClientIP\" matcher: could not match remote address : %w", err)
+			return false
+		}
+
+		return ok
+	})
+
+	return nil
+}
+
 func hostRegexp(route *mux.Route, hosts ...string) error {
 	router := route.Subrouter()
 	for _, host := range hosts {
+		if !IsASCII(host) {
+			return fmt.Errorf("invalid value %q for HostRegexp matcher, non-ASCII characters are not allowed", host)
+		}
+
 		tmpRt := router.Host(host)
 		if tmpRt.GetError() != nil {
 			return tmpRt.GetError()
@@ -206,7 +239,24 @@ func addRuleOnRouter(router *mux.Router, rule *tree) error {
 			return err
 		}
 
+		if rule.not {
+			return not(funcs[rule.matcher])(router.NewRoute(), rule.value...)
+		}
 		return funcs[rule.matcher](router.NewRoute(), rule.value...)
+	}
+}
+
+func not(m func(*mux.Route, ...string) error) func(*mux.Route, ...string) error {
+	return func(r *mux.Route, v ...string) error {
+		router := mux.NewRouter()
+		err := m(router.NewRoute(), v...)
+		if err != nil {
+			return err
+		}
+		r.MatcherFunc(func(req *http.Request, ma *mux.RouteMatch) bool {
+			return !router.Match(req, ma)
+		})
+		return nil
 	}
 }
 
@@ -234,6 +284,9 @@ func addRuleOnRoute(route *mux.Route, rule *tree) error {
 			return err
 		}
 
+		if rule.not {
+			return not(funcs[rule.matcher])(route, rule.value...)
+		}
 		return funcs[rule.matcher](route, rule.value...)
 	}
 }
@@ -249,4 +302,15 @@ func checkRule(rule *tree) error {
 		}
 	}
 	return nil
+}
+
+// IsASCII checks if the given string contains only ASCII characters.
+func IsASCII(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if s[i] >= utf8.RuneSelf {
+			return false
+		}
+	}
+
+	return true
 }

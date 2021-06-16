@@ -177,7 +177,6 @@ http:
         accessControlAllowMethods:
         - foobar
         - foobar
-        accessControlAllowOrigin: foobar
         accessControlAllowOriginList:
         - foobar
         - foobar
@@ -329,6 +328,7 @@ http:
         dialTimeout: 42s
         responseHeaderTimeout: 42s
         idleConnTimeout: 42s
+      disableHTTP2: true
     ServersTransport1:
       serverName: foobar
       insecureSkipVerify: true
@@ -345,10 +345,14 @@ http:
         dialTimeout: 42s
         responseHeaderTimeout: 42s
         idleConnTimeout: 42s
+      disableHTTP2: true
 tcp:
   routers:
     TCPRouter0:
       entryPoints:
+      - foobar
+      - foobar
+      middlewares:
       - foobar
       - foobar
       service: foobar
@@ -370,6 +374,9 @@ tcp:
       entryPoints:
       - foobar
       - foobar
+      middlewares:
+      - foobar
+      - foobar
       service: foobar
       rule: foobar
       tls:
@@ -385,6 +392,12 @@ tcp:
           sans:
           - foobar
           - foobar
+  middlewares:
+    Middleware00:
+      ipWhiteList:
+        sourceRange:
+        - foobar
+        - foobar
   services:
     TCPService01:
       loadBalancer:

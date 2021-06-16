@@ -35,7 +35,6 @@
 "traefik.http.middlewares.middleware10.headers.accesscontrolallowcredentials": "true",
 "traefik.http.middlewares.middleware10.headers.accesscontrolallowheaders": "foobar, foobar",
 "traefik.http.middlewares.middleware10.headers.accesscontrolallowmethods": "foobar, foobar",
-"traefik.http.middlewares.middleware10.headers.accesscontrolalloworigin": "foobar",
 "traefik.http.middlewares.middleware10.headers.accesscontrolalloworiginlist": "foobar, foobar",
 "traefik.http.middlewares.middleware10.headers.accesscontrolalloworiginlistregex": "foobar, foobar",
 "traefik.http.middlewares.middleware10.headers.accesscontrolexposeheaders": "foobar, foobar",

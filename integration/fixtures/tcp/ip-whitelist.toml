@@ -1,0 +1,55 @@
+[global]
+  checkNewVersion = false
+  sendAnonymousUsage = false
+
+[log]
+  level = "DEBUG"
+
+[entryPoints]
+  [entryPoints.tcp]
+    address = ":8093"
+
+[api]
+  insecure = true
+
+[providers.file]
+  filename = "{{ .SelfFilename }}"
+
+## dynamic configuration ##
+
+[tcp]
+  [tcp.routers]
+    [tcp.routers.to-whoami-a]
+      entryPoints = ["tcp"]
+      rule = "HostSNI(`whoami-a.test`)"
+      service = "whoami-a"
+      middlewares = ["blocking-ipwhitelist"]
+      [tcp.routers.to-whoami-a.tls]
+        passthrough = true
+
+    [tcp.routers.to-whoami-b]
+      entryPoints = ["tcp"]
+      rule = "HostSNI(`whoami-b.test`)"
+      service = "whoami-b"
+      middlewares = ["allowing-ipwhitelist"]
+      [tcp.routers.to-whoami-b.tls]
+        passthrough = true
+
+  [tcp.services]
+    [tcp.services.whoami-a.loadBalancer]
+      [[tcp.services.whoami-a.loadBalancer.servers]]
+        address = "localhost:8081"
+
+    [tcp.services.whoami-b.loadBalancer]
+      [[tcp.services.whoami-b.loadBalancer.servers]]
+        address = "localhost:8082"
+
+  [tcp.middlewares]
+    [tcp.middlewares.allowing-ipwhitelist.ipWhiteList]
+      sourceRange = ["127.0.0.1/32"]
+    [tcp.middlewares.blocking-ipwhitelist.ipWhiteList]
+      sourceRange = ["127.127.127.127/32"]
+
+[[tls.certificates]]
+  certFile = "fixtures/tcp/whoami-c.crt"
+  keyFile = "fixtures/tcp/whoami-c.key"

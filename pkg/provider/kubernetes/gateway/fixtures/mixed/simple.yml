@@ -1,0 +1,131 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: supersecret
+  namespace: default
+
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=
+  tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0=
+
+---
+kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-gateway-class
+spec:
+  controller: traefik.io/gateway-controller
+
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-gateway
+  namespace: default
+spec:
+  gatewayClassName: my-gateway-class
+  listeners:  # Use GatewayClass defaults for listener definition.
+    - protocol: HTTP
+      port: 9080
+      routes:
+        kind: HTTPRoute
+        namespaces:
+          from: Same
+        selector:
+          matchLabels:
+            app: http-app
+    - protocol: HTTPS
+      port: 9443
+      tls:
+        certificateRef:
+          kind: Secret
+          name: supersecret
+          group: core
+      routes:
+        kind: HTTPRoute
+        namespaces:
+          from: Same
+        selector:
+          matchLabels:
+            app: http-app
+    - protocol: TCP
+      port: 9000
+      routes:
+        kind: TCPRoute
+        namespaces:
+          from: Same
+        selector:
+          matchLabels:
+            app: tcp-app
+    - protocol: TLS
+      port: 10000
+      hostname: tls.foo.example.com
+      tls:
+        certificateRef:
+          kind: Secret
+          name: supersecret
+          group: core
+      routes:
+        kind: TCPRoute
+        namespaces:
+          from: Same
+        selector:
+          matchLabels:
+            app: tcp-app
+    - protocol: TLS
+      port: 11000
+      hostname: pass.tls.foo.example.com
+      tls:
+        mode: Passthrough
+      routes:
+        kind: TLSRoute
+        namespaces:
+          from: Same
+        selector:
+          matchLabels:
+            app: tls-app
+
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-app-1
+  namespace: default
+  labels:
+    app: http-app
+spec:
+  rules:
+    - forwardTo:
+        - serviceName: whoami
+          port: 80
+          weight: 1
+---
+kind: TCPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: tcp-app-1
+  namespace: default
+  labels:
+    app: tcp-app
+spec:
+  rules:
+    - forwardTo:
+        - serviceName: whoamitcp
+          port: 9000
+          weight: 1
+
+---
+kind: TLSRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: tls-app-1
+  namespace: default
+  labels:
+    app: tls-app
+spec:
+  rules:
+    - forwardTo:
+        - serviceName: whoamitcp
+          port: 9000
+          weight: 1

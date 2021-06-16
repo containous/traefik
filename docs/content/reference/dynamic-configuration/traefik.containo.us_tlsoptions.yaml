@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.0
+    controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
   name: tlsoptions.traefik.containo.us
 spec:
@@ -22,10 +22,14 @@ spec:
         description: TLSOption is a specification for a TLSOption resource.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
@@ -37,10 +41,12 @@ spec:
                   type: string
                 type: array
               clientAuth:
-                description: ClientAuth defines the parameters of the client authentication part of the TLS connection, if any.
+                description: ClientAuth defines the parameters of the client authentication
+                  part of the TLS connection, if any.
                 properties:
                   clientAuthType:
-                    description: ClientAuthType defines the client authentication type to apply.
+                    description: ClientAuthType defines the client authentication
+                      type to apply.
                     enum:
                     - NoClientCert
                     - RequestClientCert
@@ -48,7 +54,8 @@ spec:
                     - RequireAndVerifyClientCert
                     type: string
                   secretNames:
-                    description: SecretName is the name of the referenced Kubernetes Secret to specify the certificate details.
+                    description: SecretName is the name of the referenced Kubernetes
+                      Secret to specify the certificate details.
                     items:
                       type: string
                     type: array

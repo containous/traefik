@@ -35,7 +35,7 @@ Since this configuration is specific to your infrastructure choices, we invite y
  
 ## The Static Configuration
 
-There are three different, **mutually exclusive** (e.g. you can use only one at the same time), ways to define static configuration options in Traefik:
+There are three different, **mutually exclusive** (i.e. you can use only one at the same time), ways to define static configuration options in Traefik:
 
 1. In a configuration file
 1. In the command-line arguments

@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/traefik/traefik/v2/pkg/config/dynamic"
 	"github.com/traefik/traefik/v2/pkg/config/runtime"
+	tcpmiddleware "github.com/traefik/traefik/v2/pkg/server/middleware/tcp"
 	"github.com/traefik/traefik/v2/pkg/server/service/tcp"
 	traefiktls "github.com/traefik/traefik/v2/pkg/tls"
 )
@@ -70,6 +71,37 @@ func TestRuntimeConfiguration(t *testing.T) {
 				},
 			},
 			expectedError: 0,
+		},
+		{
+			desc: "Non-ASCII domain error",
+			tcpServiceConfig: map[string]*runtime.TCPServiceInfo{
+				"foo-service": {
+					TCPService: &dynamic.TCPService{
+						LoadBalancer: &dynamic.TCPServersLoadBalancer{
+							Servers: []dynamic.TCPServer{
+								{
+									Port:    "8085",
+									Address: "127.0.0.1:8085",
+								},
+							},
+						},
+					},
+				},
+			},
+			tcpRouterConfig: map[string]*runtime.TCPRouterInfo{
+				"foo": {
+					TCPRouter: &dynamic.TCPRouter{
+						EntryPoints: []string{"web"},
+						Service:     "foo-service",
+						Rule:        "HostSNI(`bàr.foo`)",
+						TLS: &dynamic.RouterTCPTLSConfig{
+							Passthrough: false,
+							Options:     "foo",
+						},
+					},
+				},
+			},
+			expectedError: 1,
 		},
 		{
 			desc: "HTTP routers with same domain but different TLS options",
@@ -271,7 +303,9 @@ func TestRuntimeConfiguration(t *testing.T) {
 				},
 				[]*traefiktls.CertAndStores{})
 
-			routerManager := NewManager(conf, serviceManager,
+			middlewaresBuilder := tcpmiddleware.NewBuilder(conf.TCPMiddlewares)
+
+			routerManager := NewManager(conf, serviceManager, middlewaresBuilder,
 				nil, nil, tlsManager)
 
 			_ = routerManager.BuildHandlers(context.Background(), entryPoints)
@@ -501,7 +535,9 @@ func TestDomainFronting(t *testing.T) {
 				"web": http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {}),
 			}
 
-			routerManager := NewManager(conf, serviceManager, nil, httpsHandler, tlsManager)
+			middlewaresBuilder := tcpmiddleware.NewBuilder(conf.TCPMiddlewares)
+
+			routerManager := NewManager(conf, serviceManager, middlewaresBuilder, nil, httpsHandler, tlsManager)
 
 			routers := routerManager.BuildHandlers(context.Background(), entryPoints)
 

@@ -24,13 +24,14 @@ func NewChecker(trustedIPs []string) (*Checker, error) {
 	for _, ipMask := range trustedIPs {
 		if ipAddr := net.ParseIP(ipMask); ipAddr != nil {
 			checker.authorizedIPs = append(checker.authorizedIPs, &ipAddr)
-		} else {
-			_, ipAddr, err := net.ParseCIDR(ipMask)
-			if err != nil {
-				return nil, fmt.Errorf("parsing CIDR trusted IPs %s: %w", ipAddr, err)
-			}
-			checker.authorizedIPsNet = append(checker.authorizedIPsNet, ipAddr)
+			continue
 		}
+
+		_, ipAddr, err := net.ParseCIDR(ipMask)
+		if err != nil {
+			return nil, fmt.Errorf("parsing CIDR trusted IPs %s: %w", ipAddr, err)
+		}
+		checker.authorizedIPsNet = append(checker.authorizedIPsNet, ipAddr)
 	}
 
 	return checker, nil

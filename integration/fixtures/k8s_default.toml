@@ -13,3 +13,4 @@
     address = ":8000"
 
 [providers.kubernetesIngress]
+  allowEmptyServices = true

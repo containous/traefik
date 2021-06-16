@@ -18,6 +18,8 @@ type IngressRouteTCPSpec struct {
 type RouteTCP struct {
 	Match    string       `json:"match"`
 	Services []ServiceTCP `json:"services,omitempty"`
+	// Middlewares contains references to MiddlewareTCP resources.
+	Middlewares []ObjectReference `json:"middlewares,omitempty"`
 }
 
 // TLSTCP contains the TLS certificates configuration of the routes.
@@ -34,23 +36,11 @@ type TLSTCP struct {
 	SecretName  string `json:"secretName,omitempty"`
 	Passthrough bool   `json:"passthrough,omitempty"`
 	// Options is a reference to a TLSOption, that specifies the parameters of the TLS connection.
-	Options *TLSOptionTCPRef `json:"options,omitempty"`
+	Options *ObjectReference `json:"options,omitempty"`
 	// Store is a reference to a TLSStore, that specifies the parameters of the TLS store.
-	Store        *TLSStoreTCPRef `json:"store,omitempty"`
-	CertResolver string          `json:"certResolver,omitempty"`
-	Domains      []types.Domain  `json:"domains,omitempty"`
-}
-
-// TLSOptionTCPRef is a ref to the TLSOption resources.
-type TLSOptionTCPRef struct {
-	Name      string `json:"name"`
-	Namespace string `json:"namespace,omitempty"`
-}
-
-// TLSStoreTCPRef is a ref to the TLSStore resources.
-type TLSStoreTCPRef struct {
-	Name      string `json:"name"`
-	Namespace string `json:"namespace,omitempty"`
+	Store        *ObjectReference `json:"store,omitempty"`
+	CertResolver string           `json:"certResolver,omitempty"`
+	Domains      []types.Domain   `json:"domains,omitempty"`
 }
 
 // ServiceTCP defines an upstream to proxy traffic.

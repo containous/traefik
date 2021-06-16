@@ -419,7 +419,7 @@ you'd add the label `traefik.http.services.<name-of-your-choice>.loadbalancer.pa
 You can declare pieces of middleware using labels starting with `traefik.http.middlewares.<name-of-your-choice>.`,
 followed by the middleware type/options.
 
-For example, to declare a middleware [`redirectscheme`](../../middlewares/redirectscheme.md) named `my-redirect`,
+For example, to declare a middleware [`redirectscheme`](../../middlewares/http/redirectscheme.md) named `my-redirect`,
 you'd write `traefik.http.middlewares.my-redirect.redirectscheme.scheme=https`.
 
 More information about available middlewares in the dedicated [middlewares section](../../middlewares/overview.md).

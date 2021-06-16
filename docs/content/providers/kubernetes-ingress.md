@@ -440,6 +440,30 @@ providers:
 --providers.kubernetesingress.throttleDuration=10s
 ```
 
+### `allowEmptyServices`
+
+_Optional, Default: false
+
+```toml tab="File (TOML)"
+[providers.kubernetesIngress]
+  allowEmptyServices = true
+  # ...
+```
+
+```yaml tab="File (YAML)"
+providers:
+  kubernetesIngress:
+    allowEmptyServices: true
+    # ...
+```
+
+```bash tab="CLI"
+--providers.kubernetesingress.allowEmptyServices=true
+```
+
+Allow the creation of services if there are no endpoints available.
+This results in `503` http responses instead of `404`.
+
 ### Further
 
 To learn more about the various aspects of the Ingress specification that Traefik supports,

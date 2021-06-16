@@ -81,7 +81,10 @@ func checkDevPluginConfiguration(plugin *DevPlugin) error {
 		return err
 	}
 
-	if m.Type != "middleware" {
+	switch m.Type {
+	case "middleware", "provider":
+		// noop
+	default:
 		return errors.New("unsupported type")
 	}
 

@@ -18,34 +18,36 @@ import (
 	traefiktls "github.com/traefik/traefik/v2/pkg/tls"
 )
 
-const (
-	defaultTLSConfigName = "default"
-	defaultTLSStoreName  = "default"
-)
+type middlewareBuilder interface {
+	BuildChain(ctx context.Context, names []string) *tcp.Chain
+}
 
 // NewManager Creates a new Manager.
 func NewManager(conf *runtime.Configuration,
 	serviceManager *tcpservice.Manager,
+	middlewaresBuilder middlewareBuilder,
 	httpHandlers map[string]http.Handler,
 	httpsHandlers map[string]http.Handler,
 	tlsManager *traefiktls.Manager,
 ) *Manager {
 	return &Manager{
-		serviceManager: serviceManager,
-		httpHandlers:   httpHandlers,
-		httpsHandlers:  httpsHandlers,
-		tlsManager:     tlsManager,
-		conf:           conf,
+		serviceManager:     serviceManager,
+		middlewaresBuilder: middlewaresBuilder,
+		httpHandlers:       httpHandlers,
+		httpsHandlers:      httpsHandlers,
+		tlsManager:         tlsManager,
+		conf:               conf,
 	}
 }
 
 // Manager is a route/router manager.
 type Manager struct {
-	serviceManager *tcpservice.Manager
-	httpHandlers   map[string]http.Handler
-	httpsHandlers  map[string]http.Handler
-	tlsManager     *traefiktls.Manager
-	conf           *runtime.Configuration
+	serviceManager     *tcpservice.Manager
+	middlewaresBuilder middlewareBuilder
+	httpHandlers       map[string]http.Handler
+	httpsHandlers      map[string]http.Handler
+	tlsManager         *traefiktls.Manager
+	conf               *runtime.Configuration
 }
 
 func (m *Manager) getTCPRouters(ctx context.Context, entryPoints []string) map[string]map[string]*runtime.TCPRouterInfo {
@@ -96,7 +98,7 @@ func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string
 	router := &tcp.Router{}
 	router.HTTPHandler(handlerHTTP)
 
-	defaultTLSConf, err := m.tlsManager.Get(defaultTLSStoreName, defaultTLSConfigName)
+	defaultTLSConf, err := m.tlsManager.Get(traefiktls.DefaultTLSStoreName, traefiktls.DefaultTLSConfigName)
 	if err != nil {
 		log.FromContext(ctx).Errorf("Error during the build of the default TLS configuration: %v", err)
 	}
@@ -116,8 +118,8 @@ func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string
 		ctxRouter := log.With(provider.AddInContext(ctx, routerHTTPName), log.Str(log.RouterName, routerHTTPName))
 		logger := log.FromContext(ctxRouter)
 
-		tlsOptionsName := defaultTLSConfigName
-		if len(routerHTTPConfig.TLS.Options) > 0 && routerHTTPConfig.TLS.Options != defaultTLSConfigName {
+		tlsOptionsName := traefiktls.DefaultTLSConfigName
+		if len(routerHTTPConfig.TLS.Options) > 0 && routerHTTPConfig.TLS.Options != traefiktls.DefaultTLSConfigName {
 			tlsOptionsName = provider.GetQualifiedName(ctxRouter, routerHTTPConfig.TLS.Options)
 		}
 
@@ -134,7 +136,7 @@ func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string
 		}
 
 		for _, domain := range domains {
-			tlsConf, err := m.tlsManager.Get(defaultTLSStoreName, tlsOptionsName)
+			tlsConf, err := m.tlsManager.Get(traefiktls.DefaultTLSStoreName, tlsOptionsName)
 			if err != nil {
 				routerHTTPConfig.AddError(err, true)
 				logger.Debug(err)
@@ -152,7 +154,7 @@ func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string
 
 			if name, ok := tlsOptionsForHost[domain]; ok && name != tlsOptionsName {
 				// Different tlsOptions on the same domain fallback to default
-				tlsOptionsForHost[domain] = defaultTLSConfigName
+				tlsOptionsForHost[domain] = traefiktls.DefaultTLSConfigName
 			} else {
 				tlsOptionsForHost[domain] = tlsOptionsName
 			}
@@ -239,7 +241,7 @@ func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string
 			continue
 		}
 
-		handler, err := m.serviceManager.BuildTCP(ctxRouter, routerConfig.Service)
+		handler, err := m.buildTCPHandler(ctxRouter, routerConfig)
 		if err != nil {
 			routerConfig.AddError(err, true)
 			logger.Error(err)
@@ -258,28 +260,36 @@ func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string
 			logger.Debugf("Adding route %s on TCP", domain)
 			switch {
 			case routerConfig.TLS != nil:
+				if !rules.IsASCII(domain) {
+					asciiError := fmt.Errorf("invalid domain name value %q, non-ASCII characters are not allowed", domain)
+					routerConfig.AddError(asciiError, true)
+					logger.Debug(asciiError)
+					continue
+				}
+
 				if routerConfig.TLS.Passthrough {
 					router.AddRoute(domain, handler)
-				} else {
-					tlsOptionsName := routerConfig.TLS.Options
-
-					if len(tlsOptionsName) == 0 {
-						tlsOptionsName = defaultTLSConfigName
-					}
-
-					if tlsOptionsName != defaultTLSConfigName {
-						tlsOptionsName = provider.GetQualifiedName(ctxRouter, tlsOptionsName)
-					}
-
-					tlsConf, err := m.tlsManager.Get(defaultTLSStoreName, tlsOptionsName)
-					if err != nil {
-						routerConfig.AddError(err, true)
-						logger.Debug(err)
-						continue
-					}
-
-					router.AddRouteTLS(domain, handler, tlsConf)
+					continue
 				}
+
+				tlsOptionsName := routerConfig.TLS.Options
+
+				if len(tlsOptionsName) == 0 {
+					tlsOptionsName = traefiktls.DefaultTLSConfigName
+				}
+
+				if tlsOptionsName != traefiktls.DefaultTLSConfigName {
+					tlsOptionsName = provider.GetQualifiedName(ctxRouter, tlsOptionsName)
+				}
+
+				tlsConf, err := m.tlsManager.Get(traefiktls.DefaultTLSStoreName, tlsOptionsName)
+				if err != nil {
+					routerConfig.AddError(err, true)
+					logger.Debug(err)
+					continue
+				}
+
+				router.AddRouteTLS(domain, handler, tlsConf)
 			case domain == "*":
 				router.AddCatchAllNoTLS(handler)
 			default:
@@ -289,6 +299,27 @@ func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string
 	}
 
 	return router, nil
+}
+
+func (m *Manager) buildTCPHandler(ctx context.Context, router *runtime.TCPRouterInfo) (tcp.Handler, error) {
+	var qualifiedNames []string
+	for _, name := range router.Middlewares {
+		qualifiedNames = append(qualifiedNames, provider.GetQualifiedName(ctx, name))
+	}
+	router.Middlewares = qualifiedNames
+
+	if router.Service == "" {
+		return nil, errors.New("the service is missing on the router")
+	}
+
+	sHandler, err := m.serviceManager.BuildTCP(ctx, router.Service)
+	if err != nil {
+		return nil, err
+	}
+
+	mHandler := m.middlewaresBuilder.BuildChain(ctx, router.Middlewares)
+
+	return tcp.NewChain().Extend(*mHandler).Then(sHandler)
 }
 
 func findTLSOptionName(tlsOptionsForHost map[string]string, host string) string {
@@ -302,5 +333,5 @@ func findTLSOptionName(tlsOptionsForHost map[string]string, host string) string 
 		return tlsOptions
 	}
 
-	return defaultTLSConfigName
+	return traefiktls.DefaultTLSConfigName
 }
