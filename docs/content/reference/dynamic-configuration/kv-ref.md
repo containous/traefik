@@ -168,6 +168,7 @@
 | `traefik/http/serversTransports/ServersTransport0/certificates/0/keyFile` | `foobar` |
 | `traefik/http/serversTransports/ServersTransport0/certificates/1/certFile` | `foobar` |
 | `traefik/http/serversTransports/ServersTransport0/certificates/1/keyFile` | `foobar` |
+| `traefik/http/serversTransports/ServersTransport0/disableHTTP2` | `true` |
 | `traefik/http/serversTransports/ServersTransport0/forwardingTimeouts/dialTimeout` | `42s` |
 | `traefik/http/serversTransports/ServersTransport0/forwardingTimeouts/idleConnTimeout` | `42s` |
 | `traefik/http/serversTransports/ServersTransport0/forwardingTimeouts/responseHeaderTimeout` | `42s` |
@@ -180,6 +181,7 @@
 | `traefik/http/serversTransports/ServersTransport1/certificates/0/keyFile` | `foobar` |
 | `traefik/http/serversTransports/ServersTransport1/certificates/1/certFile` | `foobar` |
 | `traefik/http/serversTransports/ServersTransport1/certificates/1/keyFile` | `foobar` |
+| `traefik/http/serversTransports/ServersTransport1/disableHTTP2` | `true` |
 | `traefik/http/serversTransports/ServersTransport1/forwardingTimeouts/dialTimeout` | `42s` |
 | `traefik/http/serversTransports/ServersTransport1/forwardingTimeouts/idleConnTimeout` | `42s` |
 | `traefik/http/serversTransports/ServersTransport1/forwardingTimeouts/responseHeaderTimeout` | `42s` |

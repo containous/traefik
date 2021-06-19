@@ -29,6 +29,7 @@ type itemData struct {
 	ID        string
 	Node      string
 	Name      string
+	Namespace string
 	Address   string
 	Port      string
 	Status    string
@@ -48,6 +49,7 @@ type Provider struct {
 	Cache             bool            `description:"Use local agent caching for catalog reads." json:"cache,omitempty" toml:"cache,omitempty" yaml:"cache,omitempty" export:"true"`
 	ExposedByDefault  bool            `description:"Expose containers by default." json:"exposedByDefault,omitempty" toml:"exposedByDefault,omitempty" yaml:"exposedByDefault,omitempty" export:"true"`
 	DefaultRule       string          `description:"Default rule." json:"defaultRule,omitempty" toml:"defaultRule,omitempty" yaml:"defaultRule,omitempty"`
+	Namespaces        []string        `description:"Namespaces to search.  Use ['*'] to search across all namespaces.  If missing, only the default namespace is searched." json:"namespaces,omitempty" toml:"namespaces,omitempty" yaml:"namespaces,omitempty"`
 
 	client         *api.Client
 	defaultRuleTpl *template.Template
@@ -163,60 +165,93 @@ func (p *Provider) loadConfiguration(ctx context.Context, configurationChan chan
 }
 
 func (p *Provider) getConsulServicesData(ctx context.Context) ([]itemData, error) {
-	consulServiceNames, err := p.fetchServices(ctx)
-	if err != nil {
-		return nil, err
+	// if no namespaces are specified, only use the default
+	if len(p.Namespaces) == 0 {
+		p.Namespaces = []string{"default"}
+	}
+
+	// if namespace list is ["*"], search all namespaces
+	if len(p.Namespaces) == 1 && p.Namespaces[0] == "*" {
+		allNamespaces, err := p.fetchNamespaces(ctx)
+		if err != nil {
+			return nil, err
+		}
+		p.Namespaces = allNamespaces
 	}
 
 	var data []itemData
-	for _, name := range consulServiceNames {
-		consulServices, statuses, err := p.fetchService(ctx, name)
+	for _, ns := range p.Namespaces {
+		nsLogger := log.FromContext(log.With(ctx, log.Str("namespace", ns)))
+		nsLogger.Debug("Checking namespace for services")
+		consulServiceNames, err := p.fetchServices(ctx, ns)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, consulService := range consulServices {
-			address := consulService.ServiceAddress
-			if address == "" {
-				address = consulService.Address
-			}
-
-			status, exists := statuses[consulService.ID+consulService.ServiceID]
-			if !exists {
-				status = api.HealthAny
-			}
-
-			item := itemData{
-				ID:      consulService.ServiceID,
-				Node:    consulService.Node,
-				Name:    consulService.ServiceName,
-				Address: address,
-				Port:    strconv.Itoa(consulService.ServicePort),
-				Labels:  tagsToNeutralLabels(consulService.ServiceTags, p.Prefix),
-				Tags:    consulService.ServiceTags,
-				Status:  status,
-			}
-
-			extraConf, err := p.getConfiguration(item)
+		for _, name := range consulServiceNames {
+			consulServices, statuses, err := p.fetchService(ctx, name, ns)
 			if err != nil {
-				log.FromContext(ctx).Errorf("Skip item %s: %v", item.Name, err)
-				continue
+				return nil, err
 			}
-			item.ExtraConf = extraConf
 
-			data = append(data, item)
+			for _, consulService := range consulServices {
+				address := consulService.ServiceAddress
+				if address == "" {
+					address = consulService.Address
+				}
+
+				status, exists := statuses[consulService.ID+consulService.ServiceID]
+				if !exists {
+					status = api.HealthAny
+				}
+
+				item := itemData{
+					ID:        consulService.ServiceID,
+					Node:      consulService.Node,
+					Name:      consulService.ServiceName,
+					Namespace: consulService.Namespace,
+					Address:   address,
+					Port:      strconv.Itoa(consulService.ServicePort),
+					Labels:    tagsToNeutralLabels(consulService.ServiceTags, p.Prefix),
+					Tags:      consulService.ServiceTags,
+					Status:    status,
+				}
+
+				extraConf, err := p.getConfiguration(item)
+				if err != nil {
+					log.FromContext(ctx).Errorf("Skip item %s: %v", item.Name, err)
+					continue
+				}
+				item.ExtraConf = extraConf
+
+				data = append(data, item)
+			}
 		}
 	}
 	return data, nil
 }
 
-func (p *Provider) fetchService(ctx context.Context, name string) ([]*api.CatalogService, map[string]string, error) {
+func (p *Provider) fetchNamespaces(ctx context.Context) ([]string, error) {
+	namespaces := []string{}
+	consulNamespaces, _, err := p.client.Namespaces().List(nil)
+	if err != nil {
+		return []string{}, err
+	}
+	for _, ns := range consulNamespaces {
+		if ns.DeletedAt == nil {
+			namespaces = append(namespaces, ns.Name)
+		}
+	}
+	return namespaces, nil
+}
+
+func (p *Provider) fetchService(ctx context.Context, name string, namespace string) ([]*api.CatalogService, map[string]string, error) {
 	var tagFilter string
 	if !p.ExposedByDefault {
 		tagFilter = p.Prefix + ".enable=true"
 	}
 
-	opts := &api.QueryOptions{AllowStale: p.Stale, RequireConsistent: p.RequireConsistent, UseCache: p.Cache}
+	opts := &api.QueryOptions{AllowStale: p.Stale, RequireConsistent: p.RequireConsistent, UseCache: p.Cache, Namespace: namespace}
 	opts = opts.WithContext(ctx)
 
 	consulServices, _, err := p.client.Catalog().Service(name, tagFilter, opts)
@@ -243,10 +278,10 @@ func (p *Provider) fetchService(ctx context.Context, name string) ([]*api.Catalo
 	return consulServices, statuses, err
 }
 
-func (p *Provider) fetchServices(ctx context.Context) ([]string, error) {
+func (p *Provider) fetchServices(ctx context.Context, namespace string) ([]string, error) {
 	// The query option "Filter" is not supported by /catalog/services.
 	// https://www.consul.io/api/catalog.html#list-services
-	opts := &api.QueryOptions{AllowStale: p.Stale, RequireConsistent: p.RequireConsistent, UseCache: p.Cache}
+	opts := &api.QueryOptions{AllowStale: p.Stale, RequireConsistent: p.RequireConsistent, UseCache: p.Cache, Namespace: namespace}
 	serviceNames, _, err := p.client.Catalog().Services(opts)
 	if err != nil {
 		return nil, err

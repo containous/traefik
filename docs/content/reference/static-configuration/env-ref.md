@@ -387,6 +387,9 @@ Token is used to provide a per-request ACL token which overrides the agent's def
 `TRAEFIK_PROVIDERS_CONSULCATALOG_EXPOSEDBYDEFAULT`:  
 Expose containers by default. (Default: ```true```)
 
+`TRAEFIK_PROVIDERS_CONSULCATALOG_NAMESPACES`:  
+Namespaces to search.  Use ['*'] to search across all namespaces.  If missing, only the default namespace is searched.
+
 `TRAEFIK_PROVIDERS_CONSULCATALOG_PREFIX`:  
 Prefix for consul service tags. Default 'traefik' (Default: ```traefik```)
 
@@ -719,6 +722,9 @@ Display additional provider logs. (Default: ```false```)
 
 `TRAEFIK_PROVIDERS_MARATHON_WATCH`:  
 Watch provider. (Default: ```true```)
+
+`TRAEFIK_PROVIDERS_PLUGIN_<NAME>`:  
+
 
 `TRAEFIK_PROVIDERS_PROVIDERSTHROTTLEDURATION`:  
 Backends throttle duration: minimum duration between 2 events from providers before applying a new configuration. It avoids unnecessary reloads if multiples events are sent in a short amount of time. (Default: ```2```)
