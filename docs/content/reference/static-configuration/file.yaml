@@ -32,7 +32,9 @@ entryPoints:
       trustedIPs:
       - foobar
       - foobar
-    enableHTTP3: true
+    http3:
+      enabled: true
+      advertisedAs: foobar
     udp:
       timeout: 42
     http:
@@ -421,4 +423,3 @@ experimental:
     moduleName: foobar
   http3: true
   kubernetesGateway: true
-

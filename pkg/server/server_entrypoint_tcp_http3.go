@@ -26,7 +26,7 @@ type http3server struct {
 }
 
 func newHTTP3Server(ctx context.Context, configuration *static.EntryPoint, httpsServer *httpServer) (*http3server, error) {
-	if !configuration.EnableHTTP3 {
+	if configuration.HTTP3 == nil || !configuration.HTTP3.Enabled {
 		return nil, nil
 	}
 
@@ -42,9 +42,14 @@ func newHTTP3Server(ctx context.Context, configuration *static.EntryPoint, https
 		},
 	}
 
+	// fall back to the entry point's address if AdvertisedAs is not specified
+	if configuration.HTTP3.AdvertisedAs == "" {
+		configuration.HTTP3.AdvertisedAs = configuration.GetAddress()
+	}
+
 	h3.Server = &http3.Server{
 		Server: &http.Server{
-			Addr:         configuration.GetAddress(),
+			Addr:         configuration.HTTP3.AdvertisedAs,
 			Handler:      httpsServer.Server.(*http.Server).Handler,
 			ErrorLog:     httpServerLogger,
 			ReadTimeout:  time.Duration(configuration.Transport.RespondingTimeouts.ReadTimeout),

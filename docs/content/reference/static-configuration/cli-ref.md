@@ -102,8 +102,11 @@ Entry points definition. (Default: ```false```)
 `--entrypoints.<name>.address`:  
 Entry point address.
 
-`--entrypoints.<name>.enablehttp3`:  
+`--entrypoints.<name>.http3.enabled`:  
 Enable HTTP3. (Default: ```false```)
+
+`--entrypoints.<name>.http3.advertisedAs`:  
+The advertised address for HTTP3. (Default: the entry point's address)
 
 `--entrypoints.<name>.forwardedheaders.insecure`:  
 Trust all forwarded headers. (Default: ```false```)
