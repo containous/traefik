@@ -11,12 +11,10 @@ import (
 	"github.com/traefik/traefik/v2/pkg/types"
 )
 
-var datadogClient = dogstatsd.New("traefik.", kitlog.LoggerFunc(func(keyvals ...interface{}) error {
-	log.WithoutContext().WithField(log.MetricsProviderName, "datadog").Info(keyvals)
-	return nil
-}))
-
-var datadogTicker *time.Ticker
+var (
+	datadogClient *dogstatsd.Dogstatsd
+	datadogTicker *time.Ticker
+)
 
 // Metric names consistent with https://github.com/DataDog/integrations-extras/pull/64
 const (
@@ -46,6 +44,16 @@ const (
 
 // RegisterDatadog registers the metrics pusher if this didn't happen yet and creates a datadog Registry instance.
 func RegisterDatadog(ctx context.Context, config *types.Datadog) Registry {
+	// just to be sure there is a prefix defined
+	if config.Prefix == "" {
+		config.Prefix = "traefik"
+	}
+
+	datadogClient = dogstatsd.New(config.Prefix+".", kitlog.LoggerFunc(func(keyvals ...interface{}) error {
+		log.WithoutContext().WithField(log.MetricsProviderName, "datadog").Info(keyvals)
+		return nil
+	}))
+
 	if datadogTicker == nil {
 		datadogTicker = initDatadogClient(ctx, config)
 	}
