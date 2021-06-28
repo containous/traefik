@@ -423,7 +423,7 @@
       "acme": {
         "email": "xxxx",
         "caServer": "xxxx",
-        "renewBeforeExpiry": 151200000000000,
+        "renewalWindowRatio": 0.42,
         "preferredChain": "foobar",
         "storage": "Storage",
         "keyType": "MyKeyType",

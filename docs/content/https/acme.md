@@ -140,7 +140,7 @@ Please check the [configuration examples below](#configuration-examples) for mor
 
 Traefik automatically tracks the expiry date of ACME certificates it generates.
 
-By default, if there are less than 30 days remaining before the certificate expires, Traefik will attempt to renew it automatically. [This amount of time is configurable](#renewbeforeexpiry).
+By default, the last third of each certificate's lifetime becomes its renewal window. The renewal window is the span of time at the end of the certificate's validity period in which it should be renewed. [This ratio is configurable](#renewalwindowratio). With Let's Encrypt's 90 days lifetime, that means that Traefik will by default try to renew certificates that have 30 or less days left on their validity period.
 
 !!! info ""
     Certificates that are no longer used may still be renewed, as Traefik does not currently check if the certificate is being used before renewing.
@@ -525,16 +525,16 @@ docker run -v "/my/host/acme:/etc/traefik/acme" traefik
 !!! warning
     For concurrency reasons, this file cannot be shared across multiple instances of Traefik.
 
-### `renewBeforeExpiry`
+### `renewalWindowRatio`
 
-_Optional, Default=720h_
+_Optional, Default=0.33_
 
-Time remaining on a certificate until its expiry before we try to renew it.
+How much of a certificate's lifetime becomes the renewal window. The renewal window is the span of time at the end of the certificate's validity period in which it should be renewed. By default, it's around one third.
 
 ```toml tab="File (TOML)"
 [certificatesResolvers.myresolver.acme]
   # ...
-  renewBeforeExpiry = "720h"
+  renewalWindowRatio = 0.33
   # ...
 ```
 
@@ -543,13 +543,13 @@ certificatesResolvers:
   myresolver:
     acme:
       # ...
-      renewBeforeExpiry: "720h"
+      renewalWindowRatio: 0.33
       # ...
 ```
 
 ```bash tab="CLI"
 # ...
---certificatesresolvers.myresolver.acme.renewBeforeExpiry=720h
+--certificatesresolvers.myresolver.acme.renewalWindowRatio=0.33
 # ...
 ```
 

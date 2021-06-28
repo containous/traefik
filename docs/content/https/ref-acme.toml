@@ -22,13 +22,15 @@
   #
   # caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
 
-  # Time remaining on a certificate until its expiry before we try to renew it.
-  # By default, 30 days.
+  # How much of a certificate's lifetime becomes the renewal window.
+  # The renewal window is the span of time at the end of the certificate's
+  # validity period in which it should be renewed.
+  # By default, it's around one third.
   #
   # Optional
-  # Default: "720h"
+  # Default: 0.33
   #
-  # renewBeforeExpiry = "720h"
+  # renewalWindowRatio = 0.33
 
   # Frequency in which Traefik will check if the certificate is due for renewal.
   # By default, 24 hours.
