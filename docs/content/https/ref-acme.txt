@@ -21,14 +21,14 @@
 #
 --certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
 
-# Time left on a certificate before we renew it.
+# Time remaining on a certificate until its expiry before we try to renew it.
 # By default, 30 days.
 #
 # Optional
 # Default: 720h
 --certificatesresolvers.myresolver.acme.renewBeforeExpiry=720h
 
-# Time remaining before the certificate expiration when Traefik will try to renew it.
+# Frequency in which Traefik will check if the certificate is due for renewal.
 # By default, 24 hours.
 #
 # Optional

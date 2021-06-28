@@ -22,7 +22,7 @@
   #
   # caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
 
-  # Time left on a certificate before we renew it.
+  # Time remaining on a certificate until its expiry before we try to renew it.
   # By default, 30 days.
   #
   # Optional
@@ -30,7 +30,7 @@
   #
   # renewBeforeExpiry = "720h"
 
-  # Frequency in which Traefik will check if certificate is due for renewal.
+  # Frequency in which Traefik will check if the certificate is due for renewal.
   # By default, 24 hours.
   #
   # Optional

@@ -529,7 +529,7 @@ docker run -v "/my/host/acme:/etc/traefik/acme" traefik
 
 _Optional, Default=720h_
 
-Time remaining before the certificate expiration when Traefik will try to renew it.
+Time remaining on a certificate until its expiry before we try to renew it.
 
 ```toml tab="File (TOML)"
 [certificatesResolvers.myresolver.acme]
