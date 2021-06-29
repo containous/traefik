@@ -645,7 +645,6 @@ func (p *Provider) refreshCertificates() {
 // within the renewal window, according to the given start/end
 // dates and the ratio of the renewal window. If true is returned,
 // the certificate being considered is due for renewal.
-// heavily inspired in CertMagic
 // https://github.com/caddyserver/certmagic/blob/647f27cf265e6f72b6f043ac52ba34f01bb5da56/certificates.go#L79
 func (p *Provider) currentlyInRenewalWindow(notBefore, notAfter time.Time) bool {
 	if notAfter.IsZero() {
@@ -662,7 +661,7 @@ func (p *Provider) currentlyInRenewalWindow(notBefore, notAfter time.Time) bool 
 }
 
 // NeedsRenewal returns true if the certificate is in its
-// renewal window or has expired
+// renewal window or has expired.
 func (p *Provider) NeedsRenewal(cert *x509.Certificate) bool {
 	return p.currentlyInRenewalWindow(cert.NotBefore, cert.NotAfter)
 }
