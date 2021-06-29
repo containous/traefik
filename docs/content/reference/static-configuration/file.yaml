@@ -425,5 +425,3 @@ experimental:
   devPlugin:
     goPath: foobar
     moduleName: foobar
-  http3: true
-  kubernetesGateway: true
