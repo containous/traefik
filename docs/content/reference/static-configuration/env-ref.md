@@ -484,7 +484,7 @@ The AWS credentials access key to use for making requests
 Auto discover cluster (Default: ```false```)
 
 `TRAEFIK_PROVIDERS_ECS_CLUSTERS`:  
-ECS Clusters name (Default: ```default```)
+ECS Cluster names (Default: ```default```)
 
 `TRAEFIK_PROVIDERS_ECS_CONSTRAINTS`:  
 Constraints is an expression that Traefik matches against the container's labels to determine whether to create any route for that container.
@@ -501,8 +501,14 @@ Polling interval (in seconds) (Default: ```15```)
 `TRAEFIK_PROVIDERS_ECS_REGION`:  
 The AWS region to use for requests
 
+`TRAEFIK_PROVIDERS_ECS_REQUIREHEALTHYTASK`:  
+Require a task to be in the healthy state (Default: ```false```)
+
 `TRAEFIK_PROVIDERS_ECS_SECRETACCESSKEY`:  
 The AWS credentials access key to use for making requests
+
+`TRAEFIK_PROVIDERS_ECS_SERVICES`:  
+ECS Service names
 
 `TRAEFIK_PROVIDERS_ETCD`:  
 Enable Etcd backend with default settings. (Default: ```false```)
