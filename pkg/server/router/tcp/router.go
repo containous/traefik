@@ -95,8 +95,9 @@ type nameAndConfig struct {
 }
 
 func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string]*runtime.TCPRouterInfo, configsHTTP map[string]*runtime.RouterInfo, handlerHTTP, handlerHTTPS http.Handler) (*tcp.Router, error) {
+	// Build a new Router.
 	router := &tcp.Router{}
-	router.HTTPHandler(handlerHTTP)
+	router.SetHTTPHandler(handlerHTTP)
 
 	defaultTLSConf, err := m.tlsManager.Get(traefiktls.DefaultTLSStoreName, traefiktls.DefaultTLSConfigName)
 	if err != nil {
@@ -194,7 +195,7 @@ func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string
 		handlerHTTPS.ServeHTTP(rw, req)
 	})
 
-	router.HTTPSHandler(sniCheck, defaultTLSConf)
+	router.SetHTTPSHandler(sniCheck, defaultTLSConf)
 
 	logger := log.FromContext(ctx)
 	for hostSNI, tlsConfigs := range tlsOptionsForHostSNI {
@@ -268,7 +269,9 @@ func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string
 				}
 
 				if routerConfig.TLS.Passthrough {
-					router.AddRoute(domain, handler)
+					route := tcp.NewRoute(handler)
+					route.AddMatcher(tcp.NewSNIHost(domain))
+					router.AddRoute(route)
 					continue
 				}
 
@@ -289,12 +292,27 @@ func (m *Manager) buildEntryPointHandler(ctx context.Context, configs map[string
 					continue
 				}
 
-				router.AddRouteTLS(domain, handler, tlsConf)
+				route := tcp.NewRoute(&tcp.TLSHandler{Next: handler, Config: tlsConf})
+				route.AddMatcher(tcp.NewSNIHost(domain))
+				router.AddRoute(route)
 			case domain == "*":
-				router.AddCatchAllNoTLS(handler)
+				router.SetCatchAllNoTLS(handler)
 			default:
 				logger.Warn("TCP Router ignored, cannot specify a Host rule without TLS")
 			}
+		}
+
+		ips, err := rules.ParseClientIP(routerConfig.Rule)
+		if err != nil {
+			routerErr := fmt.Errorf("unknown rule %s", routerConfig.Rule)
+			routerConfig.AddError(routerErr, true)
+			logger.Error(routerErr)
+			continue
+		}
+		for _, ip := range ips {
+			route := tcp.NewRoute(handler)
+			route.AddMatcher(tcp.NewClientIP(ip))
+			router.AddRoute(route)
 		}
 	}
 

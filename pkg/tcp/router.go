@@ -8,7 +8,6 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/traefik/traefik/v2/pkg/log"
@@ -19,14 +18,43 @@ const defaultBufSize = 4096
 
 // Router is a TCP router.
 type Router struct {
-	routingTable      map[string]Handler
-	httpForwarder     Handler
-	httpsForwarder    Handler
-	httpHandler       http.Handler
-	httpsHandler      http.Handler
-	httpsTLSConfig    *tls.Config // default TLS config
-	catchAllNoTLS     Handler
+	// TCP Routes that will be matched (ordered).
+	routes []*Route
+
+	// Forwarder handlers.
+	httpForwarder  Handler
+	httpsForwarder Handler
+
+	// HTTP(S) handlers.
+	httpHandler  http.Handler
+	httpsHandler http.Handler
+
+	// Catchall handlers.
+	catchAllNoTLS Handler
+
+	// TLS configs.
+	httpsTLSConfig    *tls.Config            // default TLS config
 	hostHTTPTLSConfig map[string]*tls.Config // TLS configs keyed by SNI
+}
+
+// NewRouter returns a new TCP router.
+func NewRouter() (Router, error) {
+	return Router{}, nil
+}
+
+func (r *Router) match(conn WriteCloser) Handler {
+	// For each route, check if match, and return the handler for that route.
+	for _, route := range r.routes {
+		if route.Match(conn) {
+			return route.handler
+		}
+	}
+	return nil
+}
+
+// AddRoute adds a route to the router.
+func (r *Router) AddRoute(route *Route) {
+	r.routes = append(r.routes, route)
 }
 
 // GetTLSGetClientInfo is called after a ClientHello is received from a client.
@@ -43,7 +71,7 @@ func (r *Router) GetTLSGetClientInfo() func(info *tls.ClientHelloInfo) (*tls.Con
 func (r *Router) ServeTCP(conn WriteCloser) {
 	// FIXME -- Check if ProxyProtocol changes the first bytes of the request
 
-	if r.catchAllNoTLS != nil && len(r.routingTable) == 0 {
+	if r.catchAllNoTLS != nil && len(r.routes) == 0 {
 		r.catchAllNoTLS.ServeTCP(conn)
 		return
 	}
@@ -80,17 +108,13 @@ func (r *Router) ServeTCP(conn WriteCloser) {
 
 	// FIXME Optimize and test the routing table before helloServerName
 	serverName = types.CanonicalDomain(serverName)
-	if r.routingTable != nil && serverName != "" {
-		if target, ok := r.routingTable[serverName]; ok {
+
+	if len(r.routes) > 0 && serverName != "" {
+		target := r.match(conn)
+		if target != nil {
 			target.ServeTCP(r.GetConn(conn, peeked))
 			return
 		}
-	}
-
-	// FIXME Needs tests
-	if target, ok := r.routingTable["*"]; ok {
-		target.ServeTCP(r.GetConn(conn, peeked))
-		return
 	}
 
 	if r.httpsForwarder != nil {
@@ -98,22 +122,6 @@ func (r *Router) ServeTCP(conn WriteCloser) {
 	} else {
 		conn.Close()
 	}
-}
-
-// AddRoute defines a handler for a given sniHost (* is the only valid option).
-func (r *Router) AddRoute(sniHost string, target Handler) {
-	if r.routingTable == nil {
-		r.routingTable = map[string]Handler{}
-	}
-	r.routingTable[strings.ToLower(sniHost)] = target
-}
-
-// AddRouteTLS defines a handler for a given sniHost and sets the matching tlsConfig.
-func (r *Router) AddRouteTLS(sniHost string, target Handler, config *tls.Config) {
-	r.AddRoute(sniHost, &TLSHandler{
-		Next:   target,
-		Config: config,
-	})
 }
 
 // AddRouteHTTPTLS defines a handler for a given sniHost and sets the matching tlsConfig.
@@ -124,8 +132,8 @@ func (r *Router) AddRouteHTTPTLS(sniHost string, config *tls.Config) {
 	r.hostHTTPTLSConfig[sniHost] = config
 }
 
-// AddCatchAllNoTLS defines the fallback tcp handler.
-func (r *Router) AddCatchAllNoTLS(handler Handler) {
+// SetCatchAllNoTLS set the fallback tcp handler.
+func (r *Router) SetCatchAllNoTLS(handler Handler) {
 	r.catchAllNoTLS = handler
 }
 
@@ -149,15 +157,17 @@ func (r *Router) GetHTTPSHandler() http.Handler {
 	return r.httpsHandler
 }
 
-// HTTPForwarder sets the tcp handler that will forward the connections to an http handler.
-func (r *Router) HTTPForwarder(handler Handler) {
+// SetHTTPForwarder sets the tcp handler that will forward the connections to an http handler.
+func (r *Router) SetHTTPForwarder(handler Handler) {
 	r.httpForwarder = handler
 }
 
-// HTTPSForwarder sets the tcp handler that will forward the TLS connections to an http handler.
-func (r *Router) HTTPSForwarder(handler Handler) {
+// SetHTTPSForwarder sets the tcp handler that will forward the TLS connections to an http handler.
+func (r *Router) SetHTTPSForwarder(handler Handler) {
 	for sniHost, tlsConf := range r.hostHTTPTLSConfig {
-		r.AddRouteTLS(sniHost, handler, tlsConf)
+		route := NewRoute(&TLSHandler{Next: handler, Config: tlsConf})
+		route.AddMatcher(NewSNIHost(sniHost))
+		r.AddRoute(route)
 	}
 
 	r.httpsForwarder = &TLSHandler{
@@ -166,13 +176,13 @@ func (r *Router) HTTPSForwarder(handler Handler) {
 	}
 }
 
-// HTTPHandler attaches http handlers on the router.
-func (r *Router) HTTPHandler(handler http.Handler) {
+// SetHTTPHandler attaches an http handler to the router.
+func (r *Router) SetHTTPHandler(handler http.Handler) {
 	r.httpHandler = handler
 }
 
-// HTTPSHandler attaches https handlers on the router.
-func (r *Router) HTTPSHandler(handler http.Handler, config *tls.Config) {
+// SetHTTPSHandler attaches an https handler to the router.
+func (r *Router) SetHTTPSHandler(handler http.Handler, config *tls.Config) {
 	r.httpsHandler = handler
 	r.httpsTLSConfig = config
 }

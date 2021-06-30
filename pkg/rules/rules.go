@@ -26,6 +26,11 @@ var funcs = map[string]func(*mux.Route, ...string) error{
 	"Query":         query,
 }
 
+var tcpFuncs = map[string]func() error{
+	"HostSNI":  tcpHostSNI,
+	"ClientIP": tcpClientIP,
+}
+
 // Router handle routing with rules.
 type Router struct {
 	*mux.Router
@@ -34,7 +39,7 @@ type Router struct {
 
 // NewRouter returns a new router instance.
 func NewRouter() (*Router, error) {
-	parser, err := newParser()
+	parser, err := newParser(false)
 	if err != nil {
 		return nil, err
 	}
@@ -214,6 +219,14 @@ func query(route *mux.Route, query ...string) error {
 	route.Queries(queries...)
 	// Queries can return nil so we can't chain the GetError()
 	return route.GetError()
+}
+
+func tcpHostSNI() error {
+	return nil
+}
+
+func tcpClientIP() error {
+	return nil
 }
 
 func addRuleOnRouter(router *mux.Router, rule *tree) error {
