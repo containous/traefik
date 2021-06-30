@@ -35,6 +35,7 @@ type Service struct {
 	LoadBalancer *ServersLoadBalancer `json:"loadBalancer,omitempty" toml:"loadBalancer,omitempty" yaml:"loadBalancer,omitempty" export:"true"`
 	Weighted     *WeightedRoundRobin  `json:"weighted,omitempty" toml:"weighted,omitempty" yaml:"weighted,omitempty" label:"-" export:"true"`
 	Mirroring    *Mirroring           `json:"mirroring,omitempty" toml:"mirroring,omitempty" yaml:"mirroring,omitempty" label:"-" export:"true"`
+	Reroute      *RerouteService      `json:"reroute,omitempty" toml:"retoute,omitempty" yaml:"reroute,omitempty" export:"true"`
 }
 
 // +k8s:deepcopy-gen=true
@@ -129,6 +130,42 @@ type Cookie struct {
 
 // +k8s:deepcopy-gen=true
 
+// RerouteService reroutes outgoing requests using URL segments of incoming requets.
+type RerouteService struct {
+	Scheme             string              `json:"scheme,omitempty" toml:"scheme,omitempty" yaml:"scheme,omitempty" export:"true"`
+	TargetHostSegment  int                 `json:"targetHostSegment,omitempty" toml:"targetHostSegment,omitempty" yaml:"targetHostSegment,omitempty" export:"true"`
+	HealthCheck        *HealthCheck        `json:"healthCheck,omitempty" toml:"healthCheck,omitempty" yaml:"healthCheck,omitempty" export:"true"`
+	PassHostHeader     *bool               `json:"passHostHeader" toml:"passHostHeader" yaml:"passHostHeader" export:"true"`
+	ResponseForwarding *ResponseForwarding `json:"responseForwarding,omitempty" toml:"responseForwarding,omitempty" yaml:"responseForwarding,omitempty" export:"true"`
+	ServersTransport   string              `json:"serversTransport,omitempty" toml:"serversTransport,omitempty" yaml:"serversTransport,omitempty" export:"true"`
+	SpnegoOut          *SpnegoOutService   `json:"spnegoOut,omitempty" toml:"spnegoOut,omitempty" yaml:"spnegoOut,omitempty" export:"true"`
+}
+
+// +k8s:deepcopy-gen=true
+
+// SpnegoOutService enables SPNEGO in outgoing requests to access Kerberos protected sites.
+type SpnegoOutService struct {
+	User               string              `json:"user,omitempty" toml:"user,omitempty" yaml:"user,omitempty" export:"true"`
+	Realm              string              `json:"realm,omitempty" toml:"realm,omitempty" yaml:"realm,omitempty" export:"true"`
+	KrbConfPath        string              `json:"krbConfPath,omitempty" toml:"krbConfPath,omitempty" yaml:"krbConfPath,omitempty" export:"true"`
+	KeytabPath         string              `json:"keytabPath,omitempty" toml:"keytabPath,omitempty" yaml:"keytabPath,omitempty" export:"true"`
+	CcachePath         string              `json:"ccachePath,omitempty" toml:"ccachePath,omitempty" yaml:"ccachePath,omitempty" export:"true"`
+	SpnOverrides       []SpnMapping        `json:"spnOverrides,omitempty" toml:"spnOverrides,omitempty" yaml:"spnOverrides,omitempty" export:"true"`
+	PassHostHeader     *bool               `json:"passHostHeader" toml:"passHostHeader" yaml:"passHostHeader" export:"true"`
+	ResponseForwarding *ResponseForwarding `json:"responseForwarding,omitempty" toml:"responseForwarding,omitempty" yaml:"responseForwarding,omitempty" export:"true"`
+	ServersTransport   string              `json:"serversTransport,omitempty" toml:"serversTransport,omitempty" yaml:"serversTransport,omitempty" export:"true"`
+}
+
+// +k8s:deepcopy-gen=true
+
+// SpnMapping maps domain name and SPN. If this is not specified, HTTP/domain-name per site is used by default.
+type SpnMapping struct {
+	Spn        string `json:"spn,omitempty" toml:"spn,omitempty" yaml:"spn,omitempty" export:"true"`
+	DomainName string `json:"domainName,omitempty" toml:"domainName,omitempty" yaml:"domainName,omitempty" export:"true"`
+}
+
+// +k8s:deepcopy-gen=true
+
 // ServersLoadBalancer holds the ServersLoadBalancer configuration.
 type ServersLoadBalancer struct {
 	Sticky  *Sticky  `json:"sticky,omitempty" toml:"sticky,omitempty" yaml:"sticky,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
@@ -141,6 +178,7 @@ type ServersLoadBalancer struct {
 	PassHostHeader     *bool               `json:"passHostHeader" toml:"passHostHeader" yaml:"passHostHeader" export:"true"`
 	ResponseForwarding *ResponseForwarding `json:"responseForwarding,omitempty" toml:"responseForwarding,omitempty" yaml:"responseForwarding,omitempty" export:"true"`
 	ServersTransport   string              `json:"serversTransport,omitempty" toml:"serversTransport,omitempty" yaml:"serversTransport,omitempty" export:"true"`
+	SpnegoOut          *SpnegoOutService   `json:"spnegoOut,omitempty" toml:"spnegoOut,omitempty" yaml:"spnegoOut,omitempty" export:"true"`
 }
 
 // Mergeable tells if the given service is mergeable.
