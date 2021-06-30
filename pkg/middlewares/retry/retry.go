@@ -16,6 +16,7 @@ import (
 	"github.com/traefik/traefik/v2/pkg/config/dynamic"
 	"github.com/traefik/traefik/v2/pkg/log"
 	"github.com/traefik/traefik/v2/pkg/middlewares"
+	"github.com/traefik/traefik/v2/pkg/safe"
 	"github.com/traefik/traefik/v2/pkg/tracing"
 )
 
@@ -40,6 +41,7 @@ type Listeners []Listener
 // nexter returns the duration to wait before retrying the operation.
 type nexter interface {
 	NextBackOff() time.Duration
+	Reset()
 }
 
 // retry is a middleware that retries requests.
@@ -82,44 +84,45 @@ func (r *retry) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	attempts := 1
-	backOff := r.newBackOff()
-	currentInterval := 0 * time.Millisecond
-	for {
-		select {
-		case <-time.After(currentInterval):
+	backOff := backoff.WithContext(r.newBackOff(), req.Context())
 
-			shouldRetry := attempts < r.attempts
-			retryResponseWriter := newResponseWriter(rw, shouldRetry)
+	operation := func() error {
+		shouldRetry := attempts < r.attempts
+		retryResponseWriter := newResponseWriter(rw, shouldRetry)
 
-			// Disable retries when the backend already received request data
-			trace := &httptrace.ClientTrace{
-				WroteHeaders: func() {
-					retryResponseWriter.DisableRetries()
-				},
-				WroteRequest: func(httptrace.WroteRequestInfo) {
-					retryResponseWriter.DisableRetries()
-				},
-			}
-			newCtx := httptrace.WithClientTrace(req.Context(), trace)
-
-			r.next.ServeHTTP(retryResponseWriter, req.WithContext(newCtx))
-
-			if !retryResponseWriter.ShouldRetry() {
-				return
-			}
-
-			currentInterval = backOff.NextBackOff()
-
-			attempts++
-
-			log.FromContext(middlewares.GetLoggerCtx(req.Context(), r.name, typeName)).
-				Debugf("New attempt %d for request: %v", attempts, req.URL)
-
-			r.listener.Retried(req, attempts)
-
-		case <-req.Context().Done():
-			return
+		// Disable retries when the backend already received request data
+		trace := &httptrace.ClientTrace{
+			WroteHeaders: func() {
+				retryResponseWriter.DisableRetries()
+			},
+			WroteRequest: func(httptrace.WroteRequestInfo) {
+				retryResponseWriter.DisableRetries()
+			},
 		}
+		newCtx := httptrace.WithClientTrace(req.Context(), trace)
+
+		r.next.ServeHTTP(retryResponseWriter, req.WithContext(newCtx))
+
+		if !retryResponseWriter.ShouldRetry() {
+			return nil
+		}
+
+		attempts++
+
+		return fmt.Errorf("attempt %d failed", attempts-1)
+	}
+
+	notify := func(err error, d time.Duration) {
+		log.FromContext(middlewares.GetLoggerCtx(req.Context(), r.name, typeName)).
+			Debugf("New attempt %d for request: %v", attempts, req.URL)
+
+		r.listener.Retried(req, attempts)
+	}
+
+	err := backoff.RetryNotify(safe.OperationWithRecover(operation), backOff, notify)
+	if err != nil {
+		log.FromContext(middlewares.GetLoggerCtx(req.Context(), r.name, typeName)).
+			Debugf("Final retry attempt failed: %v", err.Error())
 	}
 }
 
