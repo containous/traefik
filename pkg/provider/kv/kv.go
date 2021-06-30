@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/abronan/valkeyrie"
@@ -143,14 +144,27 @@ func (p *Provider) watchKv(ctx context.Context, configurationChan chan<- dynamic
 	return nil
 }
 
+func (p *Provider) configKeyPrefix() string {
+	aliasKey := p.RootKey + "/alias"
+
+	res, err := p.kvClient.Get(aliasKey, nil)
+	if err != nil {
+		return p.RootKey
+	}
+
+	return strings.Trim(string(res.Value), "/")
+}
+
 func (p *Provider) buildConfiguration() (*dynamic.Configuration, error) {
-	pairs, err := p.kvClient.List(p.RootKey, nil)
+	prefix := p.configKeyPrefix()
+
+	pairs, err := p.kvClient.List(prefix, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	cfg := &dynamic.Configuration{}
-	err = kv.Decode(pairs, cfg, p.RootKey)
+	err = kv.Decode(pairs, cfg, prefix)
 	if err != nil {
 		return nil, err
 	}
