@@ -23,34 +23,55 @@ func TestDatadog(t *testing.T) {
 	if !datadogRegistry.IsEpEnabled() || !datadogRegistry.IsRouterEnabled() || !datadogRegistry.IsSvcEnabled() {
 		t.Errorf("DatadogRegistry should return true for IsEnabled(), IsRouterEnabled() and IsSvcEnabled()")
 	}
+	testDatadogRegistry(t, "", datadogRegistry)
+}
+
+func TestDatadogWithPrefix(t *testing.T) {
+	t.Cleanup(func() {
+		StopDatadog()
+	})
+
+	udp.SetAddr(":18125")
+	// This is needed to make sure that UDP Listener listens for data a bit longer, otherwise it will quit after a millisecond
+	udp.Timeout = 5 * time.Second
+
+	datadogRegistry := RegisterDatadog(context.Background(), &types.Datadog{Prefix: "testPrefix", Address: ":18125", PushInterval: ptypes.Duration(time.Second), AddEntryPointsLabels: true, AddRoutersLabels: true, AddServicesLabels: true})
+
+	testDatadogRegistry(t, "testPrefix", datadogRegistry)
+}
+
+func testDatadogRegistry(t *testing.T, metricsPrefix string, datadogRegistry Registry) {
+	if metricsPrefix == "" {
+		metricsPrefix = "traefik"
+	}
 
 	expected := []string{
-		"traefik.config.reload.total:1.000000|c\n",
-		"traefik.config.reload.total:1.000000|c|#failure:true\n",
-		"traefik.config.reload.lastSuccessTimestamp:1.000000|g\n",
-		"traefik.config.reload.lastFailureTimestamp:1.000000|g\n",
+		metricsPrefix + ".config.reload.total:1.000000|c\n",
+		metricsPrefix + ".config.reload.total:1.000000|c|#failure:true\n",
+		metricsPrefix + ".config.reload.lastSuccessTimestamp:1.000000|g\n",
+		metricsPrefix + ".config.reload.lastFailureTimestamp:1.000000|g\n",
 
-		"traefik.tls.certs.notAfterTimestamp:1.000000|g|#key:value\n",
+		metricsPrefix + ".tls.certs.notAfterTimestamp:1.000000|g|#key:value\n",
 
-		"traefik.entrypoint.request.total:1.000000|c|#entrypoint:test\n",
-		"traefik.entrypoint.request.tls.total:1.000000|c|#entrypoint:test,tls_version:foo,tls_cipher:bar\n",
-		"traefik.entrypoint.request.duration:10000.000000|h|#entrypoint:test\n",
-		"traefik.entrypoint.connections.open:1.000000|g|#entrypoint:test\n",
+		metricsPrefix + ".entrypoint.request.total:1.000000|c|#entrypoint:test\n",
+		metricsPrefix + ".entrypoint.request.tls.total:1.000000|c|#entrypoint:test,tls_version:foo,tls_cipher:bar\n",
+		metricsPrefix + ".entrypoint.request.duration:10000.000000|h|#entrypoint:test\n",
+		metricsPrefix + ".entrypoint.connections.open:1.000000|g|#entrypoint:test\n",
 
-		"traefik.router.request.total:1.000000|c|#router:demo,service:test,code:404,method:GET\n",
-		"traefik.router.request.total:1.000000|c|#router:demo,service:test,code:200,method:GET\n",
-		"traefik.router.request.tls.total:1.000000|c|#router:demo,service:test,tls_version:foo,tls_cipher:bar\n",
-		"traefik.router.request.duration:10000.000000|h|#router:demo,service:test,code:200\n",
-		"traefik.router.connections.open:1.000000|g|#router:demo,service:test\n",
+		metricsPrefix + ".router.request.total:1.000000|c|#router:demo,service:test,code:404,method:GET\n",
+		metricsPrefix + ".router.request.total:1.000000|c|#router:demo,service:test,code:200,method:GET\n",
+		metricsPrefix + ".router.request.tls.total:1.000000|c|#router:demo,service:test,tls_version:foo,tls_cipher:bar\n",
+		metricsPrefix + ".router.request.duration:10000.000000|h|#router:demo,service:test,code:200\n",
+		metricsPrefix + ".router.connections.open:1.000000|g|#router:demo,service:test\n",
 
-		"traefik.service.request.total:1.000000|c|#service:test,code:404,method:GET\n",
-		"traefik.service.request.total:1.000000|c|#service:test,code:200,method:GET\n",
-		"traefik.service.request.tls.total:1.000000|c|#service:test,tls_version:foo,tls_cipher:bar\n",
-		"traefik.service.request.duration:10000.000000|h|#service:test,code:200\n",
-		"traefik.service.connections.open:1.000000|g|#service:test\n",
-		"traefik.service.retries.total:2.000000|c|#service:test\n",
-		"traefik.service.request.duration:10000.000000|h|#service:test,code:200\n",
-		"traefik.service.server.up:1.000000|g|#service:test,url:http://127.0.0.1,one:two\n",
+		metricsPrefix + ".service.request.total:1.000000|c|#service:test,code:404,method:GET\n",
+		metricsPrefix + ".service.request.total:1.000000|c|#service:test,code:200,method:GET\n",
+		metricsPrefix + ".service.request.tls.total:1.000000|c|#service:test,tls_version:foo,tls_cipher:bar\n",
+		metricsPrefix + ".service.request.duration:10000.000000|h|#service:test,code:200\n",
+		metricsPrefix + ".service.connections.open:1.000000|g|#service:test\n",
+		metricsPrefix + ".service.retries.total:2.000000|c|#service:test\n",
+		metricsPrefix + ".service.request.duration:10000.000000|h|#service:test,code:200\n",
+		metricsPrefix + ".service.server.up:1.000000|g|#service:test,url:http://127.0.0.1,one:two\n",
 	}
 
 	udp.ShouldReceiveAll(t, expected, func() {
