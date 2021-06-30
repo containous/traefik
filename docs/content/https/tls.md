@@ -366,6 +366,40 @@ spec:
   sniStrict: true
 ```
 
+### SNI Fallback
+
+SNI Fallback allows TLS connections where the client does not send an SNI name indication,
+or if the SNI name indicated matched no known certificate, to use a fallback certificate,
+as if the client had originally indicated that server name to be used.
+
+```toml tab="File (TOML)"
+# Dynamic configuration
+
+[tls.options]
+  [tls.options.default]
+    sniFallback = "my-service.example.com"
+```
+
+```yaml tab="File (YAML)"
+# Dynamic configuration
+
+tls:
+  options:
+    default:
+      sniFallback: "my-service.example.com"
+```
+
+```yaml tab="Kubernetes"
+apiVersion: traefik.containo.us/v1alpha1
+kind: TLSOption
+metadata:
+  name: default
+  namespace: default
+
+spec:
+  sniFallback: "my-service.example.com"
+```
+
 ### Prefer Server Cipher Suites
 
 This option allows the server to choose its most preferred cipher suite instead of the client's.
