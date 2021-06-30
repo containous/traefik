@@ -267,6 +267,8 @@
     addEntryPointsLabels = true
     addRoutersLabels = true
     addServicesLabels = true
+    [metrics.influxDB.additionalLabels]
+      foobar = "foobar"
 
 [ping]
   entryPoint = "foobar"

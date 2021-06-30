@@ -246,6 +246,9 @@ InfluxDB metrics exporter type. (Default: ```false```)
 `TRAEFIK_METRICS_INFLUXDB_ADDENTRYPOINTSLABELS`:  
 Enable metrics on entry points. (Default: ```true```)
 
+`TRAEFIK_METRICS_INFLUXDB_ADDITIONALLABELS_<NAME>`:  
+Additional labels (influxdb tags) on all metrics
+
 `TRAEFIK_METRICS_INFLUXDB_ADDRESS`:  
 InfluxDB address. (Default: ```localhost:8089```)
 

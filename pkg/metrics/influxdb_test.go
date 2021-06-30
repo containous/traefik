@@ -21,7 +21,16 @@ func TestInfluxDB(t *testing.T) {
 	// This is needed to make sure that UDP Listener listens for data a bit longer, otherwise it will quit after a millisecond
 	udp.Timeout = 5 * time.Second
 
-	influxDBRegistry := RegisterInfluxDB(context.Background(), &types.InfluxDB{Address: ":8089", PushInterval: ptypes.Duration(time.Second), AddEntryPointsLabels: true, AddRoutersLabels: true, AddServicesLabels: true})
+	influxDBClient = nil
+	influxDBRegistry := RegisterInfluxDB(context.Background(),
+		&types.InfluxDB{
+			Address:              ":8089",
+			PushInterval:         ptypes.Duration(time.Second),
+			AddEntryPointsLabels: true,
+			AddRoutersLabels:     true,
+			AddServicesLabels:    true,
+			AdditionalLabels:     map[string]string{"tag1": "val1"},
+		})
 	defer StopInfluxDB()
 
 	if !influxDBRegistry.IsEpEnabled() || !influxDBRegistry.IsRouterEnabled() || !influxDBRegistry.IsSvcEnabled() {
@@ -29,10 +38,10 @@ func TestInfluxDB(t *testing.T) {
 	}
 
 	expectedServer := []string{
-		`(traefik\.config\.reload\.total count=1) [\d]{19}`,
-		`(traefik\.config\.reload\.total\.failure count=1) [\d]{19}`,
-		`(traefik\.config\.reload\.lastSuccessTimestamp value=1) [\d]{19}`,
-		`(traefik\.config\.reload\.lastFailureTimestamp value=1) [\d]{19}`,
+		`(traefik\.config\.reload\.total,tag1=val1 count=1) [\d]{19}`,
+		`(traefik\.config\.reload\.total\.failure,tag1=val1 count=1) [\d]{19}`,
+		`(traefik\.config\.reload\.lastSuccessTimestamp,tag1=val1 value=1) [\d]{19}`,
+		`(traefik\.config\.reload\.lastFailureTimestamp,tag1=val1 value=1) [\d]{19}`,
 	}
 
 	msgServer := udp.ReceiveString(t, func() {
@@ -45,7 +54,7 @@ func TestInfluxDB(t *testing.T) {
 	assertMessage(t, msgServer, expectedServer)
 
 	expectedTLS := []string{
-		`(traefik\.tls\.certs\.notAfterTimestamp,key=value value=1) [\d]{19}`,
+		`(traefik\.tls\.certs\.notAfterTimestamp,key=value,tag1=val1 value=1) [\d]{19}`,
 	}
 
 	msgTLS := udp.ReceiveString(t, func() {
@@ -55,10 +64,10 @@ func TestInfluxDB(t *testing.T) {
 	assertMessage(t, msgTLS, expectedTLS)
 
 	expectedEntrypoint := []string{
-		`(traefik\.entrypoint\.requests\.total,code=200,entrypoint=test,method=GET count=1) [\d]{19}`,
-		`(traefik\.entrypoint\.requests\.tls\.total,entrypoint=test,tls_cipher=bar,tls_version=foo count=1) [\d]{19}`,
-		`(traefik\.entrypoint\.request\.duration(?:,code=[\d]{3})?,entrypoint=test p50=10000,p90=10000,p95=10000,p99=10000) [\d]{19}`,
-		`(traefik\.entrypoint\.connections\.open,entrypoint=test value=1) [\d]{19}`,
+		`(traefik\.entrypoint\.requests\.total,code=200,entrypoint=test,method=GET,tag1=val1 count=1) [\d]{19}`,
+		`(traefik\.entrypoint\.requests\.tls\.total,entrypoint=test,tag1=val1,tls_cipher=bar,tls_version=foo count=1) [\d]{19}`,
+		`(traefik\.entrypoint\.request\.duration(?:,code=[\d]{3})?,entrypoint=test,tag1=val1 p50=10000,p90=10000,p95=10000,p99=10000) [\d]{19}`,
+		`(traefik\.entrypoint\.connections\.open,entrypoint=test,tag1=val1 value=1) [\d]{19}`,
 	}
 
 	msgEntrypoint := udp.ReceiveString(t, func() {
@@ -71,11 +80,11 @@ func TestInfluxDB(t *testing.T) {
 	assertMessage(t, msgEntrypoint, expectedEntrypoint)
 
 	expectedRouter := []string{
-		`(traefik\.router\.requests\.total,code=200,method=GET,router=demo,service=test count=1) [\d]{19}`,
-		`(traefik\.router\.requests\.total,code=404,method=GET,router=demo,service=test count=1) [\d]{19}`,
-		`(traefik\.router\.requests\.tls\.total,router=demo,service=test,tls_cipher=bar,tls_version=foo count=1) [\d]{19}`,
-		`(traefik\.router\.request\.duration,code=200,router=demo,service=test p50=10000,p90=10000,p95=10000,p99=10000) [\d]{19}`,
-		`(traefik\.router\.connections\.open,router=demo,service=test value=1) [\d]{19}`,
+		`(traefik\.router\.requests\.total,code=200,method=GET,router=demo,service=test,tag1=val1 count=1) [\d]{19}`,
+		`(traefik\.router\.requests\.total,code=404,method=GET,router=demo,service=test,tag1=val1 count=1) [\d]{19}`,
+		`(traefik\.router\.requests\.tls\.total,router=demo,service=test,tag1=val1,tls_cipher=bar,tls_version=foo count=1) [\d]{19}`,
+		`(traefik\.router\.request\.duration,code=200,router=demo,service=test,tag1=val1 p50=10000,p90=10000,p95=10000,p99=10000) [\d]{19}`,
+		`(traefik\.router\.connections\.open,router=demo,service=test,tag1=val1 value=1) [\d]{19}`,
 	}
 
 	msgRouter := udp.ReceiveString(t, func() {
@@ -89,13 +98,13 @@ func TestInfluxDB(t *testing.T) {
 	assertMessage(t, msgRouter, expectedRouter)
 
 	expectedService := []string{
-		`(traefik\.service\.requests\.total,code=200,method=GET,service=test count=1) [\d]{19}`,
-		`(traefik\.service\.requests\.total,code=404,method=GET,service=test count=1) [\d]{19}`,
-		`(traefik\.service\.requests\.tls\.total,service=test,tls_cipher=bar,tls_version=foo count=1) [\d]{19}`,
-		`(traefik\.service\.request\.duration,code=200,service=test p50=10000,p90=10000,p95=10000,p99=10000) [\d]{19}`,
-		`(traefik\.service\.retries\.total(?:,code=[\d]{3},method=GET)?,service=test count=2) [\d]{19}`,
-		`(traefik\.service\.server\.up,service=test,url=http://127.0.0.1 value=1) [\d]{19}`,
-		`(traefik\.service\.connections\.open,service=test value=1) [\d]{19}`,
+		`(traefik\.service\.requests\.total,code=200,method=GET,service=test,tag1=val1 count=1) [\d]{19}`,
+		`(traefik\.service\.requests\.total,code=404,method=GET,service=test,tag1=val1 count=1) [\d]{19}`,
+		`(traefik\.service\.requests\.tls\.total,service=test,tag1=val1,tls_cipher=bar,tls_version=foo count=1) [\d]{19}`,
+		`(traefik\.service\.request\.duration,code=200,service=test,tag1=val1 p50=10000,p90=10000,p95=10000,p99=10000) [\d]{19}`,
+		`(traefik\.service\.retries\.total(?:,code=[\d]{3},method=GET)?,service=test,tag1=val1 count=2) [\d]{19}`,
+		`(traefik\.service\.server\.up,service=test,tag1=val1,url=http://127.0.0.1 value=1) [\d]{19}`,
+		`(traefik\.service\.connections\.open,service=test,tag1=val1 value=1) [\d]{19}`,
 	}
 
 	msgService := udp.ReceiveString(t, func() {
@@ -126,7 +135,18 @@ func TestInfluxDBHTTP(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	influxDBRegistry := RegisterInfluxDB(context.Background(), &types.InfluxDB{Address: ts.URL, Protocol: "http", PushInterval: ptypes.Duration(time.Second), Database: "test", RetentionPolicy: "autogen", AddEntryPointsLabels: true, AddServicesLabels: true, AddRoutersLabels: true})
+	influxDBClient = nil
+	influxDBRegistry := RegisterInfluxDB(context.Background(),
+		&types.InfluxDB{
+			Address:              ts.URL,
+			Protocol:             "http",
+			PushInterval:         ptypes.Duration(time.Second),
+			Database:             "test",
+			RetentionPolicy:      "autogen",
+			AddEntryPointsLabels: true,
+			AddServicesLabels:    true,
+			AddRoutersLabels:     true,
+		})
 	defer StopInfluxDB()
 
 	if !influxDBRegistry.IsEpEnabled() || !influxDBRegistry.IsRouterEnabled() || !influxDBRegistry.IsSvcEnabled() {
