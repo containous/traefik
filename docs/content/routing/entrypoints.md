@@ -293,6 +293,8 @@ You can configure Traefik to trust the forwarded headers information (`X-Forward
     --entryPoints.web.forwardedHeaders.trustedIPs=127.0.0.1/32,192.168.1.7
     ```
 
+!!! important "`forwardedHeaders.trustedIPs` will also enable the parsing of the header `X-Forwarded-For` (if present) to determine the `X-Real-IP` by the same (reading from right to left) logic applied for `ipStrategy.excludedIps` within the Middlewares"
+
 ??? info "`forwardedHeaders.insecure`"
 
     Insecure Mode (Always Trusting Forwarded Headers).

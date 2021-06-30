@@ -97,6 +97,19 @@ func TestServeHTTP(t *testing.T) {
 			},
 		},
 		{
+			desc:       "insecure false with incoming X-Forwarded headers and valid Trusted Ips -> xRealIP",
+			insecure:   false,
+			trustedIps: []string{"10.0.0.0/8"},
+			remoteAddr: "10.0.1.100:80",
+			incomingHeaders: map[string]string{
+				"X-Forwarded-for": "172.31.1.25, 10.0.1.0, 10.0.1.12",
+			},
+			expectedHeaders: map[string]string{
+				"X-Forwarded-for": "172.31.1.25, 10.0.1.0, 10.0.1.12",
+				xRealIP:           "172.31.1.25",
+			},
+		},
+		{
 			desc:       "insecure false with incoming X-Forwarded headers and invalid Trusted Ips",
 			insecure:   false,
 			trustedIps: []string{"10.0.1.100"},
@@ -158,6 +171,15 @@ func TestServeHTTP(t *testing.T) {
 		},
 		{
 			desc:       "xRealIP populated from remote address",
+			remoteAddr: "10.0.1.101:80",
+			expectedHeaders: map[string]string{
+				xRealIP: "10.0.1.101",
+			},
+		},
+		{
+			desc:       "xRealIP populated from remote address, but not tricked by Trusted Ips",
+			insecure:   false,
+			trustedIps: []string{"10.0.0.0/8"},
 			remoteAddr: "10.0.1.101:80",
 			expectedHeaders: map[string]string{
 				xRealIP: "10.0.1.101",

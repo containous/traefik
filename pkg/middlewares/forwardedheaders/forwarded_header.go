@@ -135,6 +135,15 @@ func (x *XForwarded) rewrite(outreq *http.Request) {
 	if clientIP, _, err := net.SplitHostPort(outreq.RemoteAddr); err == nil {
 		clientIP = removeIPv6Zone(clientIP)
 
+		if x.ipChecker != nil {
+			strategy := ip.CheckerStrategy{Checker: x.ipChecker}
+			xClientIP := strategy.GetIP(outreq)
+			if xClientIP != "" {
+				// X-Forwarded-For wasn't empty
+				clientIP = xClientIP
+			}
+		}
+
 		if unsafeHeader(outreq.Header).Get(xRealIP) == "" {
 			unsafeHeader(outreq.Header).Set(xRealIP, clientIP)
 		}
