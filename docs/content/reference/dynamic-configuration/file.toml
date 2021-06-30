@@ -122,6 +122,7 @@
     [http.middlewares.Middleware05]
       [http.middlewares.Middleware05.compress]
         excludedContentTypes = ["foobar", "foobar"]
+        minimumBodySizeBytes = 42
     [http.middlewares.Middleware06]
       [http.middlewares.Middleware06.contentType]
         autoDetect = true

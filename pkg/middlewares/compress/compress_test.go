@@ -153,6 +153,29 @@ func TestShouldNotCompressWhenSpecificContentType(t *testing.T) {
 	}
 }
 
+func TestShouldNotCompressWhenTooLowBodySize(t *testing.T) {
+	minimumBodySize := 1000
+
+	fakeBody := generateBytes(minimumBodySize - 1)
+
+	req := testhelpers.MustNewRequest(http.MethodGet, "http://localhost", nil)
+	req.Header.Add(acceptEncodingHeader, gzipValue)
+
+	next := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		_, err := rw.Write(fakeBody)
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
+		}
+	})
+	handler := &compress{next: next, minimumBodySize: minimumBodySize}
+
+	rw := httptest.NewRecorder()
+	handler.ServeHTTP(rw, req)
+
+	assert.Empty(t, rw.Header().Get(contentEncodingHeader))
+	assert.EqualValues(t, rw.Body.Bytes(), fakeBody)
+}
+
 func TestIntegrationShouldNotCompress(t *testing.T) {
 	fakeCompressedBody := generateBytes(100000)
 

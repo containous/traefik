@@ -104,6 +104,7 @@ type CircuitBreaker struct {
 // Compress holds the compress configuration.
 type Compress struct {
 	ExcludedContentTypes []string `json:"excludedContentTypes,omitempty" toml:"excludedContentTypes,omitempty" yaml:"excludedContentTypes,omitempty" export:"true"`
+	MinimumBodySizeBytes int      `json:"minimumBodySizeBytes,omitempty" toml:"minimumBodySizeBytes,omitempty" yaml:"minimumBodySizeBytes,omitempty" export:"true"`
 }
 
 // +k8s:deepcopy-gen=true

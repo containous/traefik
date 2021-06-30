@@ -101,6 +101,9 @@ spec:
                     items:
                       type: string
                     type: array
+                  minimumBodySizeBytes:
+                    format: int64
+                    type: integer
                 type: object
               contentType:
                 description: ContentType middleware - or rather its unique `autoDetect`

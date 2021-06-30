@@ -15,6 +15,7 @@
 | `traefik/http/middlewares/Middleware04/circuitBreaker/expression` | `foobar` |
 | `traefik/http/middlewares/Middleware05/compress/excludedContentTypes/0` | `foobar` |
 | `traefik/http/middlewares/Middleware05/compress/excludedContentTypes/1` | `foobar` |
+| `traefik/http/middlewares/Middleware05/compress/minimumBodySizeBytes` | `42` |
 | `traefik/http/middlewares/Middleware06/contentType/autoDetect` | `true` |
 | `traefik/http/middlewares/Middleware07/digestAuth/headerField` | `foobar` |
 | `traefik/http/middlewares/Middleware07/digestAuth/realm` | `foobar` |

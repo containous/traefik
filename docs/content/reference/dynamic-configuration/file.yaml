@@ -128,6 +128,7 @@ http:
         excludedContentTypes:
         - foobar
         - foobar
+        minimumBodySizeBytes: 42
     Middleware06:
       contentType:
         autoDetect: true

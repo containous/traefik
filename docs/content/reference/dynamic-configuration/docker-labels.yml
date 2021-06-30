@@ -13,6 +13,7 @@
 - "traefik.http.middlewares.middleware04.circuitbreaker.expression=foobar"
 - "traefik.http.middlewares.middleware05.compress=true"
 - "traefik.http.middlewares.middleware05.compress.excludedcontenttypes=foobar, foobar"
+- "traefik.http.middlewares.middleware05.compress.minimumbodysizebytes=42"
 - "traefik.http.middlewares.middleware06.contenttype.autodetect=true"
 - "traefik.http.middlewares.middleware07.digestauth.headerfield=foobar"
 - "traefik.http.middlewares.middleware07.digestauth.realm=foobar"
