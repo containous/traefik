@@ -423,9 +423,11 @@
       "acme": {
         "email": "xxxx",
         "caServer": "xxxx",
+        "renewalWindowRatio": 0.42,
         "preferredChain": "foobar",
         "storage": "Storage",
         "keyType": "MyKeyType",
+        "expirationCheckInterval": 151200000000000,
         "dnsChallenge": {
           "provider": "DNSProvider",
           "delayBeforeCheck": "42ns",

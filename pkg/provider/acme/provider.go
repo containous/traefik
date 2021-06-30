@@ -33,12 +33,14 @@ var oscpMustStaple = false
 
 // Configuration holds ACME configuration provided by users.
 type Configuration struct {
-	Email          string `description:"Email address used for registration." json:"email,omitempty" toml:"email,omitempty" yaml:"email,omitempty"`
-	CAServer       string `description:"CA server to use." json:"caServer,omitempty" toml:"caServer,omitempty" yaml:"caServer,omitempty"`
-	PreferredChain string `description:"Preferred chain to use." json:"preferredChain,omitempty" toml:"preferredChain,omitempty" yaml:"preferredChain,omitempty" export:"true"`
-	Storage        string `description:"Storage to use." json:"storage,omitempty" toml:"storage,omitempty" yaml:"storage,omitempty" export:"true"`
-	KeyType        string `description:"KeyType used for generating certificate private key. Allow value 'EC256', 'EC384', 'RSA2048', 'RSA4096', 'RSA8192'." json:"keyType,omitempty" toml:"keyType,omitempty" yaml:"keyType,omitempty" export:"true"`
-	EAB            *EAB   `description:"External Account Binding to use." json:"eab,omitempty" toml:"eab,omitempty" yaml:"eab,omitempty"`
+	Email                   string        `description:"Email address used for registration." json:"email,omitempty" toml:"email,omitempty" yaml:"email,omitempty"`
+	CAServer                string        `description:"CA server to use." json:"caServer,omitempty" toml:"caServer,omitempty" yaml:"caServer,omitempty"`
+	RenewalWindowRatio      float64       `description:"How much of a certificate's lifetime becomes the renewal window. The renewal window is the span of time at the end of the certificate's validity period in which it should be renewed." json:"renewalWindowRatio,omitempty" toml:"renewalWindowRatio,omitempty" yaml:"renewalWindowRatio,omitempty" export:"true"`
+	PreferredChain          string        `description:"Preferred chain to use." json:"preferredChain,omitempty" toml:"preferredChain,omitempty" yaml:"preferredChain,omitempty" export:"true"`
+	Storage                 string        `description:"Storage to use." json:"storage,omitempty" toml:"storage,omitempty" yaml:"storage,omitempty" export:"true"`
+	KeyType                 string        `description:"KeyType used for generating certificate private key. Allow value 'EC256', 'EC384', 'RSA2048', 'RSA4096', 'RSA8192'." json:"keyType,omitempty" toml:"keyType,omitempty" yaml:"keyType,omitempty" export:"true"`
+	EAB                     *EAB          `description:"External Account Binding to use." json:"eab,omitempty" toml:"eab,omitempty" yaml:"eab,omitempty"`
+	ExpirationCheckInterval time.Duration `description:"Frequency in which Traefik will check if the certificate is due for renewal." json:"expirationCheckInterval,omitempty" toml:"expirationCheckInterval,omitempty" yaml:"expirationCheckInterval,omitempty" export:"true"`
 
 	DNSChallenge  *DNSChallenge  `description:"Activate DNS-01 Challenge." json:"dnsChallenge,omitempty" toml:"dnsChallenge,omitempty" yaml:"dnsChallenge,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
 	HTTPChallenge *HTTPChallenge `description:"Activate HTTP-01 Challenge." json:"httpChallenge,omitempty" toml:"httpChallenge,omitempty" yaml:"httpChallenge,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
@@ -50,6 +52,8 @@ func (a *Configuration) SetDefaults() {
 	a.CAServer = lego.LEDirectoryProduction
 	a.Storage = "acme.json"
 	a.KeyType = "RSA4096"
+	a.RenewalWindowRatio = 1.0 / 3.0
+	a.ExpirationCheckInterval = 24 * time.Hour
 }
 
 // CertAndStore allows mapping a TLS certificate to a TLS store.
@@ -189,7 +193,7 @@ func (p *Provider) Provide(configurationChan chan<- dynamic.Message, pool *safe.
 
 	p.renewCertificates(ctx)
 
-	ticker := time.NewTicker(24 * time.Hour)
+	ticker := time.NewTicker(p.Configuration.ExpirationCheckInterval)
 	pool.GoCtx(func(ctxPool context.Context) {
 		for {
 			select {
@@ -637,6 +641,31 @@ func (p *Provider) refreshCertificates() {
 	p.configurationChan <- conf
 }
 
+// currentlyInRenewalWindow returns true if the current time is
+// within the renewal window, according to the given start/end
+// dates and the ratio of the renewal window. If true is returned,
+// the certificate being considered is due for renewal.
+// https://github.com/caddyserver/certmagic/blob/647f27cf265e6f72b6f043ac52ba34f01bb5da56/certificates.go#L79
+func (p *Provider) currentlyInRenewalWindow(notBefore, notAfter time.Time) bool {
+	if notAfter.IsZero() {
+		return false
+	}
+	lifetime := notAfter.Sub(notBefore)
+	renewalWindowRatio := p.Configuration.RenewalWindowRatio
+	if renewalWindowRatio <= 0 || renewalWindowRatio >= 1 {
+		renewalWindowRatio = 1.0 / 3.0
+	}
+	renewalWindow := time.Duration(float64(lifetime) * renewalWindowRatio)
+	renewalWindowStart := notAfter.Add(-renewalWindow)
+	return time.Now().After(renewalWindowStart)
+}
+
+// NeedsRenewal returns true if the certificate is in its
+// renewal window or has expired.
+func (p *Provider) NeedsRenewal(cert *x509.Certificate) bool {
+	return p.currentlyInRenewalWindow(cert.NotBefore, cert.NotAfter)
+}
+
 func (p *Provider) renewCertificates(ctx context.Context) {
 	logger := log.FromContext(ctx)
 
@@ -644,15 +673,14 @@ func (p *Provider) renewCertificates(ctx context.Context) {
 	for _, cert := range p.certificates {
 		crt, err := getX509Certificate(ctx, &cert.Certificate)
 		// If there's an error, we assume the cert is broken, and needs update
-		// <= 30 days left, renew certificate
-		if err != nil || crt == nil || crt.NotAfter.Before(time.Now().Add(24*30*time.Hour)) {
+		if err != nil || crt == nil || p.NeedsRenewal(crt) {
 			client, err := p.getClient()
 			if err != nil {
-				logger.Infof("Error renewing certificate from LE : %+v, %v", cert.Domain, err)
+				logger.Infof("Error renewing certificate from ACME CA (%s) : %+v, %v", p.Configuration.CAServer, cert.Domain, err)
 				continue
 			}
 
-			logger.Infof("Renewing certificate from LE : %+v", cert.Domain)
+			logger.Infof("Renewing certificate from ACME CA (%s): %+v", p.Configuration.CAServer, cert.Domain)
 
 			renewedCert, err := client.Certificate.Renew(certificate.Resource{
 				Domain:      cert.Domain.Main,
@@ -660,7 +688,7 @@ func (p *Provider) renewCertificates(ctx context.Context) {
 				Certificate: cert.Certificate.Certificate,
 			}, true, oscpMustStaple, p.PreferredChain)
 			if err != nil {
-				logger.Errorf("Error renewing certificate from LE: %v, %v", cert.Domain, err)
+				logger.Errorf("Error renewing certificate from ACME CA (%s): %v, %v", p.Configuration.CAServer, cert.Domain, err)
 				continue
 			}
 
