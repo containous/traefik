@@ -88,6 +88,13 @@ The `users` option is an array of authorized users. Each user must be declared u
     - If both `users` and `usersFile` are provided, the two are merged. The contents of `usersFile` have precedence over the values in `users`.
     - For security reasons, the field `users` doesn't exist for Kubernetes IngressRoute, and one should use the `secret` field instead.
 
+!!! note "Kubernetes kubernetes.io/basic-auth secret type"
+    
+  Kubernetes supports a special `kubernetes.io/basic-auth` secret type.
+  This secret must contain two keys: `username` and `password`.
+  Please note that these keys are not hashed or encrypted in any way, and therefore is less secure than other methods.
+  You can find more information on the [Kubernetes Basic Authentication Secret Documentation](https://kubernetes.io/docs/concepts/configuration/secret/#basic-authentication-secret)
+
 ```yaml tab="Docker"
 # Declaring the user list
 #
@@ -118,11 +125,24 @@ kind: Secret
 metadata:
   name: authsecret
   namespace: default
-
 data:
   users: |2
     dGVzdDokYXByMSRINnVza2trVyRJZ1hMUDZld1RyU3VCa1RycUU4d2ovCnRlc3QyOiRhcHIxJGQ5
     aHI5SEJCJDRIeHdnVWlyM0hQNEVzZ2dQL1FObzAK
+
+---
+# This is an alternate auth secret that demonstrates the basic-auth secret type.
+# Note: the password is not hashed, and is merely base64 encoded.
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: authsecret2
+  namespace: default
+type: kubernetes.io/basic-auth
+data:
+  username: dXNlcg== # username: user
+  password: cGFzc3dvcmQ= # password: password
 ```
 
 ```yaml tab="Consul Catalog"

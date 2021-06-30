@@ -4,9 +4,11 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
+	auth "github.com/abbot/go-http-auth"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/traefik/paerser/types"
@@ -4903,4 +4905,67 @@ func TestCrossNamespace(t *testing.T) {
 			assert.Equal(t, test.expected, conf)
 		})
 	}
+}
+
+func TestCreateAuthCredentials(t *testing.T) {
+	var k8sObjects []runtime.Object
+	var crdObjects []runtime.Object
+	yamlContent, err := os.ReadFile(filepath.FromSlash("./fixtures/basic_auth_secrets.yml"))
+	if err != nil {
+		panic(err)
+	}
+
+	objects := k8s.MustParseYaml(yamlContent)
+	for _, obj := range objects {
+		switch o := obj.(type) {
+		case *corev1.Secret:
+			k8sObjects = append(k8sObjects, o)
+		default:
+		}
+	}
+
+	kubeClient := kubefake.NewSimpleClientset(k8sObjects...)
+	crdClient := crdfake.NewSimpleClientset(crdObjects...)
+
+	client := newClientImpl(kubeClient, crdClient)
+
+	stopCh := make(chan struct{})
+
+	eventCh, err := client.WatchAll([]string{"default"}, stopCh)
+	require.NoError(t, err)
+
+	if k8sObjects != nil || crdObjects != nil {
+		// just wait for the first event
+		<-eventCh
+	}
+
+	// Testing for username/password components in basic-auth secret
+	basicAuth, secretErr := createBasicAuthMiddleware(client, "default", &v1alpha1.BasicAuth{Secret: "basic-auth-secret"})
+	require.NoError(t, secretErr)
+	require.Len(t, basicAuth.Users, 1)
+
+	components := strings.Split(basicAuth.Users[0], ":")
+	require.Len(t, components, 2)
+
+	username := components[0]
+	hashedPassword := components[1]
+
+	require.Equal(t, "user", username)
+	require.Equal(t, "{SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=", hashedPassword)
+	assert.True(t, auth.CheckSecret("password", hashedPassword))
+
+	// Testing for username/password components in htpasswd secret
+	basicAuth, secretErr = createBasicAuthMiddleware(client, "default", &v1alpha1.BasicAuth{Secret: "authsecret"})
+	require.NoError(t, secretErr)
+	require.Len(t, basicAuth.Users, 2)
+
+	components = strings.Split(basicAuth.Users[1], ":")
+	require.Len(t, components, 2)
+
+	username = components[0]
+	hashedPassword = components[1]
+
+	assert.Equal(t, username, "test2")
+	assert.Equal(t, hashedPassword, "$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0")
+	assert.True(t, auth.CheckSecret("test2", hashedPassword))
 }

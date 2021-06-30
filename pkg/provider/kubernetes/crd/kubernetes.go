@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/sha1"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -555,9 +557,38 @@ func createBasicAuthMiddleware(client Client, namespace string, basicAuth *v1alp
 		return nil, nil
 	}
 
-	credentials, err := getAuthCredentials(client, basicAuth.Secret, namespace)
+	if basicAuth.Secret == "" {
+		return nil, fmt.Errorf("auth secret must be set")
+	}
+
+	secret, ok, err := client.GetSecret(namespace, basicAuth.Secret)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch secret '%s/%s': %w", namespace, basicAuth.Secret, err)
+	}
+	if !ok {
+		return nil, fmt.Errorf("secret '%s/%s' not found", namespace, basicAuth.Secret)
+	}
+	if secret == nil {
+		return nil, fmt.Errorf("data for secret '%s/%s' must not be nil", namespace, basicAuth.Secret)
+	}
+
+	if secret.Type == corev1.SecretTypeBasicAuth {
+		credentials, err := loadBasicAuthCredentials(secret)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load basic auth credentials: %w", err)
+		}
+
+		return &dynamic.BasicAuth{
+			Users:        credentials,
+			Realm:        basicAuth.Realm,
+			RemoveHeader: basicAuth.RemoveHeader,
+			HeaderField:  basicAuth.HeaderField,
+		}, nil
+	}
+
+	credentials, err := loadAuthCredentials(secret)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load basic auth credentials: %w", err)
 	}
 
 	return &dynamic.BasicAuth{
@@ -573,9 +604,24 @@ func createDigestAuthMiddleware(client Client, namespace string, digestAuth *v1a
 		return nil, nil
 	}
 
-	credentials, err := getAuthCredentials(client, digestAuth.Secret, namespace)
+	if digestAuth.Secret == "" {
+		return nil, fmt.Errorf("auth secret must be set")
+	}
+
+	secret, ok, err := client.GetSecret(namespace, digestAuth.Secret)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch secret '%s/%s': %w", namespace, digestAuth.Secret, err)
+	}
+	if !ok {
+		return nil, fmt.Errorf("secret '%s/%s' not found", namespace, digestAuth.Secret)
+	}
+	if secret == nil {
+		return nil, fmt.Errorf("data for secret '%s/%s' must not be nil", namespace, digestAuth.Secret)
+	}
+
+	credentials, err := loadAuthCredentials(secret)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load digest auth credentials: %w", err)
 	}
 
 	return &dynamic.DigestAuth{
@@ -586,32 +632,23 @@ func createDigestAuthMiddleware(client Client, namespace string, digestAuth *v1a
 	}, nil
 }
 
-func getAuthCredentials(k8sClient Client, authSecret, namespace string) ([]string, error) {
-	if authSecret == "" {
-		return nil, fmt.Errorf("auth secret must be set")
+func loadBasicAuthCredentials(secret *corev1.Secret) ([]string, error) {
+	username, usernameExists := secret.Data["username"]
+	password, passwordExists := secret.Data["password"]
+	if !(usernameExists && passwordExists) {
+		return nil, fmt.Errorf("secret '%s/%s' must contain both username and password keys", secret.Namespace, secret.Name)
 	}
 
-	auth, err := loadAuthCredentials(namespace, authSecret, k8sClient)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load auth credentials: %w", err)
-	}
+	hash := sha1.New()
+	hash.Write(password)
+	passwordSum := base64.StdEncoding.EncodeToString(hash.Sum(nil))
 
-	return auth, nil
+	return []string{fmt.Sprintf("%s:{SHA}%s", username, passwordSum)}, nil
 }
 
-func loadAuthCredentials(namespace, secretName string, k8sClient Client) ([]string, error) {
-	secret, ok, err := k8sClient.GetSecret(namespace, secretName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch secret '%s/%s': %w", namespace, secretName, err)
-	}
-	if !ok {
-		return nil, fmt.Errorf("secret '%s/%s' not found", namespace, secretName)
-	}
-	if secret == nil {
-		return nil, fmt.Errorf("data for secret '%s/%s' must not be nil", namespace, secretName)
-	}
+func loadAuthCredentials(secret *corev1.Secret) ([]string, error) {
 	if len(secret.Data) != 1 {
-		return nil, fmt.Errorf("found %d elements for secret '%s/%s', must be single element exactly", len(secret.Data), namespace, secretName)
+		return nil, fmt.Errorf("found %d elements for secret '%s/%s', must be single element exactly", len(secret.Data), secret.Namespace, secret.Name)
 	}
 
 	var firstSecret []byte
@@ -628,10 +665,10 @@ func loadAuthCredentials(namespace, secretName string, k8sClient Client) ([]stri
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("error reading secret for %s/%s: %w", namespace, secretName, err)
+		return nil, fmt.Errorf("error reading secret for %s/%s: %w", secret.Namespace, secret.Name, err)
 	}
 	if len(credentials) == 0 {
-		return nil, fmt.Errorf("secret '%s/%s' does not contain any credentials", namespace, secretName)
+		return nil, fmt.Errorf("secret '%s/%s' does not contain any credentials", secret.Namespace, secret.Name)
 	}
 
 	return credentials, nil
