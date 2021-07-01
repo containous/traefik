@@ -60,7 +60,7 @@ func (s *Server) Start(ctx context.Context) {
 
 	s.tcpEntryPoints.Start()
 	s.udpEntryPoints.Start()
-	s.watcher.Start()
+	s.watcher.start()
 
 	s.routinesPool.GoCtx(s.listenSignals)
 }
