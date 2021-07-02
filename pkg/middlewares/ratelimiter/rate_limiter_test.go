@@ -227,7 +227,7 @@ func TestRateLimit(t *testing.T) {
 		// 		Average: 0,
 		// 		Burst:   1,
 		// 	},
-		// 	incomingLoad: 1000,
+		// 	incomingLoad: 100000,
 		// 	loadDuration: time.Second,
 		// },
 	}
