@@ -20,9 +20,10 @@ const (
 
 // Compress is a middleware that allows to compress the response.
 type compress struct {
-	next     http.Handler
-	name     string
-	excludes []string
+	next       http.Handler
+	compressed http.Handler
+	name       string
+	excludes   []string
 }
 
 // New creates a new compress middleware.
@@ -39,7 +40,13 @@ func New(ctx context.Context, next http.Handler, conf dynamic.Compress, name str
 		excludes = append(excludes, mediaType)
 	}
 
-	return &compress{next: next, name: name, excludes: excludes}, nil
+	c := compress{next: next, name: name, excludes: excludes}
+	err := c.setGzipHandler()
+	if err != nil {
+		return nil, err
+	}
+
+	return &c, nil
 }
 
 func (c *compress) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
@@ -51,8 +58,7 @@ func (c *compress) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if contains(c.excludes, mediaType) {
 		c.next.ServeHTTP(rw, req)
 	} else {
-		ctx := middlewares.GetLoggerCtx(req.Context(), c.name, typeName)
-		c.gzipHandler(ctx).ServeHTTP(rw, req)
+		c.compressed.ServeHTTP(rw, req)
 	}
 }
 
@@ -60,16 +66,17 @@ func (c *compress) GetTracingInformation() (string, ext.SpanKindEnum) {
 	return c.name, tracing.SpanKindNoneEnum
 }
 
-func (c *compress) gzipHandler(ctx context.Context) http.Handler {
+func (c *compress) setGzipHandler() error {
 	wrapper, err := gzhttp.NewWrapper(
 		gzhttp.ExceptContentTypes(c.excludes),
 		gzhttp.CompressionLevel(gzip.DefaultCompression),
 		gzhttp.MinSize(gzhttp.DefaultMinSize))
 	if err != nil {
-		log.FromContext(ctx).Error(err)
+		return err
 	}
 
-	return wrapper(c.next)
+	c.compressed = wrapper(c.next)
+	return nil
 }
 
 func contains(values []string, val string) bool {
