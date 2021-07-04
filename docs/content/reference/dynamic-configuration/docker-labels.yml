@@ -79,7 +79,6 @@
 - "traefik.http.middlewares.middleware13.passtlsclientcert.info.issuer.domaincomponent=true"
 - "traefik.http.middlewares.middleware13.passtlsclientcert.info.issuer.locality=true"
 - "traefik.http.middlewares.middleware13.passtlsclientcert.info.issuer.organization=true"
-- "traefik.http.middlewares.middleware13.passtlsclientcert.info.issuer.organizationalunit=true"
 - "traefik.http.middlewares.middleware13.passtlsclientcert.info.issuer.province=true"
 - "traefik.http.middlewares.middleware13.passtlsclientcert.info.issuer.serialnumber=true"
 - "traefik.http.middlewares.middleware13.passtlsclientcert.info.notafter=true"

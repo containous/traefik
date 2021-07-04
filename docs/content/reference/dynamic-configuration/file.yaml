@@ -259,7 +259,6 @@ http:
             province: true
             locality: true
             organization: true
-            organizationalUnit: true
             commonName: true
             serialNumber: true
             domainComponent: true

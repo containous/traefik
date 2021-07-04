@@ -315,7 +315,7 @@ func TestDo_dynamicConfiguration(t *testing.T) {
 						NotAfter:  true,
 						NotBefore: true,
 						Sans:      true,
-						Subject: &dynamic.TLSCLientCertificateDNInfo{
+						Subject: &dynamic.TLSCLientCertificateSubjectDNInfo{
 							Country:            true,
 							Province:           true,
 							Locality:           true,
@@ -325,15 +325,14 @@ func TestDo_dynamicConfiguration(t *testing.T) {
 							SerialNumber:       true,
 							DomainComponent:    true,
 						},
-						Issuer: &dynamic.TLSCLientCertificateDNInfo{
-							Country:            true,
-							Province:           true,
-							Locality:           true,
-							Organization:       true,
-							OrganizationalUnit: true,
-							CommonName:         true,
-							SerialNumber:       true,
-							DomainComponent:    true,
+						Issuer: &dynamic.TLSCLientCertificateIssuerDNInfo{
+							Country:         true,
+							Province:        true,
+							Locality:        true,
+							Organization:    true,
+							CommonName:      true,
+							SerialNumber:    true,
+							DomainComponent: true,
 						},
 						SerialNumber: true,
 					},
