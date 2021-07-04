@@ -90,6 +90,7 @@
 "traefik.http.middlewares.middleware13.passtlsclientcert.info.subject.domaincomponent": "true",
 "traefik.http.middlewares.middleware13.passtlsclientcert.info.subject.locality": "true",
 "traefik.http.middlewares.middleware13.passtlsclientcert.info.subject.organization": "true",
+"traefik.http.middlewares.middleware13.passtlsclientcert.info.subject.organizationalunit": "true",
 "traefik.http.middlewares.middleware13.passtlsclientcert.info.subject.province": "true",
 "traefik.http.middlewares.middleware13.passtlsclientcert.info.subject.serialnumber": "true",
 "traefik.http.middlewares.middleware13.passtlsclientcert.pem": "true",

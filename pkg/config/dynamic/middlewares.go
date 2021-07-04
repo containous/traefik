@@ -399,19 +399,19 @@ type StripPrefixRegex struct {
 
 // TLSClientCertificateInfo holds the client TLS certificate info configuration.
 type TLSClientCertificateInfo struct {
-	NotAfter     bool                        `json:"notAfter,omitempty" toml:"notAfter,omitempty" yaml:"notAfter,omitempty" export:"true"`
-	NotBefore    bool                        `json:"notBefore,omitempty" toml:"notBefore,omitempty" yaml:"notBefore,omitempty" export:"true"`
-	Sans         bool                        `json:"sans,omitempty" toml:"sans,omitempty" yaml:"sans,omitempty" export:"true"`
-	Subject      *TLSCLientCertificateDNInfo `json:"subject,omitempty" toml:"subject,omitempty" yaml:"subject,omitempty" export:"true"`
-	Issuer       *TLSCLientCertificateDNInfo `json:"issuer,omitempty" toml:"issuer,omitempty" yaml:"issuer,omitempty" export:"true"`
-	SerialNumber bool                        `json:"serialNumber,omitempty" toml:"serialNumber,omitempty" yaml:"serialNumber,omitempty" export:"true"`
+	NotAfter     bool                               `json:"notAfter,omitempty" toml:"notAfter,omitempty" yaml:"notAfter,omitempty" export:"true"`
+	NotBefore    bool                               `json:"notBefore,omitempty" toml:"notBefore,omitempty" yaml:"notBefore,omitempty" export:"true"`
+	Sans         bool                               `json:"sans,omitempty" toml:"sans,omitempty" yaml:"sans,omitempty" export:"true"`
+	Subject      *TLSCLientCertificateSubjectDNInfo `json:"subject,omitempty" toml:"subject,omitempty" yaml:"subject,omitempty" export:"true"`
+	Issuer       *TLSCLientCertificateIssuerDNInfo  `json:"issuer,omitempty" toml:"issuer,omitempty" yaml:"issuer,omitempty" export:"true"`
+	SerialNumber bool                               `json:"serialNumber,omitempty" toml:"serialNumber,omitempty" yaml:"serialNumber,omitempty" export:"true"`
 }
 
 // +k8s:deepcopy-gen=true
 
-// TLSCLientCertificateDNInfo holds the client TLS certificate distinguished name info configuration.
+// TLSCLientCertificateIssuerDNInfo holds the client TLS certificate distinguished name info configuration.
 // cf https://tools.ietf.org/html/rfc3739
-type TLSCLientCertificateDNInfo struct {
+type TLSCLientCertificateIssuerDNInfo struct {
 	Country         bool `json:"country,omitempty" toml:"country,omitempty" yaml:"country,omitempty" export:"true"`
 	Province        bool `json:"province,omitempty" toml:"province,omitempty" yaml:"province,omitempty" export:"true"`
 	Locality        bool `json:"locality,omitempty" toml:"locality,omitempty" yaml:"locality,omitempty" export:"true"`
@@ -419,6 +419,21 @@ type TLSCLientCertificateDNInfo struct {
 	CommonName      bool `json:"commonName,omitempty" toml:"commonName,omitempty" yaml:"commonName,omitempty" export:"true"`
 	SerialNumber    bool `json:"serialNumber,omitempty" toml:"serialNumber,omitempty" yaml:"serialNumber,omitempty" export:"true"`
 	DomainComponent bool `json:"domainComponent,omitempty" toml:"domainComponent,omitempty" yaml:"domainComponent,omitempty" export:"true"`
+}
+
+// +k8s:deepcopy-gen=true
+
+// TLSCLientCertificateSubjectDNInfo holds the client TLS certificate distinguished name info configuration.
+// cf https://tools.ietf.org/html/rfc3739
+type TLSCLientCertificateSubjectDNInfo struct {
+	Country            bool `json:"country,omitempty" toml:"country,omitempty" yaml:"country,omitempty" export:"true"`
+	Province           bool `json:"province,omitempty" toml:"province,omitempty" yaml:"province,omitempty" export:"true"`
+	Locality           bool `json:"locality,omitempty" toml:"locality,omitempty" yaml:"locality,omitempty" export:"true"`
+	Organization       bool `json:"organization,omitempty" toml:"organization,omitempty" yaml:"organization,omitempty" export:"true"`
+	OrganizationalUnit bool `json:"organizationalUnit,omitempty" toml:"organizationalUnit,omitempty" yaml:"organizationalUnit,omitempty" export:"true"`
+	CommonName         bool `json:"commonName,omitempty" toml:"commonName,omitempty" yaml:"commonName,omitempty" export:"true"`
+	SerialNumber       bool `json:"serialNumber,omitempty" toml:"serialNumber,omitempty" yaml:"serialNumber,omitempty" export:"true"`
+	DomainComponent    bool `json:"domainComponent,omitempty" toml:"domainComponent,omitempty" yaml:"domainComponent,omitempty" export:"true"`
 }
 
 // +k8s:deepcopy-gen=true

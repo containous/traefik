@@ -106,6 +106,7 @@
 | `traefik/http/middlewares/Middleware13/passTLSClientCert/info/subject/domainComponent` | `true` |
 | `traefik/http/middlewares/Middleware13/passTLSClientCert/info/subject/locality` | `true` |
 | `traefik/http/middlewares/Middleware13/passTLSClientCert/info/subject/organization` | `true` |
+| `traefik/http/middlewares/Middleware13/passTLSClientCert/info/subject/organizationalUnit` | `true` |
 | `traefik/http/middlewares/Middleware13/passTLSClientCert/info/subject/province` | `true` |
 | `traefik/http/middlewares/Middleware13/passTLSClientCert/info/subject/serialNumber` | `true` |
 | `traefik/http/middlewares/Middleware13/passTLSClientCert/pem` | `true` |
