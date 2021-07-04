@@ -449,6 +449,36 @@ func Test_mergeConfiguration_tlsStore(t *testing.T) {
 	}
 }
 
+func Test_mergeConfiguration_defaultTCPEntryPoint(t *testing.T) {
+	given := dynamic.Configurations{
+		"provider-1": &dynamic.Configuration{
+			TCP: &dynamic.TCPConfiguration{
+				Routers: map[string]*dynamic.TCPRouter{
+					"router-1": {},
+				},
+				Services: map[string]*dynamic.TCPService{
+					"service-1": {},
+				},
+			},
+		},
+	}
+
+	expected := &dynamic.TCPConfiguration{
+		Routers: map[string]*dynamic.TCPRouter{
+			"router-1@provider-1": {
+				EntryPoints: []string{"defaultEP"},
+			},
+		},
+		Middlewares: map[string]*dynamic.TCPMiddleware{},
+		Services: map[string]*dynamic.TCPService{
+			"service-1@provider-1": {},
+		},
+	}
+
+	actual := mergeConfiguration(given, []string{"defaultEP"})
+	assert.Equal(t, expected, actual.TCP)
+}
+
 func Test_applyModel(t *testing.T) {
 	testCases := []struct {
 		desc     string

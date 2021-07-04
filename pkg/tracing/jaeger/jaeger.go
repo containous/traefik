@@ -68,7 +68,7 @@ func (c *Config) Setup(componentName string) (opentracing.Tracer, io.Closer, err
 		reporter.Password = c.Collector.Password
 	}
 
-	jcfg := jaegercfg.Configuration{
+	jcfg := &jaegercfg.Configuration{
 		Sampler: &jaegercfg.SamplerConfig{
 			SamplingServerURL: c.SamplingServerURL,
 			Type:              c.SamplingType,
@@ -78,6 +78,12 @@ func (c *Config) Setup(componentName string) (opentracing.Tracer, io.Closer, err
 		Headers: &jaegercli.HeadersConfig{
 			TraceContextHeaderName: c.TraceContextHeaderName,
 		},
+	}
+
+	// Overrides existing tracer's Configuration with environment variables.
+	_, err := jcfg.FromEnv()
+	if err != nil {
+		return nil, nil, err
 	}
 
 	jMetricsFactory := jaegermet.NullFactory
@@ -106,7 +112,7 @@ func (c *Config) Setup(componentName string) (opentracing.Tracer, io.Closer, err
 		opts...,
 	)
 	if err != nil {
-		log.WithoutContext().Warnf("Could not initialize jaeger tracer: %s", err.Error())
+		log.WithoutContext().Warnf("Could not initialize jaeger tracer: %v", err)
 		return nil, nil, err
 	}
 	log.WithoutContext().Debug("Jaeger tracer configured")

@@ -47,13 +47,6 @@ labels:
   - "traefik.http.middlewares.limit.buffering.maxRequestBodyBytes=2000000"
 ```
 
-```toml tab="File (TOML)"
-# Sets the maximum request body to 2MB
-[http.middlewares]
-  [http.middlewares.limit.buffering]
-    maxRequestBodyBytes = 2000000
-```
-
 ```yaml tab="File (YAML)"
 # Sets the maximum request body to 2MB
 http:
@@ -61,6 +54,13 @@ http:
     limit:
       buffering:
         maxRequestBodyBytes: 2000000
+```
+
+```toml tab="File (TOML)"
+# Sets the maximum request body to 2MB
+[http.middlewares]
+  [http.middlewares.limit.buffering]
+    maxRequestBodyBytes = 2000000
 ```
 
 ## Configuration Options
@@ -101,18 +101,18 @@ labels:
   - "traefik.http.middlewares.limit.buffering.maxRequestBodyBytes=2000000"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.limit.buffering]
-    maxRequestBodyBytes = 2000000
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
     limit:
       buffering:
         maxRequestBodyBytes: 2000000
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.limit.buffering]
+    maxRequestBodyBytes = 2000000
 ```
 
 ### `memRequestBodyBytes`
@@ -149,18 +149,18 @@ labels:
   - "traefik.http.middlewares.limit.buffering.memRequestBodyBytes=2000000"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.limit.buffering]
-    memRequestBodyBytes = 2000000
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
     limit:
       buffering:
         memRequestBodyBytes: 2000000
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.limit.buffering]
+    memRequestBodyBytes = 2000000
 ```
 
 ### `maxResponseBodyBytes`
@@ -199,18 +199,18 @@ labels:
   - "traefik.http.middlewares.limit.buffering.maxResponseBodyBytes=2000000"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.limit.buffering]
-    maxResponseBodyBytes = 2000000
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
     limit:
       buffering:
         maxResponseBodyBytes: 2000000
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.limit.buffering]
+    maxResponseBodyBytes = 2000000
 ```
 
 ### `memResponseBodyBytes`
@@ -247,12 +247,6 @@ labels:
   - "traefik.http.middlewares.limit.buffering.memResponseBodyBytes=2000000"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.limit.buffering]
-    memResponseBodyBytes = 2000000
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
@@ -261,17 +255,23 @@ http:
         memResponseBodyBytes: 2000000
 ```
 
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.limit.buffering]
+    memResponseBodyBytes = 2000000
+```
+
 ### `retryExpression`
 
 You can have the Buffering middleware replay the request using `retryExpression`.
 
 ??? example "Retries once in the case of a network error"
-    
+
     ```yaml tab="Docker"
     labels:
       - "traefik.http.middlewares.limit.buffering.retryExpression=IsNetworkError() && Attempts() < 2"
     ```
-    
+
     ```yaml tab="Kubernetes"
     apiVersion: traefik.containo.us/v1alpha1
     kind: Middleware
@@ -281,34 +281,34 @@ You can have the Buffering middleware replay the request using `retryExpression`
       buffering:
         retryExpression: "IsNetworkError() && Attempts() < 2"
     ```
-    
+
     ```yaml tab="Consul Catalog"
     - "traefik.http.middlewares.limit.buffering.retryExpression=IsNetworkError() && Attempts() < 2"
     ```
-        
+
     ```json tab="Marathon"
     "labels": {
       "traefik.http.middlewares.limit.buffering.retryExpression": "IsNetworkError() && Attempts() < 2"
     }
     ```
-    
+
     ```yaml tab="Rancher"
     labels:
       - "traefik.http.middlewares.limit.buffering.retryExpression=IsNetworkError() && Attempts() < 2"
     ```
-    
-    ```toml tab="File (TOML)"
-    [http.middlewares]
-      [http.middlewares.limit.buffering]
-        retryExpression = "IsNetworkError() && Attempts() < 2"
-    ```
-    
+
     ```yaml tab="File (YAML)"
     http:
       middlewares:
         limit:
           buffering:
             retryExpression: "IsNetworkError() && Attempts() < 2"
+    ```
+
+    ```toml tab="File (TOML)"
+    [http.middlewares]
+      [http.middlewares.limit.buffering]
+        retryExpression = "IsNetworkError() && Attempts() < 2"
     ```
 
 The retry expression is defined as a logical combination of the functions below with the operators AND (`&&`) and OR (`||`). At least one function is required:

@@ -137,9 +137,9 @@ func (s *HeadersSuite) TestSecureHeadersResponses(c *check.C) {
 		internalReqHost string
 	}{
 		{
-			desc: "Feature-Policy Set",
+			desc: "Permissions-Policy Set",
 			expected: http.Header{
-				"Feature-Policy": {"vibrate 'none';"},
+				"Permissions-Policy": {"microphone=(),"},
 			},
 			reqHost:         "test.localhost",
 			internalReqHost: "internal.localhost",
@@ -185,7 +185,7 @@ func (s *HeadersSuite) TestMultipleSecureHeadersResponses(c *check.C) {
 		reqHost  string
 	}{
 		{
-			desc: "Feature-Policy Set",
+			desc: "Multiple Secure Headers Set",
 			expected: http.Header{
 				"X-Frame-Options":        {"DENY"},
 				"X-Content-Type-Options": {"nosniff"},

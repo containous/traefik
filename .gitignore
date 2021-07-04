@@ -17,4 +17,5 @@
 cover.out
 vendor/
 plugins-storage/
+plugins-local/
 traefik_changelog.md

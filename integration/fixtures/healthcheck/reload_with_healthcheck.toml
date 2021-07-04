@@ -1,0 +1,46 @@
+[global]
+  checkNewVersion = false
+  sendAnonymousUsage = false
+
+[log]
+  level = "DEBUG"
+
+[entryPoints]
+  [entryPoints.web]
+    address = ":8000"
+
+[api]
+  insecure = true
+
+[providers.file]
+  filename = "{{ .SelfFilename }}"
+
+[http.routers]
+  [http.routers.wsp-router-1]
+    service = "wsp-service1"
+    rule = "Host(`root.localhost`)"
+
+[http.services]
+  [http.services.wsp-service1.weighted]
+    [http.services.wsp-service1.weighted.healthcheck]
+    [[http.services.wsp-service1.weighted.services]]
+      name = "wsp1"
+      weight = 1
+    [[http.services.wsp-service1.weighted.services]]
+      name = "wsp2"
+      weight = 1
+
+  [http.services.wsp1.loadBalancer]
+    [http.services.wsp1.loadBalancer.healthcheck]
+      path = "/health"
+      interval = "1s"
+      timeout = "0.9s"
+    [[http.services.wsp1.loadBalancer.servers]]
+      url = "http://{{.Server1}}:80"
+  [http.services.wsp2.loadBalancer]
+    [http.services.wsp2.loadBalancer.healthcheck]
+      path = "/health"
+      interval = "1s"
+      timeout = "0.9s"
+    [[http.services.wsp2.loadBalancer.servers]]
+      url = "http://{{.Server2}}:80"

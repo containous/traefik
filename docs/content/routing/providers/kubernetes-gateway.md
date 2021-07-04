@@ -209,7 +209,7 @@ Kubernetes cluster before creating `HTTPRoute` objects.
             - headers:                          # [8]
                 type: Exact                     # [9]
                 values:                         # [10]
-                  - foo: bar
+                  foo: bar
           forwardTo:                            # [11]
             - serviceName: whoami               # [12]
               weight: 1                         # [13]

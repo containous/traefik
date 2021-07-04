@@ -48,6 +48,10 @@ type healthCheckLoadBalancer struct {
 	amountServer int
 }
 
+func (lb *healthCheckLoadBalancer) RegisterStatusUpdater(fn func(up bool)) error {
+	return nil
+}
+
 func (lb *healthCheckLoadBalancer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }

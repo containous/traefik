@@ -26,5 +26,5 @@ node:
     - K3S_CLUSTER_SECRET=somethingtotallyrandom
   volumes:
     # this is where you would place a alternative traefik image (saved as a .tar file with
-    # 'docker save'), if you want to use it, instead of the traefik:v2.4 image.
+    # 'docker save'), if you want to use it, instead of the traefik:v2.5 image.
     - /sowewhere/on/your/host/custom-image:/var/lib/rancher/k3s/agent/images

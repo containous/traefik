@@ -12,9 +12,9 @@
     ],
     "maxIdleConnsPerHost": 111,
     "forwardingTimeouts": {
-      "dialTimeout": 111000000000,
-      "responseHeaderTimeout": 111000000000,
-      "idleConnTimeout": 111000000000
+      "dialTimeout": "1m51s",
+      "responseHeaderTimeout": "1m51s",
+      "idleConnTimeout": "1m51s"
     }
   },
   "entryPoints": {
@@ -22,13 +22,13 @@
       "address": "xxxx",
       "transport": {
         "lifeCycle": {
-          "requestAcceptGraceTimeout": 111000000000,
-          "graceTimeOut": 111000000000
+          "requestAcceptGraceTimeout": "1m51s",
+          "graceTimeOut": "1m51s"
         },
         "respondingTimeouts": {
-          "readTimeout": 111000000000,
-          "writeTimeout": 111000000000,
-          "idleTimeout": 111000000000
+          "readTimeout": "1m51s",
+          "writeTimeout": "1m51s",
+          "idleTimeout": "1m51s"
         }
       },
       "proxyProtocol": {
@@ -75,7 +75,7 @@
     }
   },
   "providers": {
-    "providersThrottleDuration": 111000000000,
+    "providersThrottleDuration": "1m51s",
     "docker": {
       "constraints": "Label(\"foo\", \"bar\")",
       "watch": true,
@@ -92,8 +92,8 @@
       "useBindPortIP": true,
       "swarmMode": true,
       "network": "MyNetwork",
-      "swarmModeRefreshSeconds": 42,
-      "httpClientTimeout": 42
+      "swarmModeRefreshSeconds": "42ns",
+      "httpClientTimeout": "42ns"
     },
     "file": {
       "directory": "file Directory",
@@ -116,10 +116,10 @@
         "key": "xxxx",
         "insecureSkipVerify": true
       },
-      "dialerTimeout": 42,
-      "responseHeaderTimeout": 42,
-      "tlsHandshakeTimeout": 42,
-      "keepAlive": 42,
+      "dialerTimeout": "42ns",
+      "responseHeaderTimeout": "42ns",
+      "tlsHandshakeTimeout": "42ns",
+      "keepAlive": "42ns",
       "forceTaskHostname": true,
       "basic": {
         "httpBasicAuthUser": "xxxx",
@@ -142,7 +142,7 @@
         "hostname": "xxxx",
         "publishedService": "xxxx"
       },
-      "throttleDuration": 111000000000
+      "throttleDuration": "1m51s"
     },
     "kubernetesCRD": {
       "endpoint": "xxxx",
@@ -154,7 +154,7 @@
       ],
       "labelSelector": "myLabelSelector",
       "ingressClass": "MyIngressClass",
-      "throttleDuration": 111000000000
+      "throttleDuration": "1m51s"
     },
     "kubernetesGateway": {
       "endpoint": "xxxx",
@@ -165,7 +165,7 @@
         "b"
       ],
       "labelSelector": "myLabelSelector",
-      "throttleDuration": 111000000000
+      "throttleDuration": "1m51s"
     },
     "rest": {
       "insecure": true
@@ -198,10 +198,10 @@
           "username": "xxxx",
           "password": "xxxx"
         },
-        "endpointWaitTime": 42
+        "endpointWaitTime": "42ns"
       },
       "prefix": "MyPrefix",
-      "refreshInterval": 42,
+      "refreshInterval": "42ns",
       "requireConsistent": true,
       "stale": true,
       "cache": true,
@@ -272,8 +272,8 @@
     },
     "http": {
       "endpoint": "xxxx",
-      "pollInterval": 42,
-      "pollTimeout": 42,
+      "pollInterval": "42ns",
+      "pollTimeout": "42ns",
       "tls": {
         "ca": "xxxx",
         "caOptional": true,
@@ -303,13 +303,13 @@
     },
     "datadog": {
       "address": "xxxx",
-      "pushInterval": 42,
+      "pushInterval": "42ns",
       "addEntryPointsLabels": true,
       "addServicesLabels": true
     },
     "statsD": {
       "address": "xxxx",
-      "pushInterval": 42,
+      "pushInterval": "42ns",
       "addEntryPointsLabels": true,
       "addServicesLabels": true,
       "prefix": "MyPrefix"
@@ -317,7 +317,7 @@
     "influxDB": {
       "address": "xxxx",
       "protocol": "xxxx",
-      "pushInterval": 42,
+      "pushInterval": "42ns",
       "database": "myDB",
       "retentionPolicy": "12",
       "username": "xxxx",
@@ -345,7 +345,7 @@
         "500"
       ],
       "retryAttempts": true,
-      "minDuration": 42
+      "minDuration": "42ns"
     },
     "fields": {
       "defaultMode": "drop",
@@ -428,7 +428,7 @@
         "keyType": "MyKeyType",
         "dnsChallenge": {
           "provider": "DNSProvider",
-          "delayBeforeCheck": 42,
+          "delayBeforeCheck": "42ns",
           "resolvers": [
             "xxxx",
             "xxxx"
@@ -456,9 +456,13 @@
         "version": "foobar"
       }
     },
-    "devPlugin": {
-      "goPath": "foobar",
-      "moduleName": "foobar"
+    "localPlugins": {
+      "Descriptor0": {
+        "moduleName": "foobar"
+      },
+      "Descriptor1": {
+        "moduleName": "foobar"
+      }
     }
   }
 }

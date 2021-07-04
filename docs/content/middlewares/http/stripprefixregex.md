@@ -38,12 +38,6 @@ labels:
   - "traefik.http.middlewares.test-stripprefixregex.stripprefixregex.regex=/foo/[a-z0-9]+/[0-9]+/"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-stripprefixregex.stripPrefixRegex]
-    regex = ["/foo/[a-z0-9]+/[0-9]+/"]
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
@@ -51,6 +45,12 @@ http:
       stripPrefixRegex:
         regex:
           - "/foo/[a-z0-9]+/[0-9]+/"
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-stripprefixregex.stripPrefixRegex]
+    regex = ["/foo/[a-z0-9]+/[0-9]+/"]
 ```
 
 ## Configuration Options

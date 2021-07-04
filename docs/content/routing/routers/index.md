@@ -13,14 +13,6 @@ or act before forwarding the request to the service.
 
 ??? example "Requests /foo are Handled by service-foo -- Using the [File Provider](../../providers/file.md)"
 
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [http.routers]
-      [http.routers.my-router]
-        rule = "Path(`/foo`)"
-        service = "service-foo"
-    ```
-
     ```yaml tab="YAML"
     ## Dynamic configuration
     http:
@@ -30,21 +22,18 @@ or act before forwarding the request to the service.
           service: service-foo
     ```
 
-??? example "Forwarding all (non-tls) requests on port 3306 to a database service"
-    
-    **Dynamic Configuration**
-    
-    ```toml tab="File (TOML)"
+    ```toml tab="TOML"
     ## Dynamic configuration
-    [tcp]
-      [tcp.routers]
-        [tcp.routers.to-database]
-          entryPoints = ["mysql"]
-          # Catch every request (only available rule for non-tls routers. See below.)
-          rule = "HostSNI(`*`)"
-          service = "database"
+    [http.routers]
+      [http.routers.my-router]
+        rule = "Path(`/foo`)"
+        service = "service-foo"
     ```
-    
+
+??? example "Forwarding all (non-tls) requests on port 3306 to a database service"
+
+    **Dynamic Configuration**
+
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
     tcp:
@@ -56,27 +45,38 @@ or act before forwarding the request to the service.
           rule: "HostSNI(`*`)"
           service: database
     ```
-    
-    **Static Configuration**
-    
+
     ```toml tab="File (TOML)"
-    ## Static configuration
-    [entryPoints]
-      [entryPoints.web]
-        address = ":80"
-      [entryPoints.mysql]
-        address = ":3306"   
+    ## Dynamic configuration
+    [tcp]
+      [tcp.routers]
+        [tcp.routers.to-database]
+          entryPoints = ["mysql"]
+          # Catch every request (only available rule for non-tls routers. See below.)
+          rule = "HostSNI(`*`)"
+          service = "database"
     ```
-     
+
+    **Static Configuration**
+
     ```yaml tab="File (YAML)"
     ## Static configuration
     entryPoints:
       web:
         address: ":80"
       mysql:
-        address: ":3306"   
+        address: ":3306"
     ```
-    
+
+    ```toml tab="File (TOML)"
+    ## Static configuration
+    [entryPoints]
+      [entryPoints.web]
+        address = ":80"
+      [entryPoints.mysql]
+        address = ":3306"
+    ```
+
     ```bash tab="CLI"
     ## Static configuration
     --entryPoints.web.address=:80
@@ -93,18 +93,9 @@ If not specified, HTTP routers will accept requests from all defined entry point
 If you want to limit the router scope to a set of entry points, set the `entryPoints` option.
 
 ??? example "Listens to Every EntryPoint"
-    
+
     **Dynamic Configuration**
-    
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    [http.routers]
-      [http.routers.Router-1]
-        # By default, routers listen to every entry points
-        rule = "Host(`example.com`)"
-        service = "service-1"
-    ```
-    
+
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
     http:
@@ -114,20 +105,18 @@ If you want to limit the router scope to a set of entry points, set the `entryPo
           rule: "Host(`example.com`)"
           service: "service-1"
     ```
-    
-    **Static Configuration**
-    
+
     ```toml tab="File (TOML)"
-    ## Static configuration
-    [entryPoints]
-      [entryPoints.web]
-        address = ":80"
-      [entryPoints.websecure]
-        address = ":443"
-      [entryPoints.other]
-        address = ":9090"
+    ## Dynamic configuration
+    [http.routers]
+      [http.routers.Router-1]
+        # By default, routers listen to every entry points
+        rule = "Host(`example.com`)"
+        service = "service-1"
     ```
-    
+
+    **Static Configuration**
+
     ```yaml tab="File (YAML)"
     ## Static configuration
     entryPoints:
@@ -138,7 +127,18 @@ If you want to limit the router scope to a set of entry points, set the `entryPo
       other:
         address: ":9090"
     ```
-    
+
+    ```toml tab="File (TOML)"
+    ## Static configuration
+    [entryPoints]
+      [entryPoints.web]
+        address = ":80"
+      [entryPoints.websecure]
+        address = ":443"
+      [entryPoints.other]
+        address = ":9090"
+    ```
+
     ```bash tab="CLI"
     ## Static configuration
     --entrypoints.web.address=:80
@@ -147,19 +147,9 @@ If you want to limit the router scope to a set of entry points, set the `entryPo
     ```
 
 ??? example "Listens to Specific EntryPoints"
-    
+
     **Dynamic Configuration**
-    
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    [http.routers]
-      [http.routers.Router-1]
-        # won't listen to entry point web
-        entryPoints = ["websecure", "other"]
-        rule = "Host(`example.com`)"
-        service = "service-1"
-    ```
-    
+
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
     http:
@@ -173,19 +163,18 @@ If you want to limit the router scope to a set of entry points, set the `entryPo
           service: "service-1"
     ```
 
-    **Static Configuration**
-    
     ```toml tab="File (TOML)"
-    ## Static configuration
-    [entryPoints]
-      [entryPoints.web]
-        address = ":80"
-      [entryPoints.websecure]
-        address = ":443"
-      [entryPoints.other]
-        address = ":9090"
+    ## Dynamic configuration
+    [http.routers]
+      [http.routers.Router-1]
+        # won't listen to entry point web
+        entryPoints = ["websecure", "other"]
+        rule = "Host(`example.com`)"
+        service = "service-1"
     ```
-    
+
+    **Static Configuration**
+
     ```yaml tab="File (YAML)"
     ## Static configuration
     entryPoints:
@@ -196,7 +185,18 @@ If you want to limit the router scope to a set of entry points, set the `entryPo
       other:
         address: ":9090"
     ```
-    
+
+    ```toml tab="File (TOML)"
+    ## Static configuration
+    [entryPoints]
+      [entryPoints.web]
+        address = ":80"
+      [entryPoints.websecure]
+        address = ":443"
+      [entryPoints.other]
+        address = ":9090"
+    ```
+
     ```bash tab="CLI"
     ## Static configuration
     --entrypoints.web.address=:80
@@ -211,7 +211,7 @@ If the rule is verified, the router becomes active, calls middlewares, and then 
 
 ??? tip "Backticks or Quotes?"
     To set the value of a rule, use [backticks](https://en.wiktionary.org/wiki/backtick) ``` ` ``` or escaped double-quotes `\"`.
-    
+
     Single quotes `'` are not accepted as values are [Golang's String Literals](https://golang.org/ref/spec#String_literals).
 
 !!! example "Host is example.com"
@@ -285,17 +285,6 @@ A value of `0` for the priority is ignored: `priority = 0` means that the defaul
 
 ??? info "How default priorities are computed"
 
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    [http.routers]
-      [http.routers.Router-1]
-        rule = "HostRegexp(`.*\.traefik\.com`)"
-        # ...
-      [http.routers.Router-2]
-        rule = "Host(`foobar.traefik.com`)"
-        # ...
-    ```
-    
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
     http:
@@ -307,35 +296,31 @@ A value of `0` for the priority is ignored: `priority = 0` means that the defaul
           rule: "Host(`foobar.traefik.com`)"
           # ...
     ```
-    
-    In this case, all requests with host `foobar.traefik.com` will be routed through `Router-1` instead of `Router-2`.
-    
-    | Name     | Rule                                 | Priority |
-    |----------|--------------------------------------|----------|
-    | Router-1 | ```HostRegexp(`.*\.traefik\.com`)``` | 30       |
-    | Router-2 | ```Host(`foobar.traefik.com`)```     | 26       |
-    
-    The previous table shows that `Router-1` has a higher priority than `Router-2`.
-    
-    To solve this issue, the priority must be set.
 
-??? example "Set priorities -- using the [File Provider](../../providers/file.md)"
-    
     ```toml tab="File (TOML)"
     ## Dynamic configuration
     [http.routers]
       [http.routers.Router-1]
         rule = "HostRegexp(`.*\.traefik\.com`)"
-        entryPoints = ["web"]
-        service = "service-1"
-        priority = 1
+        # ...
       [http.routers.Router-2]
         rule = "Host(`foobar.traefik.com`)"
-        entryPoints = ["web"]
-        priority = 2
-        service = "service-2"
+        # ...
     ```
-    
+
+    In this case, all requests with host `foobar.traefik.com` will be routed through `Router-1` instead of `Router-2`.
+
+    | Name     | Rule                                 | Priority |
+    |----------|--------------------------------------|----------|
+    | Router-1 | ```HostRegexp(`.*\.traefik\.com`)``` | 30       |
+    | Router-2 | ```Host(`foobar.traefik.com`)```     | 26       |
+
+    The previous table shows that `Router-1` has a higher priority than `Router-2`.
+
+    To solve this issue, the priority must be set.
+
+??? example "Set priorities -- using the [File Provider](../../providers/file.md)"
+
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
     http:
@@ -354,6 +339,21 @@ A value of `0` for the priority is ignored: `priority = 0` means that the defaul
           service: service-2
     ```
 
+    ```toml tab="File (TOML)"
+    ## Dynamic configuration
+    [http.routers]
+      [http.routers.Router-1]
+        rule = "HostRegexp(`.*\.traefik\.com`)"
+        entryPoints = ["web"]
+        service = "service-1"
+        priority = 1
+      [http.routers.Router-2]
+        rule = "Host(`foobar.traefik.com`)"
+        entryPoints = ["web"]
+        priority = 2
+        service = "service-2"
+    ```
+
     In this configuration, the priority is configured to allow `Router-2` to handle requests with the `foobar.traefik.com` host.
 
 ### Middlewares
@@ -364,20 +364,10 @@ The middlewares will take effect only if the rule matches, and before forwarding
 !!! warning "The character `@` is not authorized in the middleware name."
 
 !!! tip "Middlewares order"
-    
+
     Middlewares are applied in the same order as their declaration in **router**.
 
 ??? example "With a [middleware](../../middlewares/overview.md) -- using the [File Provider](../../providers/file.md)"
-
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [http.routers]
-      [http.routers.my-router]
-        rule = "Path(`/foo`)"
-        # declared elsewhere
-        middlewares = ["authentication"]
-        service = "service-foo"
-    ```
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -389,6 +379,16 @@ The middlewares will take effect only if the rule matches, and before forwarding
           middlewares:
           - authentication
           service: service-foo
+    ```
+
+    ```toml tab="TOML"
+    ## Dynamic configuration
+    [http.routers]
+      [http.routers.my-router]
+        rule = "Path(`/foo`)"
+        # declared elsewhere
+        middlewares = ["authentication"]
+        service = "service-foo"
     ```
 
 ### Service
@@ -415,16 +415,6 @@ Traefik will terminate the SSL connections (meaning that it will send decrypted 
 
 ??? example "Configuring the router to accept HTTPS requests only"
 
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    [http.routers]
-      [http.routers.Router-1]
-        rule = "Host(`foo-domain`) && Path(`/foo-path/`)"
-        service = "service-id"
-        # will terminate the TLS request
-        [http.routers.Router-1.tls]
-    ```
-    
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
     http:
@@ -436,26 +426,22 @@ Traefik will terminate the SSL connections (meaning that it will send decrypted 
           tls: {}
     ```
 
+    ```toml tab="File (TOML)"
+    ## Dynamic configuration
+    [http.routers]
+      [http.routers.Router-1]
+        rule = "Host(`foo-domain`) && Path(`/foo-path/`)"
+        service = "service-id"
+        # will terminate the TLS request
+        [http.routers.Router-1.tls]
+    ```
+
 !!! important "Routers for HTTP & HTTPS"
 
     If you need to define the same route for both HTTP and HTTPS requests, you will need to define two different routers:
     one with the tls section, one without.
 
     ??? example "HTTP & HTTPS routes"
-
-        ```toml tab="File (TOML)"
-        ## Dynamic configuration
-        [http.routers]
-          [http.routers.my-https-router]
-            rule = "Host(`foo-domain`) && Path(`/foo-path/`)"
-            service = "service-id"
-            # will terminate the TLS request
-            [http.routers.my-https-router.tls]
-
-          [http.routers.my-http-router]
-            rule = "Host(`foo-domain`) && Path(`/foo-path/`)"
-            service = "service-id"
-        ```
 
         ```yaml tab="File (YAML)"
         ## Dynamic configuration
@@ -470,6 +456,20 @@ Traefik will terminate the SSL connections (meaning that it will send decrypted 
             my-http-router:
               rule: "Host(`foo-domain`) && Path(`/foo-path/`)"
               service: service-id
+        ```
+
+        ```toml tab="File (TOML)"
+        ## Dynamic configuration
+        [http.routers]
+          [http.routers.my-https-router]
+            rule = "Host(`foo-domain`) && Path(`/foo-path/`)"
+            service = "service-id"
+            # will terminate the TLS request
+            [http.routers.my-https-router.tls]
+
+          [http.routers.my-http-router]
+            rule = "Host(`foo-domain`) && Path(`/foo-path/`)"
+            service = "service-id"
         ```
 
 #### `options`
@@ -494,28 +494,6 @@ It refers to a [TLS Options](../../https/tls.md#tls-options) and will be applied
 
 ??? example "Configuring the TLS options"
 
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    [http.routers]
-      [http.routers.Router-1]
-        rule = "Host(`foo-domain`) && Path(`/foo-path/`)"
-        service = "service-id"
-        # will terminate the TLS request
-        [http.routers.Router-1.tls]
-          options = "foo"
-    
-    [tls.options]
-      [tls.options.foo]
-        minVersion = "VersionTLS12"
-        cipherSuites = [
-          "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-          "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
-          "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
-          "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-        ]
-    ```
-    
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
     http:
@@ -526,7 +504,7 @@ It refers to a [TLS Options](../../https/tls.md#tls-options) and will be applied
           # will terminate the TLS request
           tls:
             options: foo
-    
+
     tls:
       options:
         foo:
@@ -539,26 +517,33 @@ It refers to a [TLS Options](../../https/tls.md#tls-options) and will be applied
             - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
     ```
 
+    ```toml tab="File (TOML)"
+    ## Dynamic configuration
+    [http.routers]
+      [http.routers.Router-1]
+        rule = "Host(`foo-domain`) && Path(`/foo-path/`)"
+        service = "service-id"
+        # will terminate the TLS request
+        [http.routers.Router-1.tls]
+          options = "foo"
+
+    [tls.options]
+      [tls.options.foo]
+        minVersion = "VersionTLS12"
+        cipherSuites = [
+          "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+          "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+          "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+          "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+        ]
+    ```
+
 !!! important "Conflicting TLS Options"
 
     Since a TLS options reference is mapped to a host name,
     if a configuration introduces a situation where the same host name (from a `Host` rule) gets matched with two TLS options references,
     a conflict occurs, such as in the example below:
-
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    [http.routers]
-      [http.routers.routerfoo]
-        rule = "Host(`snitest.com`) && Path(`/foo`)"
-        [http.routers.routerfoo.tls]
-          options = "foo"
-
-    [http.routers]
-      [http.routers.routerbar]
-        rule = "Host(`snitest.com`) && Path(`/bar`)"
-        [http.routers.routerbar.tls]
-          options = "bar"
-    ```
 
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
@@ -575,20 +560,26 @@ It refers to a [TLS Options](../../https/tls.md#tls-options) and will be applied
             options: bar
     ```
 
+    ```toml tab="File (TOML)"
+    ## Dynamic configuration
+    [http.routers]
+      [http.routers.routerfoo]
+        rule = "Host(`snitest.com`) && Path(`/foo`)"
+        [http.routers.routerfoo.tls]
+          options = "foo"
+
+    [http.routers]
+      [http.routers.routerbar]
+        rule = "Host(`snitest.com`) && Path(`/bar`)"
+        [http.routers.routerbar.tls]
+          options = "bar"
+    ```
+
     If that happens, both mappings are discarded, and the host name (`snitest.com` in this case) for these routers gets associated with the default TLS options instead.
 
 #### `certResolver`
 
 If `certResolver` is defined, Traefik will try to generate certificates based on routers `Host` & `HostSNI` rules.
-
-```toml tab="File (TOML)"
-## Dynamic configuration
-[http.routers]
-  [http.routers.routerfoo]
-    rule = "Host(`snitest.com`) && Path(`/foo`)"
-    [http.routers.routerfoo.tls]
-      certResolver = "foo"
-```
 
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
@@ -600,6 +591,15 @@ http:
         certResolver: foo
 ```
 
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.routers]
+  [http.routers.routerfoo]
+    rule = "Host(`snitest.com`) && Path(`/foo`)"
+    [http.routers.routerfoo.tls]
+      certResolver = "foo"
+```
+
 !!! info "Multiple Hosts in a Rule"
     The rule ```Host(`test1.example.com`,`test2.example.com`)``` will request a certificate with the main domain `test1.example.com` and SAN `test2.example.com`.
 
@@ -608,18 +608,6 @@ http:
 You can set SANs (alternative domains) for each main domain.
 Every domain must have A/AAAA records pointing to Traefik.
 Each domain & SAN will lead to a certificate request.
-
-```toml tab="File (TOML)"
-## Dynamic configuration
-[http.routers]
-  [http.routers.routerbar]
-    rule = "Host(`snitest.com`) && Path(`/bar`)"
-    [http.routers.routerbar.tls]
-      certResolver = "bar"
-      [[http.routers.routerbar.tls.domains]]
-        main = "snitest.com"
-        sans = ["*.snitest.com"]
-```
 
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
@@ -633,6 +621,18 @@ http:
           - main: "snitest.com"
             sans:
               - "*.snitest.com"
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.routers]
+  [http.routers.routerbar]
+    rule = "Host(`snitest.com`) && Path(`/bar`)"
+    [http.routers.routerbar.tls]
+      certResolver = "bar"
+      [[http.routers.routerbar.tls.domains]]
+        main = "snitest.com"
+        sans = ["*.snitest.com"]
 ```
 
 [ACME v2](https://community.letsencrypt.org/t/acme-v2-and-wildcard-certificate-support-is-live/55579) supports wildcard certificates.
@@ -666,24 +666,12 @@ If not specified, TCP routers will accept requests from all defined entry points
 If you want to limit the router scope to a set of entry points, set the entry points option.
 
 ??? example "Listens to Every Entry Point"
-    
+
     **Dynamic Configuration**
 
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    
-    [tcp.routers]
-      [tcp.routers.Router-1]
-        # By default, routers listen to every entrypoints
-        rule = "HostSNI(`example.com`)"
-        service = "service-1"
-        # will route TLS requests (and ignore non tls requests)
-        [tcp.routers.Router-1.tls]
-    ```
-    
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
-    
+
     tcp:
       routers:
         Router-1:
@@ -694,23 +682,23 @@ If you want to limit the router scope to a set of entry points, set the entry po
           tls: {}
     ```
 
-    **Static Configuration**
-    
     ```toml tab="File (TOML)"
-    ## Static configuration
-    
-    [entryPoints]
-      [entryPoints.web]
-        address = ":80"
-      [entryPoints.websecure]
-        address = ":443"
-      [entryPoints.other]
-        address = ":9090"
+    ## Dynamic configuration
+
+    [tcp.routers]
+      [tcp.routers.Router-1]
+        # By default, routers listen to every entrypoints
+        rule = "HostSNI(`example.com`)"
+        service = "service-1"
+        # will route TLS requests (and ignore non tls requests)
+        [tcp.routers.Router-1.tls]
     ```
-    
+
+    **Static Configuration**
+
     ```yaml tab="File (YAML)"
     ## Static configuration
-    
+
     entryPoints:
       web:
         address: ":80"
@@ -719,7 +707,19 @@ If you want to limit the router scope to a set of entry points, set the entry po
       other:
         address: ":9090"
     ```
-    
+
+    ```toml tab="File (TOML)"
+    ## Static configuration
+
+    [entryPoints]
+      [entryPoints.web]
+        address = ":80"
+      [entryPoints.websecure]
+        address = ":443"
+      [entryPoints.other]
+        address = ":9090"
+    ```
+
     ```bash tab="CLI"
     ## Static configuration
     --entrypoints.web.address=:80
@@ -728,21 +728,9 @@ If you want to limit the router scope to a set of entry points, set the entry po
     ```
 
 ??? example "Listens to Specific Entry Points"
-    
+
     **Dynamic Configuration**
-    
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    [tcp.routers]
-      [tcp.routers.Router-1]
-        # won't listen to entry point web
-        entryPoints = ["websecure", "other"]
-        rule = "HostSNI(`example.com`)"
-        service = "service-1"
-        # will route TLS requests (and ignore non tls requests)
-        [tcp.routers.Router-1.tls]
-    ```
-    
+
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
     tcp:
@@ -758,23 +746,23 @@ If you want to limit the router scope to a set of entry points, set the entry po
           tls: {}
     ```
 
-    **Static Configuration**
-    
     ```toml tab="File (TOML)"
-    ## Static configuration
-    
-    [entryPoints]
-      [entryPoints.web]
-        address = ":80"
-      [entryPoints.websecure]
-        address = ":443"
-      [entryPoints.other]
-        address = ":9090"
+    ## Dynamic configuration
+    [tcp.routers]
+      [tcp.routers.Router-1]
+        # won't listen to entry point web
+        entryPoints = ["websecure", "other"]
+        rule = "HostSNI(`example.com`)"
+        service = "service-1"
+        # will route TLS requests (and ignore non tls requests)
+        [tcp.routers.Router-1.tls]
     ```
-    
+
+    **Static Configuration**
+
     ```yaml tab="File (YAML)"
     ## Static configuration
-    
+
     entryPoints:
       web:
         address: ":80"
@@ -783,7 +771,19 @@ If you want to limit the router scope to a set of entry points, set the entry po
       other:
         address: ":9090"
     ```
-    
+
+    ```toml tab="File (TOML)"
+    ## Static configuration
+
+    [entryPoints]
+      [entryPoints.web]
+        address = ":80"
+      [entryPoints.websecure]
+        address = ":443"
+      [entryPoints.other]
+        address = ":9090"
+    ```
+
     ```bash tab="CLI"
     ## Static configuration
     --entrypoints.web.address=:80
@@ -861,16 +861,6 @@ By default, a router with a TLS section will terminate the TLS connections, mean
 
 ??? example "Router for TLS requests"
 
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    [tcp.routers]
-      [tcp.routers.Router-1]
-        rule = "HostSNI(`foo-domain`)"
-        service = "service-id"
-        # will terminate the TLS request by default
-        [tcp.routers.Router-1.tls]
-    ```
-
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
     tcp:
@@ -882,6 +872,16 @@ By default, a router with a TLS section will terminate the TLS connections, mean
           tls: {}
     ```
 
+    ```toml tab="File (TOML)"
+    ## Dynamic configuration
+    [tcp.routers]
+      [tcp.routers.Router-1]
+        rule = "HostSNI(`foo-domain`)"
+        service = "service-id"
+        # will terminate the TLS request by default
+        [tcp.routers.Router-1.tls]
+    ```
+
 #### `passthrough`
 
 As seen above, a TLS router will terminate the TLS connection by default.
@@ -890,16 +890,6 @@ However, the `passthrough` option can be specified to set whether the requests s
 It defaults to `false`.
 
 ??? example "Configuring passthrough"
-
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    [tcp.routers]
-      [tcp.routers.Router-1]
-        rule = "HostSNI(`foo-domain`)"
-        service = "service-id"
-        [tcp.routers.Router-1.tls]
-          passthrough = true
-    ```
 
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
@@ -912,34 +902,22 @@ It defaults to `false`.
             passthrough: true
     ```
 
-#### `options`
-
-The `options` field enables fine-grained control of the TLS parameters.  
-It refers to a [TLS Options](../../https/tls.md#tls-options) and will be applied only if a `HostSNI` rule is defined.
-
-!!! example "Configuring the tls options"
-
     ```toml tab="File (TOML)"
     ## Dynamic configuration
     [tcp.routers]
       [tcp.routers.Router-1]
         rule = "HostSNI(`foo-domain`)"
         service = "service-id"
-        # will terminate the TLS request
         [tcp.routers.Router-1.tls]
-          options = "foo"
-    
-    [tls.options]
-      [tls.options.foo]
-        minVersion = "VersionTLS12"
-        cipherSuites = [
-          "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-          "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
-          "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
-          "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-        ]
+          passthrough = true
     ```
+
+#### `options`
+
+The `options` field enables fine-grained control of the TLS parameters.
+It refers to a [TLS Options](../../https/tls.md#tls-options) and will be applied only if a `HostSNI` rule is defined.
+
+!!! example "Configuring the tls options"
 
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
@@ -951,7 +929,7 @@ It refers to a [TLS Options](../../https/tls.md#tls-options) and will be applied
           # will terminate the TLS request
           tls:
             options: foo
-    
+
     tls:
       options:
         foo:
@@ -964,18 +942,31 @@ It refers to a [TLS Options](../../https/tls.md#tls-options) and will be applied
             - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
     ```
 
+    ```toml tab="File (TOML)"
+    ## Dynamic configuration
+    [tcp.routers]
+      [tcp.routers.Router-1]
+        rule = "HostSNI(`foo-domain`)"
+        service = "service-id"
+        # will terminate the TLS request
+        [tcp.routers.Router-1.tls]
+          options = "foo"
+
+    [tls.options]
+      [tls.options.foo]
+        minVersion = "VersionTLS12"
+        cipherSuites = [
+          "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+          "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+          "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+          "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+        ]
+    ```
+
 #### `certResolver`
 
 See [`certResolver` for HTTP router](./index.md#certresolver) for more information.
-
-```toml tab="File (TOML)"
-## Dynamic configuration
-[tcp.routers]
-  [tcp.routers.routerfoo]
-    rule = "HostSNI(`snitest.com`)"
-    [tcp.routers.routerfoo.tls]
-      certResolver = "foo"
-```
 
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
@@ -987,21 +978,18 @@ tcp:
         certResolver: foo
 ```
 
-#### `domains`
-
-See [`domains` for HTTP router](./index.md#domains) for more information.
-
 ```toml tab="File (TOML)"
 ## Dynamic configuration
 [tcp.routers]
-  [tcp.routers.routerbar]
+  [tcp.routers.routerfoo]
     rule = "HostSNI(`snitest.com`)"
-    [tcp.routers.routerbar.tls]
-      certResolver = "bar"
-      [[tcp.routers.routerbar.tls.domains]]
-        main = "snitest.com"
-        sans = ["*.snitest.com"]
+    [tcp.routers.routerfoo.tls]
+      certResolver = "foo"
 ```
+
+#### `domains`
+
+See [`domains` for HTTP router](./index.md#domains) for more information.
 
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
@@ -1013,8 +1001,20 @@ tcp:
         certResolver: "bar"
         domains:
           - main: "snitest.com"
-            sans: 
+            sans:
               - "*.snitest.com"
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[tcp.routers]
+  [tcp.routers.routerbar]
+    rule = "HostSNI(`snitest.com`)"
+    [tcp.routers.routerbar.tls]
+      certResolver = "bar"
+      [[tcp.routers.routerbar.tls.domains]]
+        main = "snitest.com"
+        sans = ["*.snitest.com"]
 ```
 
 ## Configuring UDP Routers
@@ -1050,16 +1050,6 @@ If one wants to limit the router scope to a set of entry points, one should set 
 
     **Dynamic Configuration**
 
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-
-    [udp.routers]
-      [udp.routers.Router-1]
-        # By default, routers listen to all UDP entrypoints,
-        # i.e. "other", and "streaming".
-        service = "service-1"
-    ```
-
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
 
@@ -1071,21 +1061,17 @@ If one wants to limit the router scope to a set of entry points, one should set 
           service: "service-1"
     ```
 
-    **Static Configuration**
-
     ```toml tab="File (TOML)"
-    ## Static configuration
+    ## Dynamic configuration
 
-    [entryPoints]
-      # not used by UDP routers
-      [entryPoints.web]
-        address = ":80"
-      # used by UDP routers
-      [entryPoints.other]
-        address = ":9090/udp"
-      [entryPoints.streaming]
-        address = ":9191/udp"
+    [udp.routers]
+      [udp.routers.Router-1]
+        # By default, routers listen to all UDP entrypoints,
+        # i.e. "other", and "streaming".
+        service = "service-1"
     ```
+
+    **Static Configuration**
 
     ```yaml tab="File (YAML)"
     ## Static configuration
@@ -1099,6 +1085,20 @@ If one wants to limit the router scope to a set of entry points, one should set 
         address: ":9090/udp"
       streaming:
         address: ":9191/udp"
+    ```
+
+    ```toml tab="File (TOML)"
+    ## Static configuration
+
+    [entryPoints]
+      # not used by UDP routers
+      [entryPoints.web]
+        address = ":80"
+      # used by UDP routers
+      [entryPoints.other]
+        address = ":9090/udp"
+      [entryPoints.streaming]
+        address = ":9191/udp"
     ```
 
     ```bash tab="CLI"
@@ -1112,15 +1112,6 @@ If one wants to limit the router scope to a set of entry points, one should set 
 
     **Dynamic Configuration**
 
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    [udp.routers]
-      [udp.routers.Router-1]
-        # does not listen on "other" entry point
-        entryPoints = ["streaming"]
-        service = "service-1"
-    ```
-
     ```yaml tab="File (YAML)"
     ## Dynamic configuration
     udp:
@@ -1132,19 +1123,16 @@ If one wants to limit the router scope to a set of entry points, one should set 
           service: "service-1"
     ```
 
-    **Static Configuration**
-
     ```toml tab="File (TOML)"
-    ## Static configuration
-
-    [entryPoints]
-      [entryPoints.web]
-        address = ":80"
-      [entryPoints.other]
-        address = ":9090/udp"
-      [entryPoints.streaming]
-        address = ":9191/udp"
+    ## Dynamic configuration
+    [udp.routers]
+      [udp.routers.Router-1]
+        # does not listen on "other" entry point
+        entryPoints = ["streaming"]
+        service = "service-1"
     ```
+
+    **Static Configuration**
 
     ```yaml tab="File (YAML)"
     ## Static configuration
@@ -1156,6 +1144,18 @@ If one wants to limit the router scope to a set of entry points, one should set 
         address: ":9090/udp"
       streaming:
         address: ":9191/udp"
+    ```
+
+    ```toml tab="File (TOML)"
+    ## Static configuration
+
+    [entryPoints]
+      [entryPoints.web]
+        address = ":80"
+      [entryPoints.other]
+        address = ":9090/udp"
+      [entryPoints.streaming]
+        address = ":9191/udp"
     ```
 
     ```bash tab="CLI"

@@ -30,6 +30,8 @@ If you use multiple providers and wish to reference such an object declared in a
 (e.g. referencing a cross-provider object like middleware), then the object name should be suffixed by the `@`
 separator, and the provider name.
 
+For the list of the providers names, see the [supported providers](#supported-providers) table below.
+
 ```text
 <resource-name>@<provider-name>
 ```
@@ -49,18 +51,18 @@ separator, and the provider name.
 
     Declaring the add-foo-prefix in the file provider.
 
-    ```toml tab="File (TOML)"
-    [http.middlewares]
-      [http.middlewares.add-foo-prefix.addPrefix]
-        prefix = "/foo"
-    ```
-
     ```yaml tab="File (YAML)"
     http:
       middlewares:
         add-foo-prefix:
           addPrefix:
             prefix: "/foo"
+    ```
+
+    ```toml tab="File (TOML)"
+    [http.middlewares]
+      [http.middlewares.add-foo-prefix.addPrefix]
+        prefix = "/foo"
     ```
 
     Using the add-foo-prefix middleware from other providers:
@@ -125,20 +127,22 @@ separator, and the provider name.
 
 Below is the list of the currently supported providers in Traefik.
 
-| Provider                              | Type         | Configuration Type         |
-|---------------------------------------|--------------|----------------------------|
-| [Docker](./docker.md)                 | Orchestrator | Label                      |
-| [Kubernetes](./kubernetes-crd.md)     | Orchestrator | Custom Resource or Ingress |
-| [Consul Catalog](./consul-catalog.md) | Orchestrator | Label                      |
-| [ECS](./ecs.md)                       | Orchestrator | Label                      |
-| [Marathon](./marathon.md)             | Orchestrator | Label                      |
-| [Rancher](./rancher.md)               | Orchestrator | Label                      |
-| [File](./file.md)                     | Manual       | TOML/YAML format           |
-| [Consul](./consul.md)                 | KV           | KV                         |
-| [Etcd](./etcd.md)                     | KV           | KV                         |
-| [ZooKeeper](./zookeeper.md)           | KV           | KV                         |
-| [Redis](./redis.md)                   | KV           | KV                         |
-| [HTTP](./http.md)                     | Manual       | JSON format                |
+| Provider                                          | Type         | Configuration Type   | Provider Name       |
+|---------------------------------------------------|--------------|----------------------|---------------------|
+| [Docker](./docker.md)                             | Orchestrator | Label                | `docker`            |
+| [Kubernetes IngressRoute](./kubernetes-crd.md)    | Orchestrator | Custom Resource      | `kubernetescrd`     |
+| [Kubernetes Ingress](./kubernetes-ingress.md)     | Orchestrator | Ingress              | `kubernetes`        |
+| [Kubernetes Gateway API](./kubernetes-gateway.md) | Orchestrator | Gateway API Resource | `kubernetesgateway` |
+| [Consul Catalog](./consul-catalog.md)             | Orchestrator | Label                | `consulcatalog`     |
+| [ECS](./ecs.md)                                   | Orchestrator | Label                | `ecs`               |
+| [Marathon](./marathon.md)                         | Orchestrator | Label                | `marathon`          |
+| [Rancher](./rancher.md)                           | Orchestrator | Label                | `rancher`           |
+| [File](./file.md)                                 | Manual       | YAML/TOML format     | `file`              |
+| [Consul](./consul.md)                             | KV           | KV                   | `consul`            |
+| [Etcd](./etcd.md)                                 | KV           | KV                   | `etcd`              |
+| [ZooKeeper](./zookeeper.md)                       | KV           | KV                   | `zookeeper`         |
+| [Redis](./redis.md)                               | KV           | KV                   | `redis`             |
+| [HTTP](./http.md)                                 | Manual       | JSON format          | `http`              |
 
 !!! info "More Providers"
 
@@ -169,14 +173,14 @@ but the throttling algorithm applies to each of them independently.
 The value of `providers.providersThrottleDuration` should be provided in seconds or as a valid duration format,
 see [time.ParseDuration](https://golang.org/pkg/time/#ParseDuration).
 
-```toml tab="File (TOML)"
-[providers]
-  providers.providersThrottleDuration = 10s
-```
-
 ```yaml tab="File (YAML)"
 providers:
   providersThrottleDuration: 10s
+```
+
+```toml tab="File (TOML)"
+[providers]
+  providers.providersThrottleDuration = 10s
 ```
 
 ```bash tab="CLI"

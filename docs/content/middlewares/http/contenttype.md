@@ -1,4 +1,3 @@
-
 # ContentType
 
 Handling Content-Type auto-detection
@@ -62,13 +61,6 @@ labels:
   - "traefik.http.middlewares.autodetect.contenttype.autodetect=false"
 ```
 
-```toml tab="File (TOML)"
-# Disable auto-detection
-[http.middlewares]
-  [http.middlewares.autodetect.contentType]
-     autoDetect=false
-```
-
 ```yaml tab="File (YAML)"
 # Disable auto-detection
 http:
@@ -76,6 +68,13 @@ http:
     autodetect:
       contentType:
         autoDetect: false
+```
+
+```toml tab="File (TOML)"
+# Disable auto-detection
+[http.middlewares]
+  [http.middlewares.autodetect.contentType]
+     autoDetect=false
 ```
 
 ## Configuration Options

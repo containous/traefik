@@ -174,17 +174,17 @@ WriteTimeout is the maximum duration before timing out writes of the response. I
 `--entrypoints.<name>.udp.timeout`:  
 Timeout defines how long to wait on an idle session before releasing the related resources. (Default: ```3```)
 
-`--experimental.devplugin.gopath`:  
-plugin's GOPATH.
-
-`--experimental.devplugin.modulename`:  
-plugin's module name.
-
 `--experimental.http3`:  
 Enable HTTP3. (Default: ```false```)
 
 `--experimental.kubernetesgateway`:  
 Allow the Kubernetes gateway api provider usage. (Default: ```false```)
+
+`--experimental.localplugins.<name>`:  
+Local plugins configuration. (Default: ```false```)
+
+`--experimental.localplugins.<name>.modulename`:  
+plugin's module name.
 
 `--experimental.plugins.<name>.modulename`:  
 plugin's module name.
@@ -538,7 +538,7 @@ KV Username
 Enable debug logging of generated configuration template. (Default: ```false```)
 
 `--providers.file.directory`:  
-Load dynamic configuration from one or more .toml or .yml files in a directory.
+Load dynamic configuration from one or more .yml or .toml files in a directory.
 
 `--providers.file.filename`:  
 Load dynamic configuration from a file.
@@ -719,6 +719,9 @@ Display additional provider logs. (Default: ```false```)
 
 `--providers.marathon.watch`:  
 Watch provider. (Default: ```true```)
+
+`--providers.plugin.<name>`:  
+Plugins configuration.
 
 `--providers.providersthrottleduration`:  
 Backends throttle duration: minimum duration between 2 events from providers before applying a new configuration. It avoids unnecessary reloads if multiples events are sent in a short amount of time. (Default: ```2```)

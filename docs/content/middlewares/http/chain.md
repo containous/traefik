@@ -117,34 +117,6 @@ labels:
   - "traefik.http.services.service1.loadbalancer.server.port=80"
 ```
 
-```toml tab="File (TOML)"
-# ...    
-[http.routers]
-  [http.routers.router1]
-    service = "service1"
-    middlewares = ["secured"]
-    rule = "Host(`mydomain`)"
-
-[http.middlewares]
-  [http.middlewares.secured.chain]
-    middlewares = ["https-only", "known-ips", "auth-users"]
-
-  [http.middlewares.auth-users.basicAuth]
-    users = ["test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"]
-
-  [http.middlewares.https-only.redirectScheme]
-    scheme = "https"
-
-  [http.middlewares.known-ips.ipWhiteList]
-    sourceRange = ["192.168.1.7", "127.0.0.1/32"]
-
-[http.services]
-  [http.services.service1]
-    [http.services.service1.loadBalancer]
-      [[http.services.service1.loadBalancer.servers]]
-        url = "http://127.0.0.1:80"
-```
-
 ```yaml tab="File (YAML)"
 # ...
 http:
@@ -183,4 +155,32 @@ http:
       loadBalancer:
         servers:
           - url: "http://127.0.0.1:80"
+```
+
+```toml tab="File (TOML)"
+# ...
+[http.routers]
+  [http.routers.router1]
+    service = "service1"
+    middlewares = ["secured"]
+    rule = "Host(`mydomain`)"
+
+[http.middlewares]
+  [http.middlewares.secured.chain]
+    middlewares = ["https-only", "known-ips", "auth-users"]
+
+  [http.middlewares.auth-users.basicAuth]
+    users = ["test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"]
+
+  [http.middlewares.https-only.redirectScheme]
+    scheme = "https"
+
+  [http.middlewares.known-ips.ipWhiteList]
+    sourceRange = ["192.168.1.7", "127.0.0.1/32"]
+
+[http.services]
+  [http.services.service1]
+    [http.services.service1.loadBalancer]
+      [[http.services.service1.loadBalancer.servers]]
+        url = "http://127.0.0.1:80"
 ```

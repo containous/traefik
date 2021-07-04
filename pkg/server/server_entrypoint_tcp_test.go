@@ -94,8 +94,8 @@ func testShutdown(t *testing.T, router *tcp.Router) {
 
 	// We need to do a write on the conn before the shutdown to make it "exist".
 	// Because the connection indeed exists as far as TCP is concerned,
-	// but since we only pass it along to the HTTP server after at least one byte is peaked,
-	// the HTTP server (and hence its shutdown) does not know about the connection until that first byte peaking.
+	// but since we only pass it along to the HTTP server after at least one byte is peeked,
+	// the HTTP server (and hence its shutdown) does not know about the connection until that first byte peeked.
 	err = request.Write(conn)
 	require.NoError(t, err)
 

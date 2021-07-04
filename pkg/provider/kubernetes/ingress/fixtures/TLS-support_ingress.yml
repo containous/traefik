@@ -8,7 +8,7 @@ metadata:
 
 spec:
   tls:
-  - secretName: myTlsSecret
+  - secretName: my-tls-secret
   rules:
   - host: example.com
     http:
@@ -27,7 +27,7 @@ metadata:
 
 spec:
   tls:
-  - secretName: myUndefinedSecret
+  - secretName: my-undefined-secret
   rules:
   - host: example.fail
     http:

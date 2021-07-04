@@ -11,17 +11,6 @@ The `Services` are responsible for configuring how to reach the actual services 
 
 ??? example "Declaring an HTTP Service with Two Servers -- Using the [File Provider](../../providers/file.md)"
 
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [http.services]
-      [http.services.my-service.loadBalancer]
-
-        [[http.services.my-service.loadBalancer.servers]]
-          url = "http://<private-ip-server-1>:<private-port-server-1>/"
-        [[http.services.my-service.loadBalancer.servers]]
-          url = "http://<private-ip-server-2>:<private-port-server-2>/"
-    ```
-
     ```yaml tab="YAML"
     ## Dynamic configuration
     http:
@@ -33,17 +22,18 @@ The `Services` are responsible for configuring how to reach the actual services 
             - url: "http://<private-ip-server-2>:<private-port-server-2>/"
     ```
 
-??? example "Declaring a TCP Service with Two Servers -- Using the [File Provider](../../providers/file.md)"
-
     ```toml tab="TOML"
     ## Dynamic configuration
-    [tcp.services]
-      [tcp.services.my-service.loadBalancer]
-         [[tcp.services.my-service.loadBalancer.servers]]
-           address = "<private-ip-server-1>:<private-port-server-1>"
-         [[tcp.services.my-service.loadBalancer.servers]]
-           address = "<private-ip-server-2>:<private-port-server-2>"
+    [http.services]
+      [http.services.my-service.loadBalancer]
+
+        [[http.services.my-service.loadBalancer.servers]]
+          url = "http://<private-ip-server-1>:<private-port-server-1>/"
+        [[http.services.my-service.loadBalancer.servers]]
+          url = "http://<private-ip-server-2>:<private-port-server-2>/"
     ```
+
+??? example "Declaring a TCP Service with Two Servers -- Using the [File Provider](../../providers/file.md)"
 
     ```yaml tab="YAML"
     tcp:
@@ -55,17 +45,17 @@ The `Services` are responsible for configuring how to reach the actual services 
             - address: "<private-ip-server-2>:<private-port-server-2>"
     ```
 
-??? example "Declaring a UDP Service with Two Servers -- Using the [File Provider](../../providers/file.md)"
-
     ```toml tab="TOML"
     ## Dynamic configuration
-    [udp.services]
-      [udp.services.my-service.loadBalancer]
-         [[udp.services.my-service.loadBalancer.servers]]
+    [tcp.services]
+      [tcp.services.my-service.loadBalancer]
+         [[tcp.services.my-service.loadBalancer.servers]]
            address = "<private-ip-server-1>:<private-port-server-1>"
-         [[udp.services.my-service.loadBalancer.servers]]
+         [[tcp.services.my-service.loadBalancer.servers]]
            address = "<private-ip-server-2>:<private-port-server-2>"
     ```
+
+??? example "Declaring a UDP Service with Two Servers -- Using the [File Provider](../../providers/file.md)"
 
     ```yaml tab="YAML"
     udp:
@@ -75,6 +65,16 @@ The `Services` are responsible for configuring how to reach the actual services 
             servers:
             - address: "<private-ip-server-1>:<private-port-server-1>"
             - address: "<private-ip-server-2>:<private-port-server-2>"
+    ```
+
+    ```toml tab="TOML"
+    ## Dynamic configuration
+    [udp.services]
+      [udp.services.my-service.loadBalancer]
+         [[udp.services.my-service.loadBalancer.servers]]
+           address = "<private-ip-server-1>:<private-port-server-1>"
+         [[udp.services.my-service.loadBalancer.servers]]
+           address = "<private-ip-server-2>:<private-port-server-2>"
     ```
 
 ## Configuring HTTP Services
@@ -87,6 +87,16 @@ Each service has a load-balancer, even if there is only one server to forward tr
 
 ??? example "Declaring a Service with Two Servers (with Load Balancing) -- Using the [File Provider](../../providers/file.md)"
 
+    ```yaml tab="YAML"
+    http:
+      services:
+        my-service:
+          loadBalancer:
+            servers:
+            - url: "http://private-ip-server-1/"
+            - url: "http://private-ip-server-2/"
+    ```
+
     ```toml tab="TOML"
     ## Dynamic configuration
     [http.services]
@@ -96,16 +106,6 @@ Each service has a load-balancer, even if there is only one server to forward tr
           url = "http://private-ip-server-1/"
         [[http.services.my-service.loadBalancer.servers]]
           url = "http://private-ip-server-2/"
-    ```
-
-    ```yaml tab="YAML"
-    http:
-      services:
-        my-service:
-          loadBalancer:
-            servers:
-            - url: "http://private-ip-server-1/"
-            - url: "http://private-ip-server-2/"
     ```
 
 #### Servers
@@ -120,14 +120,6 @@ The `url` option point to a specific instance.
 
 ??? example "A Service with One Server -- Using the [File Provider](../../providers/file.md)"
 
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [http.services]
-      [http.services.my-service.loadBalancer]
-        [[http.services.my-service.loadBalancer.servers]]
-          url = "http://private-ip-server-1/"
-    ```
-
     ```yaml tab="YAML"
     ## Dynamic configuration
     http:
@@ -138,21 +130,19 @@ The `url` option point to a specific instance.
               - url: "http://private-ip-server-1/"
     ```
 
-#### Load-balancing
-
-For now, only round robin load balancing is supported:
-
-??? example "Load Balancing -- Using the [File Provider](../../providers/file.md)"
-
     ```toml tab="TOML"
     ## Dynamic configuration
     [http.services]
       [http.services.my-service.loadBalancer]
         [[http.services.my-service.loadBalancer.servers]]
           url = "http://private-ip-server-1/"
-        [[http.services.my-service.loadBalancer.servers]]
-          url = "http://private-ip-server-2/"
     ```
+
+#### Load-balancing
+
+For now, only round robin load balancing is supported:
+
+??? example "Load Balancing -- Using the [File Provider](../../providers/file.md)"
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -163,6 +153,16 @@ For now, only round robin load balancing is supported:
             servers:
             - url: "http://private-ip-server-1/"
             - url: "http://private-ip-server-2/"
+    ```
+
+    ```toml tab="TOML"
+    ## Dynamic configuration
+    [http.services]
+      [http.services.my-service.loadBalancer]
+        [[http.services.my-service.loadBalancer.servers]]
+          url = "http://private-ip-server-1/"
+        [[http.services.my-service.loadBalancer.servers]]
+          url = "http://private-ip-server-2/"
     ```
 
 #### Sticky sessions
@@ -186,17 +186,10 @@ On subsequent requests, to keep the session alive with the same server, the clie
 
     By default, the affinity cookie is created without those flags.
     One however can change that through configuration.
-    
+
     `SameSite` can be `none`, `lax`, `strict` or empty.
 
 ??? example "Adding Stickiness -- Using the [File Provider](../../providers/file.md)"
-
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [http.services]
-      [http.services.my-service]
-        [http.services.my-service.loadBalancer.sticky.cookie]
-    ```
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -208,18 +201,14 @@ On subsequent requests, to keep the session alive with the same server, the clie
              cookie: {}
     ```
 
-??? example "Adding Stickiness with custom Options -- Using the [File Provider](../../providers/file.md)"
-
     ```toml tab="TOML"
     ## Dynamic configuration
     [http.services]
       [http.services.my-service]
         [http.services.my-service.loadBalancer.sticky.cookie]
-          name = "my_sticky_cookie_name"
-          secure = true
-          httpOnly = true
-          sameSite = "none"
     ```
+
+??? example "Adding Stickiness with custom Options -- Using the [File Provider](../../providers/file.md)"
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -234,39 +223,18 @@ On subsequent requests, to keep the session alive with the same server, the clie
                 httpOnly: true
     ```
 
-??? example "Setting Stickiness on all the required levels -- Using the [File Provider](../../providers/file.md)"
-
     ```toml tab="TOML"
     ## Dynamic configuration
     [http.services]
-      [http.services.wrr1]
-        [http.services.wrr1.weighted.sticky.cookie]
-          name = "lvl1"
-        [[http.services.wrr1.weighted.services]]
-          name = "whoami1"
-          weight = 1
-        [[http.services.wrr1.weighted.services]]
-          name = "whoami2"
-          weight = 1
-
-      [http.services.whoami1]
-        [http.services.whoami1.loadBalancer]
-          [http.services.whoami1.loadBalancer.sticky.cookie]
-            name = "lvl2"
-          [[http.services.whoami1.loadBalancer.servers]]
-            url = "http://127.0.0.1:8081"
-          [[http.services.whoami1.loadBalancer.servers]]
-            url = "http://127.0.0.1:8082"
-
-      [http.services.whoami2]
-        [http.services.whoami2.loadBalancer]
-          [http.services.whoami2.loadBalancer.sticky.cookie]
-            name = "lvl2"
-          [[http.services.whoami2.loadBalancer.servers]]
-            url = "http://127.0.0.1:8083"
-          [[http.services.whoami2.loadBalancer.servers]]
-            url = "http://127.0.0.1:8084"
+      [http.services.my-service]
+        [http.services.my-service.loadBalancer.sticky.cookie]
+          name = "my_sticky_cookie_name"
+          secure = true
+          httpOnly = true
+          sameSite = "none"
     ```
+
+??? example "Setting Stickiness on all the required levels -- Using the [File Provider](../../providers/file.md)"
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -302,8 +270,40 @@ On subsequent requests, to keep the session alive with the same server, the clie
               - url: http://127.0.0.1:8084
     ```
 
+    ```toml tab="TOML"
+    ## Dynamic configuration
+    [http.services]
+      [http.services.wrr1]
+        [http.services.wrr1.weighted.sticky.cookie]
+          name = "lvl1"
+        [[http.services.wrr1.weighted.services]]
+          name = "whoami1"
+          weight = 1
+        [[http.services.wrr1.weighted.services]]
+          name = "whoami2"
+          weight = 1
+
+      [http.services.whoami1]
+        [http.services.whoami1.loadBalancer]
+          [http.services.whoami1.loadBalancer.sticky.cookie]
+            name = "lvl2"
+          [[http.services.whoami1.loadBalancer.servers]]
+            url = "http://127.0.0.1:8081"
+          [[http.services.whoami1.loadBalancer.servers]]
+            url = "http://127.0.0.1:8082"
+
+      [http.services.whoami2]
+        [http.services.whoami2.loadBalancer]
+          [http.services.whoami2.loadBalancer.sticky.cookie]
+            name = "lvl2"
+          [[http.services.whoami2.loadBalancer.servers]]
+            url = "http://127.0.0.1:8083"
+          [[http.services.whoami2.loadBalancer.servers]]
+            url = "http://127.0.0.1:8084"
+    ```
+
     To keep a session open with the same server, the client would then need to specify the two levels within the cookie for each request, e.g. with curl:
-    
+
     ```
     curl -b "lvl1=whoami1; lvl2=http://127.0.0.1:8081" http://localhost:8000
     ```
@@ -312,6 +312,8 @@ On subsequent requests, to keep the session alive with the same server, the clie
 
 Configure health check to remove unhealthy servers from the load balancing rotation.
 Traefik will consider your servers healthy as long as they return status codes between `2XX` and `3XX` to the health check requests (carried out every `interval`).
+
+To propagate status changes (e.g. all servers of this service are down) upwards, HealthCheck must also be enabled on the parent(s) of this service.
 
 Below are the available options for the health check mechanism:
 
@@ -342,16 +344,6 @@ Below are the available options for the health check mechanism:
 
 ??? example "Custom Interval & Timeout -- Using the [File Provider](../../providers/file.md)"
 
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [http.services]
-      [http.services.Service-1]
-        [http.services.Service-1.loadBalancer.healthCheck]
-          path = "/health"
-          interval = "10s"
-          timeout = "3s"
-    ```
-
     ```yaml tab="YAML"
     ## Dynamic configuration
     http:
@@ -364,16 +356,17 @@ Below are the available options for the health check mechanism:
               timeout: "3s"
     ```
 
-??? example "Custom Port -- Using the [File Provider](../../providers/file.md)"
-
     ```toml tab="TOML"
     ## Dynamic configuration
     [http.services]
       [http.services.Service-1]
         [http.services.Service-1.loadBalancer.healthCheck]
           path = "/health"
-          port = 8080
+          interval = "10s"
+          timeout = "3s"
     ```
+
+??? example "Custom Port -- Using the [File Provider](../../providers/file.md)"
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -386,16 +379,16 @@ Below are the available options for the health check mechanism:
               port: 8080
     ```
 
-??? example "Custom Scheme -- Using the [File Provider](../../providers/file.md)"
-
     ```toml tab="TOML"
     ## Dynamic configuration
     [http.services]
       [http.services.Service-1]
         [http.services.Service-1.loadBalancer.healthCheck]
           path = "/health"
-          scheme = "http"
+          port = 8080
     ```
+
+??? example "Custom Scheme -- Using the [File Provider](../../providers/file.md)"
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -408,19 +401,16 @@ Below are the available options for the health check mechanism:
               scheme: http
     ```
 
-??? example "Additional HTTP Headers -- Using the [File Provider](../../providers/file.md)"
-
     ```toml tab="TOML"
     ## Dynamic configuration
     [http.services]
       [http.services.Service-1]
         [http.services.Service-1.loadBalancer.healthCheck]
           path = "/health"
-
-          [http.services.Service-1.loadBalancer.healthCheck.headers]
-            My-Custom-Header = "foo"
-            My-Header = "bar"
+          scheme = "http"
     ```
+
+??? example "Additional HTTP Headers -- Using the [File Provider](../../providers/file.md)"
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -435,6 +425,18 @@ Below are the available options for the health check mechanism:
                 My-Header: bar
     ```
 
+    ```toml tab="TOML"
+    ## Dynamic configuration
+    [http.services]
+      [http.services.Service-1]
+        [http.services.Service-1.loadBalancer.healthCheck]
+          path = "/health"
+
+          [http.services.Service-1.loadBalancer.healthCheck.headers]
+            My-Custom-Header = "foo"
+            My-Header = "bar"
+    ```
+
 #### Pass Host Header
 
 The `passHostHeader` allows to forward client Host header to server.
@@ -442,14 +444,6 @@ The `passHostHeader` allows to forward client Host header to server.
 By default, `passHostHeader` is true.
 
 ??? example "Don't forward the host header -- Using the [File Provider](../../providers/file.md)"
-
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [http.services]
-      [http.services.Service01]
-        [http.services.Service01.loadBalancer]
-          passHostHeader = false
-    ```
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -460,19 +454,19 @@ By default, `passHostHeader` is true.
             passHostHeader: false
     ```
 
-#### ServersTransport
-
-`serversTransport` allows to reference a [ServersTransport](./index.md#serverstransport_1) configuration for the communication between Traefik and your servers.
-
-??? example "Specify a transport -- Using the [File Provider](../../providers/file.md)"
-
     ```toml tab="TOML"
     ## Dynamic configuration
     [http.services]
       [http.services.Service01]
         [http.services.Service01.loadBalancer]
-          serversTransport = "mytransport"
+          passHostHeader = false
     ```
+
+#### ServersTransport
+
+`serversTransport` allows to reference a [ServersTransport](./index.md#serverstransport_1) configuration for the communication between Traefik and your servers.
+
+??? example "Specify a transport -- Using the [File Provider](../../providers/file.md)"
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -483,9 +477,17 @@ By default, `passHostHeader` is true.
             serversTransport: mytransport
     ```
 
+    ```toml tab="TOML"
+    ## Dynamic configuration
+    [http.services]
+      [http.services.Service01]
+        [http.services.Service01.loadBalancer]
+          serversTransport = "mytransport"
+    ```
+
 !!! info default serversTransport
-    If no serversTransport is specified, the `default@internal` will be used. 
-    The `default@internal` serversTransport is created from the [static configuration](../overview.md#transport-configuration). 
+    If no serversTransport is specified, the `default@internal` will be used.
+    The `default@internal` serversTransport is created from the [static configuration](../overview.md#transport-configuration).
 
 #### Response Forwarding
 
@@ -501,14 +503,6 @@ Below are the available options for the Response Forwarding mechanism:
 
 ??? example "Using a custom FlushInterval -- Using the [File Provider](../../providers/file.md)"
 
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [http.services]
-      [http.services.Service-1]
-        [http.services.Service-1.loadBalancer.responseForwarding]
-          flushInterval = "1s"
-    ```
-
     ```yaml tab="YAML"
     ## Dynamic configuration
     http:
@@ -517,6 +511,14 @@ Below are the available options for the Response Forwarding mechanism:
           loadBalancer:
             responseForwarding:
               flushInterval: 1s
+    ```
+
+    ```toml tab="TOML"
+    ## Dynamic configuration
+    [http.services]
+      [http.services.Service-1]
+        [http.services.Service-1.loadBalancer.responseForwarding]
+          flushInterval = "1s"
     ```
 
 ### ServersTransport
@@ -529,18 +531,18 @@ _Optional_
 
 `serverName` configure the server name that will be used for SNI.
 
-```toml tab="File (TOML)"
-## Dynamic configuration
-[http.serversTransports.mytransport]
-  serverName = "myhost"
-```
-
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
 http:
   serversTransports:
     mytransport:
       serverName: "myhost"
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.serversTransports.mytransport]
+  serverName = "myhost"
 ```
 
 ```yaml tab="Kubernetes"
@@ -561,13 +563,6 @@ _Optional_
 `certificates` is the list of certificates (as file paths, or data bytes)
 that will be set as client certificates for mTLS.
 
-```toml tab="File (TOML)"
-## Dynamic configuration
-[[http.serversTransports.mytransport.certificates]]
-  certFile = "foo.crt"
-  keyFile = "bar.crt"
-```
-
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
 http:
@@ -576,6 +571,13 @@ http:
       certificates:
         - certFile: foo.crt
           keyFile: bar.crt
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[[http.serversTransports.mytransport.certificates]]
+  certFile = "foo.crt"
+  keyFile = "bar.crt"
 ```
 
 ```yaml tab="Kubernetes"
@@ -594,7 +596,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: mycert
-    
+
   data:
     tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=
     tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0=
@@ -606,18 +608,18 @@ _Optional_
 
 `insecureSkipVerify` disables SSL certificate verification.
 
-```toml tab="File (TOML)"
-## Dynamic configuration
-[http.serversTransports.mytransport]
-  insecureSkipVerify = true
-```
-
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
 http:
   serversTransports:
     mytransport:
       insecureSkipVerify: true
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.serversTransports.mytransport]
+  insecureSkipVerify = true
 ```
 
 ```yaml tab="Kubernetes"
@@ -638,12 +640,6 @@ _Optional_
 `rootCAs` is the list of certificates (as file paths, or data bytes)
 that will be set as Root Certificate Authorities when using a self-signed TLS certificate.
 
-```toml tab="File (TOML)"
-## Dynamic configuration
-[http.serversTransports.mytransport]
-  rootCAs = ["foo.crt", "bar.crt"]
-```
-
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
 http:
@@ -652,6 +648,12 @@ http:
       rootCAs:
         - foo.crt
         - bar.crt
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.serversTransports.mytransport]
+  rootCAs = ["foo.crt", "bar.crt"]
 ```
 
 ```yaml tab="Kubernetes"
@@ -669,7 +671,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: myca
-    
+
   data:
     tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=
 ```
@@ -680,18 +682,18 @@ _Optional, Default=2_
 
 If non-zero, `maxIdleConnsPerHost` controls the maximum idle (keep-alive) connections to keep per-host.
 
-```toml tab="File (TOML)"
-## Dynamic configuration
-[http.serversTransports.mytransport]
-  maxIdleConnsPerHost = 7
-```
-
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
 http:
   serversTransports:
     mytransport:
       maxIdleConnsPerHost: 7
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.serversTransports.mytransport]
+  maxIdleConnsPerHost = 7
 ```
 
 ```yaml tab="Kubernetes"
@@ -747,12 +749,6 @@ _Optional, Default=30s_
 `dialTimeout` is the maximum duration allowed for a connection to a backend server to be established.
 Zero means no timeout.
 
-```toml tab="File (TOML)"
-## Dynamic configuration
-[http.serversTransports.mytransport.forwardingTimeouts]
-  dialTimeout = "1s"
-```
-
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
 http:
@@ -760,6 +756,12 @@ http:
     mytransport:
       forwardingTimeouts:
         dialTimeout: "1s"
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.serversTransports.mytransport.forwardingTimeouts]
+  dialTimeout = "1s"
 ```
 
 ```yaml tab="Kubernetes"
@@ -783,12 +785,6 @@ after fully writing the request (including its body, if any).
 This time does not include the time to read the response body.
 Zero means no timeout.
 
-```toml tab="File (TOML)"
-## Dynamic configuration
-[http.serversTransports.mytransport.forwardingTimeouts]
-  responseHeaderTimeout = "1s"
-```
-
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
 http:
@@ -796,6 +792,12 @@ http:
     mytransport:
       forwardingTimeouts:
         responseHeaderTimeout: "1s"
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.serversTransports.mytransport.forwardingTimeouts]
+  responseHeaderTimeout = "1s"
 ```
 
 ```yaml tab="Kubernetes"
@@ -818,12 +820,6 @@ _Optional, Default=90s_
 will remain idle before closing itself.
 Zero means no limit.
 
-```toml tab="File (TOML)"
-## Dynamic configuration
-[http.serversTransports.mytransport.forwardingTimeouts]
-  idleConnTimeout = "1s"
-```
-
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
 http:
@@ -831,6 +827,12 @@ http:
     mytransport:
       forwardingTimeouts:
         idleConnTimeout: "1s"
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.serversTransports.mytransport.forwardingTimeouts]
+  idleConnTimeout = "1s"
 ```
 
 ```yaml tab="Kubernetes"
@@ -852,30 +854,8 @@ The WRR is able to load balance the requests between multiple services based on 
 This strategy is only available to load balance between [services](./index.md) and not between [servers](./index.md#servers).
 
 !!! info "Supported Providers"
-    
+
     This strategy can be defined currently with the [File](../../providers/file.md) or [IngressRoute](../../providers/kubernetes-crd.md) providers.
-
-```toml tab="TOML"
-## Dynamic configuration
-[http.services]
-  [http.services.app]
-    [[http.services.app.weighted.services]]
-      name = "appv1"
-      weight = 3
-    [[http.services.app.weighted.services]]
-      name = "appv2"
-      weight = 1
-
-  [http.services.appv1]
-    [http.services.appv1.loadBalancer]
-      [[http.services.appv1.loadBalancer.servers]]
-        url = "http://private-ip-server-1/"
-
-  [http.services.appv2]
-    [http.services.appv2.loadBalancer]
-      [[http.services.appv2.loadBalancer.servers]]
-        url = "http://private-ip-server-2/"
-```
 
 ```yaml tab="YAML"
 ## Dynamic configuration
@@ -900,29 +880,16 @@ http:
         - url: "http://private-ip-server-2/"
 ```
 
-### Mirroring (service)
-
-The mirroring is able to mirror requests sent to a service to other services.
-Please note that by default the whole request is buffered in memory while it is being mirrored.
-See the maxBodySize option in the example below for how to modify this behaviour.
-
-!!! info "Supported Providers"
-    
-    This strategy can be defined currently with the [File](../../providers/file.md) or [IngressRoute](../../providers/kubernetes-crd.md) providers.
-
 ```toml tab="TOML"
 ## Dynamic configuration
 [http.services]
-  [http.services.mirrored-api]
-    [http.services.mirrored-api.mirroring]
-      service = "appv1"
-      # maxBodySize is the maximum size in bytes allowed for the body of the request.
-      # If the body is larger, the request is not mirrored.
-      # Default value is -1, which means unlimited size.
-      maxBodySize = 1024
-    [[http.services.mirrored-api.mirroring.mirrors]]
+  [http.services.app]
+    [[http.services.app.weighted.services]]
+      name = "appv1"
+      weight = 3
+    [[http.services.app.weighted.services]]
       name = "appv2"
-      percent = 10
+      weight = 1
 
   [http.services.appv1]
     [http.services.appv1.loadBalancer]
@@ -934,6 +901,94 @@ See the maxBodySize option in the example below for how to modify this behaviour
       [[http.services.appv2.loadBalancer.servers]]
         url = "http://private-ip-server-2/"
 ```
+
+#### Health Check
+
+HealthCheck enables automatic self-healthcheck for this service, i.e. whenever
+one of its children is reported as down, this service becomes aware of it, and
+takes it into account (i.e. it ignores the down child) when running the
+load-balancing algorithm. In addition, if the parent of this service also has
+HealthCheck enabled, this service reports to its parent any status change.
+
+!!! info "All or nothing"
+
+    If HealthCheck is enabled for a given service, but any of its descendants does
+    not have it enabled, the creation of the service will fail.
+
+    HealthCheck on Weighted services can be defined currently only with the [File](../../providers/file.md) provider.
+
+```yaml tab="YAML"
+## Dynamic configuration
+http:
+  services:
+    app:
+      weighted:
+        healthCheck: {}
+        services:
+        - name: appv1
+          weight: 3
+        - name: appv2
+          weight: 1
+
+    appv1:
+      loadBalancer:
+        healthCheck:
+          path: /status
+          interval: 10s
+          timeout: 3s
+        servers:
+        - url: "http://private-ip-server-1/"
+
+    appv2:
+      loadBalancer:
+        healthCheck:
+          path: /status
+          interval: 10s
+          timeout: 3s
+        servers:
+        - url: "http://private-ip-server-2/"
+```
+
+```toml tab="TOML"
+## Dynamic configuration
+[http.services]
+  [http.services.app]
+    [http.services.app.weighted.healthCheck]
+    [[http.services.app.weighted.services]]
+      name = "appv1"
+      weight = 3
+    [[http.services.app.weighted.services]]
+      name = "appv2"
+      weight = 1
+
+  [http.services.appv1]
+    [http.services.appv1.loadBalancer]
+      [http.services.appv1.loadBalancer.healthCheck]
+        path = "/health"
+        interval = "10s"
+        timeout = "3s"
+      [[http.services.appv1.loadBalancer.servers]]
+        url = "http://private-ip-server-1/"
+
+  [http.services.appv2]
+    [http.services.appv2.loadBalancer]
+      [http.services.appv2.loadBalancer.healthCheck]
+        path = "/health"
+        interval = "10s"
+        timeout = "3s"
+      [[http.services.appv2.loadBalancer.servers]]
+        url = "http://private-ip-server-2/"
+```
+
+### Mirroring (service)
+
+The mirroring is able to mirror requests sent to a service to other services.
+Please note that by default the whole request is buffered in memory while it is being mirrored.
+See the maxBodySize option in the example below for how to modify this behaviour.
+
+!!! info "Supported Providers"
+
+    This strategy can be defined currently with the [File](../../providers/file.md) or [IngressRoute](../../providers/kubernetes-crd.md) providers.
 
 ```yaml tab="YAML"
 ## Dynamic configuration
@@ -961,6 +1016,101 @@ http:
         - url: "http://private-ip-server-2/"
 ```
 
+```toml tab="TOML"
+## Dynamic configuration
+[http.services]
+  [http.services.mirrored-api]
+    [http.services.mirrored-api.mirroring]
+      service = "appv1"
+      # maxBodySize is the maximum size in bytes allowed for the body of the request.
+      # If the body is larger, the request is not mirrored.
+      # Default value is -1, which means unlimited size.
+      maxBodySize = 1024
+    [[http.services.mirrored-api.mirroring.mirrors]]
+      name = "appv2"
+      percent = 10
+
+  [http.services.appv1]
+    [http.services.appv1.loadBalancer]
+      [[http.services.appv1.loadBalancer.servers]]
+        url = "http://private-ip-server-1/"
+
+  [http.services.appv2]
+    [http.services.appv2.loadBalancer]
+      [[http.services.appv2.loadBalancer.servers]]
+        url = "http://private-ip-server-2/"
+```
+
+#### Health Check
+
+HealthCheck enables automatic self-healthcheck for this service, i.e. if the
+main handler of the service becomes unreachable, the information is propagated
+upwards to its parent.
+
+!!! info "All or nothing"
+
+    If HealthCheck is enabled for a given service, but any of its descendants does
+    not have it enabled, the creation of the service will fail.
+
+    HealthCheck on Mirroring services can be defined currently only with the [File](../../providers/file.md) provider.
+
+```yaml tab="YAML"
+## Dynamic configuration
+http:
+  services:
+    mirrored-api:
+      mirroring:
+        healthCheck: {}
+        service: appv1
+        mirrors:
+        - name: appv2
+          percent: 10
+
+    appv1:
+      loadBalancer:
+        healthCheck:
+          path: /status
+          interval: 10s
+          timeout: 3s
+        servers:
+        - url: "http://private-ip-server-1/"
+
+    appv2:
+      loadBalancer:
+        servers:
+        - url: "http://private-ip-server-2/"
+```
+
+```toml tab="TOML"
+## Dynamic configuration
+[http.services]
+  [http.services.mirrored-api]
+    [http.services.mirrored-api.mirroring]
+      [http.services.mirrored-api.mirroring.healthCheck]
+      service = "appv1"
+    [[http.services.mirrored-api.mirroring.mirrors]]
+      name = "appv2"
+      percent = 10
+
+  [http.services.appv1]
+    [http.services.appv1.loadBalancer]
+      [http.services.appv1.loadBalancer.healthCheck]
+        path = "/health"
+        interval = "10s"
+        timeout = "3s"
+      [[http.services.appv1.loadBalancer.servers]]
+        url = "http://private-ip-server-1/"
+
+  [http.services.appv2]
+    [http.services.appv2.loadBalancer]
+      [http.services.appv1.loadBalancer.healthCheck]
+        path = "/health"
+        interval = "10s"
+        timeout = "3s"
+      [[http.services.appv2.loadBalancer.servers]]
+        url = "http://private-ip-server-2/"
+```
+
 ## Configuring TCP Services
 
 ### General
@@ -976,6 +1126,17 @@ The servers load balancer is in charge of balancing the requests between the ser
 
 ??? example "Declaring a Service with Two Servers -- Using the [File Provider](../../providers/file.md)"
 
+    ```yaml tab="YAML"
+    ## Dynamic configuration
+    tcp:
+      services:
+        my-service:
+          loadBalancer:
+            servers:
+            - address: "xx.xx.xx.xx:xx"
+            - address: "xx.xx.xx.xx:xx"
+    ```
+
     ```toml tab="TOML"
     ## Dynamic configuration
     [tcp.services]
@@ -986,31 +1147,12 @@ The servers load balancer is in charge of balancing the requests between the ser
            address = "xx.xx.xx.xx:xx"
     ```
 
-    ```yaml tab="YAML"
-    ## Dynamic configuration
-    tcp:
-      services:
-        my-service:
-          loadBalancer:
-            servers:
-            - address: "xx.xx.xx.xx:xx"
-            - address: "xx.xx.xx.xx:xx"
-    ```
-
 #### Servers
 
 Servers declare a single instance of your program.
 The `address` option (IP:Port) point to a specific instance.
 
 ??? example "A Service with One Server -- Using the [File Provider](../../providers/file.md)"
-
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [tcp.services]
-      [tcp.services.my-service.loadBalancer]
-        [[tcp.services.my-service.loadBalancer.servers]]
-          address = "xx.xx.xx.xx:xx"
-    ```
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -1020,6 +1162,14 @@ The `address` option (IP:Port) point to a specific instance.
           loadBalancer:
             servers:
               - address: "xx.xx.xx.xx:xx"
+    ```
+
+    ```toml tab="TOML"
+    ## Dynamic configuration
+    [tcp.services]
+      [tcp.services.my-service.loadBalancer]
+        [[tcp.services.my-service.loadBalancer.servers]]
+          address = "xx.xx.xx.xx:xx"
     ```
 
 #### PROXY Protocol
@@ -1033,17 +1183,9 @@ Below are the available options for the PROXY protocol:
 
 !!! info "Version"
 
-    Specifying a version is optional. By default the version 2 will be used. 
+    Specifying a version is optional. By default the version 2 will be used.
 
 ??? example "A Service with Proxy Protocol v1 -- Using the [File Provider](../../providers/file.md)"
-
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [tcp.services]
-      [tcp.services.my-service.loadBalancer]
-        [tcp.services.my-service.loadBalancer.proxyProtocol]
-          version = 1
-    ```
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -1053,6 +1195,14 @@ Below are the available options for the PROXY protocol:
           loadBalancer:
             proxyProtocol:
               version: 1
+    ```
+
+    ```toml tab="TOML"
+    ## Dynamic configuration
+    [tcp.services]
+      [tcp.services.my-service.loadBalancer]
+        [tcp.services.my-service.loadBalancer.proxyProtocol]
+          version = 1
     ```
 
 #### Termination Delay
@@ -1071,14 +1221,6 @@ A negative value means an infinite deadline (i.e. the connection is never fully 
 
 ??? example "A Service with a termination delay -- Using the [File Provider](../../providers/file.md)"
 
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [tcp.services]
-      [tcp.services.my-service.loadBalancer]
-        [[tcp.services.my-service.loadBalancer]]
-          terminationDelay = 200
-    ```
-
     ```yaml tab="YAML"
     ## Dynamic configuration
     tcp:
@@ -1088,6 +1230,14 @@ A negative value means an infinite deadline (i.e. the connection is never fully 
             terminationDelay: 200
     ```
 
+    ```toml tab="TOML"
+    ## Dynamic configuration
+    [tcp.services]
+      [tcp.services.my-service.loadBalancer]
+        [[tcp.services.my-service.loadBalancer]]
+          terminationDelay = 200
+    ```
+
 ### Weighted Round Robin
 
 The Weighted Round Robin (alias `WRR`) load-balancer of services is in charge of balancing the requests between multiple services based on provided weights.
@@ -1095,30 +1245,8 @@ The Weighted Round Robin (alias `WRR`) load-balancer of services is in charge of
 This strategy is only available to load balance between [services](./index.md) and not between [servers](./index.md#servers).
 
 !!! info "Supported Providers"
-    
+
     This strategy can be defined currently with the [File](../../providers/file.md) or [IngressRoute](../../providers/kubernetes-crd.md) providers.
-
-```toml tab="TOML"
-## Dynamic configuration
-[tcp.services]
-  [tcp.services.app]
-    [[tcp.services.app.weighted.services]]
-      name = "appv1"
-      weight = 3
-    [[tcp.services.app.weighted.services]]
-      name = "appv2"
-      weight = 1
-
-  [tcp.services.appv1]
-    [tcp.services.appv1.loadBalancer]
-      [[tcp.services.appv1.loadBalancer.servers]]
-        address = "private-ip-server-1:8080/"
-
-  [tcp.services.appv2]
-    [tcp.services.appv2.loadBalancer]
-      [[tcp.services.appv2.loadBalancer.servers]]
-        address = "private-ip-server-2:8080/"
-```
 
 ```yaml tab="YAML"
 ## Dynamic configuration
@@ -1143,6 +1271,28 @@ tcp:
         - address: "xxx.xxx.xxx.xxx:8080"
 ```
 
+```toml tab="TOML"
+## Dynamic configuration
+[tcp.services]
+  [tcp.services.app]
+    [[tcp.services.app.weighted.services]]
+      name = "appv1"
+      weight = 3
+    [[tcp.services.app.weighted.services]]
+      name = "appv2"
+      weight = 1
+
+  [tcp.services.appv1]
+    [tcp.services.appv1.loadBalancer]
+      [[tcp.services.appv1.loadBalancer.servers]]
+        address = "private-ip-server-1:8080/"
+
+  [tcp.services.appv2]
+    [tcp.services.appv2.loadBalancer]
+      [[tcp.services.appv2.loadBalancer.servers]]
+        address = "private-ip-server-2:8080/"
+```
+
 ## Configuring UDP Services
 
 ### General
@@ -1158,16 +1308,6 @@ The servers load balancer is in charge of balancing the requests between the ser
 
 ??? example "Declaring a Service with Two Servers -- Using the [File Provider](../../providers/file.md)"
 
-    ```toml tab="TOML"
-    ## Dynamic configuration
-    [udp.services]
-      [udp.services.my-service.loadBalancer]
-        [[udp.services.my-service.loadBalancer.servers]]
-          address = "xx.xx.xx.xx:xx"
-        [[udp.services.my-service.loadBalancer.servers]]
-          address = "xx.xx.xx.xx:xx"
-    ```
-
     ```yaml tab="YAML"
     ## Dynamic configuration
     udp:
@@ -1179,20 +1319,22 @@ The servers load balancer is in charge of balancing the requests between the ser
             - address: "xx.xx.xx.xx:xx"
     ```
 
-#### Servers
-
-The Servers field defines all the servers that are part of this load-balancing group,
-i.e. each address (IP:Port) on which an instance of the service's program is deployed.
-
-??? example "A Service with One Server -- Using the [File Provider](../../providers/file.md)"
-
     ```toml tab="TOML"
     ## Dynamic configuration
     [udp.services]
       [udp.services.my-service.loadBalancer]
         [[udp.services.my-service.loadBalancer.servers]]
           address = "xx.xx.xx.xx:xx"
+        [[udp.services.my-service.loadBalancer.servers]]
+          address = "xx.xx.xx.xx:xx"
     ```
+
+#### Servers
+
+The Servers field defines all the servers that are part of this load-balancing group,
+i.e. each address (IP:Port) on which an instance of the service's program is deployed.
+
+??? example "A Service with One Server -- Using the [File Provider](../../providers/file.md)"
 
     ```yaml tab="YAML"
     ## Dynamic configuration
@@ -1204,6 +1346,14 @@ i.e. each address (IP:Port) on which an instance of the service's program is dep
               - address: "xx.xx.xx.xx:xx"
     ```
 
+    ```toml tab="TOML"
+    ## Dynamic configuration
+    [udp.services]
+      [udp.services.my-service.loadBalancer]
+        [[udp.services.my-service.loadBalancer.servers]]
+          address = "xx.xx.xx.xx:xx"
+    ```
+
 ### Weighted Round Robin
 
 The Weighted Round Robin (alias `WRR`) load-balancer of services is in charge of balancing the requests between multiple services based on provided weights.
@@ -1211,28 +1361,6 @@ The Weighted Round Robin (alias `WRR`) load-balancer of services is in charge of
 This strategy is only available to load balance between [services](./index.md) and not between [servers](./index.md#servers).
 
 This strategy can only be defined with [File](../../providers/file.md).
-
-```toml tab="TOML"
-## Dynamic configuration
-[udp.services]
-  [udp.services.app]
-    [[udp.services.app.weighted.services]]
-      name = "appv1"
-      weight = 3
-    [[udp.services.app.weighted.services]]
-      name = "appv2"
-      weight = 1
-
-  [udp.services.appv1]
-    [udp.services.appv1.loadBalancer]
-      [[udp.services.appv1.loadBalancer.servers]]
-        address = "private-ip-server-1:8080/"
-
-  [udp.services.appv2]
-    [udp.services.appv2.loadBalancer]
-      [[udp.services.appv2.loadBalancer.servers]]
-        address = "private-ip-server-2:8080/"
-```
 
 ```yaml tab="YAML"
 ## Dynamic configuration
@@ -1255,4 +1383,26 @@ udp:
       loadBalancer:
         servers:
         - address: "xxx.xxx.xxx.xxx:8080"
+```
+
+```toml tab="TOML"
+## Dynamic configuration
+[udp.services]
+  [udp.services.app]
+    [[udp.services.app.weighted.services]]
+      name = "appv1"
+      weight = 3
+    [[udp.services.app.weighted.services]]
+      name = "appv2"
+      weight = 1
+
+  [udp.services.appv1]
+    [udp.services.appv1.loadBalancer]
+      [[udp.services.appv1.loadBalancer.servers]]
+        address = "private-ip-server-1:8080/"
+
+  [udp.services.appv2]
+    [udp.services.appv2.loadBalancer]
+      [[udp.services.appv2.loadBalancer.servers]]
+        address = "private-ip-server-2:8080/"
 ```

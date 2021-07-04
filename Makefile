@@ -142,7 +142,7 @@ generate-genconf:
 ## Create packages for the release
 release-packages: generate-webui build-dev-image
 	rm -rf dist
-	$(DOCKER_RUN_TRAEFIK_NOTTY) goreleaser release --skip-publish --timeout="60m"
+	$(DOCKER_RUN_TRAEFIK_NOTTY) goreleaser release --skip-publish --timeout="90m"
 	$(DOCKER_RUN_TRAEFIK_NOTTY) tar cfz dist/traefik-${VERSION}.src.tar.gz \
 		--exclude-vcs \
 		--exclude .idea \

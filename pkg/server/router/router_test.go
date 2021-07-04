@@ -470,7 +470,7 @@ func TestRuntimeConfiguration(t *testing.T) {
 								URL: "http://127.0.0.1:8086",
 							},
 						},
-						HealthCheck: &dynamic.HealthCheck{
+						HealthCheck: &dynamic.ServerHealthCheck{
 							Interval: "500ms",
 							Path:     "/health",
 						},

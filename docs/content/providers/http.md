@@ -14,16 +14,16 @@ _Required_
 
 Defines the HTTP(S) endpoint to poll.
 
-```toml tab="File (TOML)"
-[providers.http]
-  endpoint = "http://127.0.0.1:9000/api"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   http:
     endpoint:
       - "http://127.0.0.1:9000/api"
+```
+
+```toml tab="File (TOML)"
+[providers.http]
+  endpoint = "http://127.0.0.1:9000/api"
 ```
 
 ```bash tab="CLI"
@@ -36,15 +36,15 @@ _Optional, Default="5s"_
 
 Defines the polling interval.
 
-```toml tab="File (TOML)"
-[providers.http]
-  pollInterval = "5s"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   http:
     pollInterval: "5s"
+```
+
+```toml tab="File (TOML)"
+[providers.http]
+  pollInterval = "5s"
 ```
 
 ```bash tab="CLI"
@@ -57,15 +57,15 @@ _Optional, Default="5s"_
 
 Defines the polling timeout when connecting to the configured endpoint.
 
-```toml tab="File (TOML)"
-[providers.http]
-  pollTimeout = "5s"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   http:
     pollTimeout: "5s"
+```
+
+```toml tab="File (TOML)"
+[providers.http]
+  pollTimeout = "5s"
 ```
 
 ```bash tab="CLI"
@@ -80,16 +80,16 @@ _Optional_
 
 Certificate Authority used for the secure connection to the configured endpoint.
 
-```toml tab="File (TOML)"
-[providers.http.tls]
-  ca = "path/to/ca.crt"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   http:
     tls:
       ca: path/to/ca.crt
+```
+
+```toml tab="File (TOML)"
+[providers.http.tls]
+  ca = "path/to/ca.crt"
 ```
 
 ```bash tab="CLI"
@@ -108,16 +108,16 @@ When this option is set to `true`, a client certificate is requested during the 
 
 When this option is set to `false`, a client certificate is requested during the handshake, and at least one valid certificate should be sent by the client.
 
-```toml tab="File (TOML)"
-[providers.http.tls]
-  caOptional = true
-```
-
 ```yaml tab="File (YAML)"
 providers:
   http:
     tls:
       caOptional: true
+```
+
+```toml tab="File (TOML)"
+[providers.http.tls]
+  caOptional = true
 ```
 
 ```bash tab="CLI"
@@ -128,18 +128,18 @@ providers:
 
 Public certificate used for the secure connection to the configured endpoint.
 
-```toml tab="File (TOML)"
-[providers.http.tls]
-  cert = "path/to/foo.cert"
-  key = "path/to/foo.key"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   http:
     tls:
       cert: path/to/foo.cert
       key: path/to/foo.key
+```
+
+```toml tab="File (TOML)"
+[providers.http.tls]
+  cert = "path/to/foo.cert"
+  key = "path/to/foo.key"
 ```
 
 ```bash tab="CLI"
@@ -151,18 +151,18 @@ providers:
 
 Private certificate used for the secure connection to the configured endpoint.
 
-```toml tab="File (TOML)"
-[providers.http.tls]
-  cert = "path/to/foo.cert"
-  key = "path/to/foo.key"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   http:
     tls:
       cert: path/to/foo.cert
       key: path/to/foo.key
+```
+
+```toml tab="File (TOML)"
+[providers.http.tls]
+  cert = "path/to/foo.cert"
+  key = "path/to/foo.key"
 ```
 
 ```bash tab="CLI"
@@ -174,16 +174,16 @@ providers:
 
 If `insecureSkipVerify` is `true`, the TLS connection to the endpoint accepts any certificate presented by the server regardless of the hostnames it covers.
 
-```toml tab="File (TOML)"
-[providers.http.tls]
-  insecureSkipVerify = true
-```
-
 ```yaml tab="File (YAML)"
 providers:
   http:
     tls:
       insecureSkipVerify: true
+```
+
+```toml tab="File (TOML)"
+[providers.http.tls]
+  insecureSkipVerify = true
 ```
 
 ```bash tab="CLI"

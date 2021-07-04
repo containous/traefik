@@ -43,16 +43,6 @@ labels:
   - "traefik.http.middlewares.test-auth.digestauth.users=test:traefik:a2688e031edb4be6a3797f3882655c05,test2:traefik:518845800f9e2bfb1f1f740ec24f074e"
 ```
 
-```toml tab="File (TOML)"
-# Declaring the user list
-[http.middlewares]
-  [http.middlewares.test-auth.digestAuth]
-    users = [
-      "test:traefik:a2688e031edb4be6a3797f3882655c05",
-      "test2:traefik:518845800f9e2bfb1f1f740ec24f074e",
-    ]
-```
-
 ```yaml tab="File (YAML)"
 # Declaring the user list
 http:
@@ -62,6 +52,16 @@ http:
         users:
           - "test:traefik:a2688e031edb4be6a3797f3882655c05"
           - "test2:traefik:518845800f9e2bfb1f1f740ec24f074e"
+```
+
+```toml tab="File (TOML)"
+# Declaring the user list
+[http.middlewares]
+  [http.middlewares.test-auth.digestAuth]
+    users = [
+      "test:traefik:a2688e031edb4be6a3797f3882655c05",
+      "test2:traefik:518845800f9e2bfb1f1f740ec24f074e",
+    ]
 ```
 
 ## Configuration Options
@@ -120,15 +120,6 @@ labels:
   - "traefik.http.middlewares.test-auth.digestauth.users=test:traefik:a2688e031edb4be6a3797f3882655c05,test2:traefik:518845800f9e2bfb1f1f740ec24f074e"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-auth.digestAuth]
-    users = [
-      "test:traefik:a2688e031edb4be6a3797f3882655c05",
-      "test2:traefik:518845800f9e2bfb1f1f740ec24f074e",
-    ]
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
@@ -137,6 +128,15 @@ http:
         users:
           - "test:traefik:a2688e031edb4be6a3797f3882655c05"
           - "test2:traefik:518845800f9e2bfb1f1f740ec24f074e"
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-auth.digestAuth]
+    users = [
+      "test:traefik:a2688e031edb4be6a3797f3882655c05",
+      "test2:traefik:518845800f9e2bfb1f1f740ec24f074e",
+    ]
 ```
 
 ### `usersFile`
@@ -148,7 +148,7 @@ The file content is a list of `name:realm:encoded-password`.
 !!! note ""
 
     - If both `users` and `usersFile` are provided, the two are merged. The contents of `usersFile` have precedence over the values in `users`.
-    - Because it does not make much sense to refer to a file path on Kubernetes, the `usersFile` field doesn't exist for Kubernetes IngressRoute, and one should use the `secret` field instead. 
+    - Because it does not make much sense to refer to a file path on Kubernetes, the `usersFile` field doesn't exist for Kubernetes IngressRoute, and one should use the `secret` field instead.
 
 ```yaml tab="Docker"
 labels:
@@ -192,18 +192,18 @@ labels:
   - "traefik.http.middlewares.test-auth.digestauth.usersfile=/path/to/my/usersfile"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-auth.digestAuth]
-    usersFile = "/path/to/my/usersfile"
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
     test-auth:
       digestAuth:
         usersFile: "/path/to/my/usersfile"
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-auth.digestAuth]
+    usersFile = "/path/to/my/usersfile"
 ```
 
 ??? example "A file containing test/test and test2/test2"
@@ -247,18 +247,18 @@ labels:
   - "traefik.http.middlewares.test-auth.digestauth.realm=MyRealm"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-auth.digestAuth]
-    realm = "MyRealm"
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
     test-auth:
       digestAuth:
         realm: "MyRealm"
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-auth.digestAuth]
+    realm = "MyRealm"
 ```
 
 ### `headerField`
@@ -296,12 +296,6 @@ labels:
   - "traefik.http.middlewares.my-auth.digestauth.headerField=X-WebAuth-User"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares.my-auth.digestAuth]
-  # ...
-  headerField = "X-WebAuth-User"
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
@@ -309,6 +303,12 @@ http:
       digestAuth:
         # ...
         headerField: "X-WebAuth-User"
+```
+
+```toml tab="File (TOML)"
+[http.middlewares.my-auth.digestAuth]
+  # ...
+  headerField = "X-WebAuth-User"
 ```
 
 ### `removeHeader`
@@ -345,16 +345,16 @@ labels:
   - "traefik.http.middlewares.test-auth.digestauth.removeheader=true"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-auth.digestAuth]
-    removeHeader = true
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
     test-auth:
       digestAuth:
         removeHeader: true
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-auth.digestAuth]
+    removeHeader = true
 ```

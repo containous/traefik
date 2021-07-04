@@ -30,6 +30,9 @@ func handleDeprecation(ctx context.Context, cfg *dynamic.Headers) {
 	if cfg.SSLForceHost {
 		log.FromContext(ctx).Warn("SSLForceHost is deprecated, please use RedirectScheme middleware instead.")
 	}
+	if cfg.FeaturePolicy != "" {
+		log.FromContext(ctx).Warn("FeaturePolicy is deprecated, please use PermissionsPolicy header instead.")
+	}
 }
 
 type headers struct {

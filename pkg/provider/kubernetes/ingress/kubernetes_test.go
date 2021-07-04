@@ -648,6 +648,36 @@ func TestLoadConfigurationFromIngresses(t *testing.T) {
 			},
 		},
 		{
+			desc: "Ingress with a named port matching subset of service pods",
+			expected: &dynamic.Configuration{
+				TCP: &dynamic.TCPConfiguration{},
+				HTTP: &dynamic.HTTPConfiguration{
+					Middlewares: map[string]*dynamic.Middleware{},
+					Routers: map[string]*dynamic.Router{
+						"testing-traefik-tchouk-bar": {
+							Rule:    "Host(`traefik.tchouk`) && PathPrefix(`/bar`)",
+							Service: "testing-service1-tchouk",
+						},
+					},
+					Services: map[string]*dynamic.Service{
+						"testing-service1-tchouk": {
+							LoadBalancer: &dynamic.ServersLoadBalancer{
+								PassHostHeader: Bool(true),
+								Servers: []dynamic.Server{
+									{
+										URL: "http://10.10.0.1:8089",
+									},
+									{
+										URL: "http://10.10.0.2:8089",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			desc: "2 ingresses in different namespace with same service name",
 			expected: &dynamic.Configuration{
 				TCP: &dynamic.TCPConfiguration{},

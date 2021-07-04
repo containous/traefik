@@ -17,16 +17,16 @@ _Required, Default="127.0.0.1:8500"_
 
 Defines how to access to Consul.
 
-```toml tab="File (TOML)"
-[providers.consul]
-  endpoints = ["127.0.0.1:8500"]
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consul:
     endpoints:
       - "127.0.0.1:8500"
+```
+
+```toml tab="File (TOML)"
+[providers.consul]
+  endpoints = ["127.0.0.1:8500"]
 ```
 
 ```bash tab="CLI"
@@ -39,15 +39,15 @@ _Required, Default="traefik"_
 
 Defines the root key of the configuration.
 
-```toml tab="File (TOML)"
-[providers.consul]
-  rootKey = "traefik"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consul:
     rootKey: "traefik"
+```
+
+```toml tab="File (TOML)"
+[providers.consul]
+  rootKey = "traefik"
 ```
 
 ```bash tab="CLI"
@@ -60,17 +60,17 @@ _Optional, Default=""_
 
 Defines a username to connect to Consul with.
 
-```toml tab="File (TOML)"
-[providers.consul]
-  # ...
-  username = "foo"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consul:
     # ...
     usename: "foo"
+```
+
+```toml tab="File (TOML)"
+[providers.consul]
+  # ...
+  username = "foo"
 ```
 
 ```bash tab="CLI"
@@ -83,17 +83,17 @@ _Optional, Default=""_
 
 Defines a password with which to connect to Consul.
 
-```toml tab="File (TOML)"
-[providers.consul]
-  # ...
-  password = "bar"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consul:
     # ...
     password: "bar"
+```
+
+```toml tab="File (TOML)"
+[providers.consul]
+  # ...
+  password = "bar"
 ```
 
 ```bash tab="CLI"
@@ -108,16 +108,16 @@ _Optional_
 
 Certificate Authority used for the secure connection to Consul.
 
-```toml tab="File (TOML)"
-[providers.consul.tls]
-  ca = "path/to/ca.crt"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consul:
     tls:
       ca: path/to/ca.crt
+```
+
+```toml tab="File (TOML)"
+[providers.consul.tls]
+  ca = "path/to/ca.crt"
 ```
 
 ```bash tab="CLI"
@@ -136,16 +136,16 @@ When this option is set to `true`, a client certificate is requested during the 
 
 When this option is set to `false`, a client certificate is requested during the handshake, and at least one valid certificate should be sent by the client.
 
-```toml tab="File (TOML)"
-[providers.consul.tls]
-  caOptional = true
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consul:
     tls:
       caOptional: true
+```
+
+```toml tab="File (TOML)"
+[providers.consul.tls]
+  caOptional = true
 ```
 
 ```bash tab="CLI"
@@ -156,18 +156,18 @@ providers:
 
 Public certificate used for the secure connection to Consul.
 
-```toml tab="File (TOML)"
-[providers.consul.tls]
-  cert = "path/to/foo.cert"
-  key = "path/to/foo.key"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consul:
     tls:
       cert: path/to/foo.cert
       key: path/to/foo.key
+```
+
+```toml tab="File (TOML)"
+[providers.consul.tls]
+  cert = "path/to/foo.cert"
+  key = "path/to/foo.key"
 ```
 
 ```bash tab="CLI"
@@ -179,18 +179,18 @@ providers:
 
 Private certificate used for the secure connection to Consul.
 
-```toml tab="File (TOML)"
-[providers.consul.tls]
-  cert = "path/to/foo.cert"
-  key = "path/to/foo.key"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consul:
     tls:
       cert: path/to/foo.cert
       key: path/to/foo.key
+```
+
+```toml tab="File (TOML)"
+[providers.consul.tls]
+  cert = "path/to/foo.cert"
+  key = "path/to/foo.key"
 ```
 
 ```bash tab="CLI"
@@ -202,16 +202,16 @@ providers:
 
 If `insecureSkipVerify` is `true`, the TLS connection to Consul accepts any certificate presented by the server regardless of the hostnames it covers.
 
-```toml tab="File (TOML)"
-[providers.consul.tls]
-  insecureSkipVerify = true
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consul:
     tls:
       insecureSkipVerify: true
+```
+
+```toml tab="File (TOML)"
+[providers.consul.tls]
+  insecureSkipVerify = true
 ```
 
 ```bash tab="CLI"

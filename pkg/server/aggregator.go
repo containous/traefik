@@ -62,6 +62,12 @@ func mergeConfiguration(configurations dynamic.Configurations, defaultEntryPoint
 
 		if configuration.TCP != nil {
 			for routerName, router := range configuration.TCP.Routers {
+				if len(router.EntryPoints) == 0 {
+					log.WithoutContext().
+						WithField(log.RouterName, routerName).
+						Debugf("No entryPoint defined for this TCP router, using the default one(s) instead: %+v", defaultEntryPoints)
+					router.EntryPoints = defaultEntryPoints
+				}
 				conf.TCP.Routers[provider.MakeQualifiedName(pvd, routerName)] = router
 			}
 			for middlewareName, middleware := range configuration.TCP.Middlewares {

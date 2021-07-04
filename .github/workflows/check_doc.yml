@@ -1,0 +1,20 @@
+name: Check Documentation
+
+on:
+  pull_request:
+
+jobs:
+
+  docs:
+    name: Check, verify and build documentation
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Check documentation
+        run: make docs-pull-images docs

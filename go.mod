@@ -6,7 +6,7 @@ go 1.16
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/ExpediaDotCom/haystack-client-go v0.0.0-20190315171017-e7edbdf53a61
-	github.com/Masterminds/sprig/v3 v3.2.0
+	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/Microsoft/hcsshim v0.8.7 // indirect
 	github.com/Shopify/sarama v1.23.1 // indirect
 	github.com/abbot/go-http-auth v0.0.0-00010101000000-000000000000
@@ -30,7 +30,7 @@ require (
 	github.com/elazarl/go-bindata-assetfs v1.0.0
 	github.com/fatih/structs v1.1.0
 	github.com/gambol99/go-marathon v0.0.0-20180614232016-99a156b96fb2
-	github.com/go-acme/lego/v4 v4.3.1
+	github.com/go-acme/lego/v4 v4.4.0
 	github.com/go-check/check v0.0.0-00010101000000-000000000000
 	github.com/go-kit/kit v0.10.1-0.20200915143503-439c4d2ed3ea
 	github.com/golang/protobuf v1.4.3
@@ -70,20 +70,20 @@ require (
 	github.com/stvp/go-udp-testing v0.0.0-20191102171040-06b61409b154
 	github.com/tinylib/msgp v1.0.2 // indirect
 	github.com/traefik/gziphandler v1.1.2-0.20210212101304-175e0fad6888
-	github.com/traefik/paerser v0.1.2
-	github.com/traefik/yaegi v0.9.17
-	github.com/uber/jaeger-client-go v2.25.0+incompatible
+	github.com/traefik/paerser v0.1.4
+	github.com/traefik/yaegi v0.9.19
+	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.2.0+incompatible
 	github.com/unrolled/render v1.0.2
-	github.com/unrolled/secure v1.0.7
+	github.com/unrolled/secure v1.0.9
 	github.com/vdemeester/shakers v0.1.0
 	github.com/vulcand/oxy v1.3.0
 	github.com/vulcand/predicate v1.1.0
-	go.elastic.co/apm v1.7.0
-	go.elastic.co/apm/module/apmot v1.7.0
-	golang.org/x/mod v0.3.0
+	go.elastic.co/apm v1.11.0
+	go.elastic.co/apm/module/apmot v1.11.0
+	golang.org/x/mod v0.4.2
 	golang.org/x/net v0.0.0-20210220033124-5f55cee0dc0d
-	golang.org/x/time v0.0.0-20201208040808-7e3f01d25324
+	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 	golang.org/x/tools v0.0.0-20200904185747-39188db58858
 	google.golang.org/grpc v1.27.1
 	gopkg.in/DataDog/dd-trace-go.v1 v1.19.0

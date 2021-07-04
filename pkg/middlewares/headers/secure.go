@@ -37,6 +37,7 @@ func newSecure(next http.Handler, cfg dynamic.Headers, contextKey string) *secur
 		SSLProxyHeaders:         cfg.SSLProxyHeaders,
 		STSSeconds:              cfg.STSSeconds,
 		FeaturePolicy:           cfg.FeaturePolicy,
+		PermissionsPolicy:       cfg.PermissionsPolicy,
 		SecureContextKey:        contextKey,
 	}
 

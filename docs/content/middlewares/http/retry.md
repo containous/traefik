@@ -52,14 +52,6 @@ labels:
   - "traefik.http.middlewares.test-retry.retry.initialinterval=100ms"
 ```
 
-```toml tab="File (TOML)"
-# Retry 4 times with exponential backoff
-[http.middlewares]
-  [http.middlewares.test-retry.retry]
-    attempts = 4
-    initialInterval = "100ms"
-```
-
 ```yaml tab="File (YAML)"
 # Retry 4 times with exponential backoff
 http:
@@ -68,6 +60,14 @@ http:
       retry:
         attempts: 4
         initialInterval: 100ms
+```
+
+```toml tab="File (TOML)"
+# Retry 4 times with exponential backoff
+[http.middlewares]
+  [http.middlewares.test-retry.retry]
+    attempts = 4
+    initialInterval = "100ms"
 ```
 
 ## Configuration Options

@@ -15,6 +15,8 @@ import (
 	"github.com/traefik/traefik/v2/pkg/types"
 )
 
+const defaultBufSize = 4096
+
 // Router is a TCP router.
 type Router struct {
 	routingTable      map[string]Handler
@@ -238,6 +240,11 @@ func clientHelloServerName(br *bufio.Reader) (string, bool, string, error) {
 	}
 
 	recLen := int(hdr[3])<<8 | int(hdr[4]) // ignoring version in hdr[1:3]
+
+	if recordHeaderLen+recLen > defaultBufSize {
+		br = bufio.NewReaderSize(br, recordHeaderLen+recLen)
+	}
+
 	helloBytes, err := br.Peek(recordHeaderLen + recLen)
 	if err != nil {
 		log.Errorf("Error while Hello: %s", err)

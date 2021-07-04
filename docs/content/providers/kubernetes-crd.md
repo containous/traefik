@@ -15,7 +15,7 @@ the Traefik engineering team developed a [Custom Resource Definition](https://ku
 
     * Add/update **all** the Traefik resources [definitions](../reference/dynamic-configuration/kubernetes-crd.md#definitions)
     * Add/update the [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) for the Traefik custom resources
-    * Use [Helm Chart](../getting-started/install-traefik.md#use-the-helm-chart) or use a custom Traefik Deployment 
+    * Use [Helm Chart](../getting-started/install-traefik.md#use-the-helm-chart) or use a custom Traefik Deployment
         * Enable the kubernetesCRD provider
         * Apply the needed kubernetesCRD provider [configuration](#provider-configuration)
     * Add all necessary Traefik custom [resources](../reference/dynamic-configuration/kubernetes-crd.md#resources)
@@ -87,17 +87,17 @@ When the environment variables are not found, Traefik tries to connect to the Ku
 In this case, the endpoint is required.
 Specifically, it may be set to the URL used by `kubectl proxy` to connect to a Kubernetes cluster using the granted authentication and authorization of the associated kubeconfig.
 
-```toml tab="File (TOML)"
-[providers.kubernetesCRD]
-  endpoint = "http://localhost:8080"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   kubernetesCRD:
     endpoint: "http://localhost:8080"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.kubernetesCRD]
+  endpoint = "http://localhost:8080"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -110,17 +110,17 @@ _Optional, Default=""_
 
 Bearer token used for the Kubernetes client configuration.
 
-```toml tab="File (TOML)"
-[providers.kubernetesCRD]
-  token = "mytoken"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   kubernetesCRD:
     token: "mytoken"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.kubernetesCRD]
+  token = "mytoken"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -134,17 +134,17 @@ _Optional, Default=""_
 Path to the certificate authority file.
 Used for the Kubernetes client configuration.
 
-```toml tab="File (TOML)"
-[providers.kubernetesCRD]
-  certAuthFilePath = "/my/ca.crt"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   kubernetesCRD:
     certAuthFilePath: "/my/ca.crt"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.kubernetesCRD]
+  certAuthFilePath = "/my/ca.crt"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -158,12 +158,6 @@ _Optional, Default: []_
 Array of namespaces to watch.
 If left empty, watches all namespaces if the value of `namespaces`.
 
-```toml tab="File (TOML)"
-[providers.kubernetesCRD]
-  namespaces = ["default", "production"]
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   kubernetesCRD:
@@ -171,6 +165,12 @@ providers:
     - "default"
     - "production"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.kubernetesCRD]
+  namespaces = ["default", "production"]
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -192,17 +192,17 @@ See [label-selectors](https://kubernetes.io/docs/concepts/overview/working-with-
 
     Because the label selector is applied to all Traefik Custom Resources, they all must match the filter.
 
-```toml tab="File (TOML)"
-[providers.kubernetesCRD]
-  labelselector = "app=traefik"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   kubernetesCRD:
     labelselector: "app=traefik"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.kubernetesCRD]
+  labelselector = "app=traefik"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -218,17 +218,17 @@ Value of `kubernetes.io/ingress.class` annotation that identifies resource objec
 If the parameter is set, only resources containing an annotation with the same value are processed.
 Otherwise, resources missing the annotation, having an empty value, or the value `traefik` are processed.
 
-```toml tab="File (TOML)"
-[providers.kubernetesCRD]
-  ingressClass = "traefik-internal"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   kubernetesCRD:
     ingressClass: "traefik-internal"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.kubernetesCRD]
+  ingressClass = "traefik-internal"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -247,17 +247,17 @@ If left empty, the provider does not apply any throttling and does not drop any 
 The value of `throttleDuration` should be provided in seconds or as a valid duration format,
 see [time.ParseDuration](https://golang.org/pkg/time/#ParseDuration).
 
-```toml tab="File (TOML)"
-[providers.kubernetesCRD]
-  throttleDuration = "10s"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   kubernetesCRD:
     throttleDuration: "10s"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.kubernetesCRD]
+  throttleDuration = "10s"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -274,17 +274,17 @@ If the parameter is set to `false`, IngressRoutes are not able to reference any 
 
     Please note that the default value for this option will be set to `false` in a future version.
 
-```toml tab="File (TOML)"
-[providers.kubernetesCRD]
-  allowCrossNamespace = false
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   kubernetesCRD:
     allowCrossNamespace: false
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.kubernetesCRD]
+  allowCrossNamespace = false
+  # ...
 ```
 
 ```bash tab="CLI"

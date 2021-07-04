@@ -11,12 +11,11 @@ env:
   global:
     - REPO=$TRAVIS_REPO_SLUG
     - VERSION=$TRAVIS_TAG
-    - CODENAME=livarot
+    - CODENAME=brie
     - GO111MODULE=on
 
 script:
 - echo "Skipping tests... (Tests are executed on SemaphoreCI)"
-- if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then travis_retry make docs-pull-images && make docs; fi
 
 before_deploy:
   - >

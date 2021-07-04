@@ -41,13 +41,6 @@ labels:
   - "traefik.http.middlewares.test-inflightreq.inflightreq.amount=10"
 ```
 
-```toml tab="File (TOML)"
-# Limiting to 10 simultaneous connections
-[http.middlewares]
-  [http.middlewares.test-inflightreq.inFlightReq]
-    amount = 10
-```
-
 ```yaml tab="File (YAML)"
 # Limiting to 10 simultaneous connections
 http:
@@ -55,6 +48,13 @@ http:
     test-inflightreq:
       inFlightReq:
         amount: 10
+```
+
+```toml tab="File (TOML)"
+# Limiting to 10 simultaneous connections
+[http.middlewares]
+  [http.middlewares.test-inflightreq.inFlightReq]
+    amount = 10
 ```
 
 ## Configuration Options
@@ -96,13 +96,6 @@ labels:
   - "traefik.http.middlewares.test-inflightreq.inflightreq.amount=10"
 ```
 
-```toml tab="File (TOML)"
-# Limiting to 10 simultaneous connections
-[http.middlewares]
-  [http.middlewares.test-inflightreq.inFlightReq]
-    amount = 10
-```
-
 ```yaml tab="File (YAML)"
 # Limiting to 10 simultaneous connections
 http:
@@ -110,6 +103,13 @@ http:
     test-inflightreq:
       inFlightReq:
         amount: 10
+```
+
+```toml tab="File (TOML)"
+# Limiting to 10 simultaneous connections
+[http.middlewares]
+  [http.middlewares.test-inflightreq.inFlightReq]
+    amount = 10
 ```
 
 ### `sourceCriterion`
@@ -171,13 +171,6 @@ labels:
   - "traefik.http.middlewares.test-inflightreq.inflightreq.sourcecriterion.ipstrategy.depth=2"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-inflightreq.inflightreq]
-    [http.middlewares.test-inflightreq.inFlightReq.sourceCriterion.ipStrategy]
-      depth = 2
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
@@ -186,6 +179,13 @@ http:
         sourceCriterion:
           ipStrategy:
             depth: 2
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-inflightreq.inflightreq]
+    [http.middlewares.test-inflightreq.inFlightReq.sourceCriterion.ipStrategy]
+      depth = 2
 ```
 
 ##### `ipStrategy.excludedIPs`
@@ -238,13 +238,6 @@ labels:
   - "traefik.http.middlewares.test-inflightreq.inflightreq.sourcecriterion.ipstrategy.excludedips=127.0.0.1/32, 192.168.1.7"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-inflightreq.inflightreq]
-    [http.middlewares.test-inflightreq.inFlightReq.sourceCriterion.ipStrategy]
-      excludedIPs = ["127.0.0.1/32", "192.168.1.7"]
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
@@ -255,6 +248,13 @@ http:
             excludedIPs:
               - "127.0.0.1/32"
               - "192.168.1.7"
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-inflightreq.inflightreq]
+    [http.middlewares.test-inflightreq.inFlightReq.sourceCriterion.ipStrategy]
+      excludedIPs = ["127.0.0.1/32", "192.168.1.7"]
 ```
 
 #### `sourceCriterion.requestHeaderName`
@@ -292,13 +292,6 @@ labels:
   - "traefik.http.middlewares.test-inflightreq.inflightreq.sourcecriterion.requestheadername=username"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-inflightreq.inflightreq]
-    [http.middlewares.test-inflightreq.inFlightReq.sourceCriterion]
-      requestHeaderName = "username"
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
@@ -306,6 +299,13 @@ http:
       inFlightReq:
         sourceCriterion:
           requestHeaderName: username
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-inflightreq.inflightreq]
+    [http.middlewares.test-inflightreq.inFlightReq.sourceCriterion]
+      requestHeaderName = "username"
 ```
 
 #### `sourceCriterion.requestHost`
@@ -343,13 +343,6 @@ labels:
   - "traefik.http.middlewares.test-inflightreq.inflightreq.sourcecriterion.requesthost=true"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-inflightreq.inflightreq]
-    [http.middlewares.test-inflightreq.inFlightReq.sourceCriterion]
-      requestHost = true
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
@@ -357,4 +350,11 @@ http:
       inFlightReq:
         sourceCriterion:
           requestHost: true
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-inflightreq.inflightreq]
+    [http.middlewares.test-inflightreq.inFlightReq.sourceCriterion]
+      requestHost = true
 ```

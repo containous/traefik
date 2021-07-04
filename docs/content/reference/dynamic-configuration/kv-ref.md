@@ -170,6 +170,7 @@
 | `traefik/http/serversTransports/ServersTransport0/certificates/0/keyFile` | `foobar` |
 | `traefik/http/serversTransports/ServersTransport0/certificates/1/certFile` | `foobar` |
 | `traefik/http/serversTransports/ServersTransport0/certificates/1/keyFile` | `foobar` |
+| `traefik/http/serversTransports/ServersTransport0/disableHTTP2` | `true` |
 | `traefik/http/serversTransports/ServersTransport0/forwardingTimeouts/dialTimeout` | `42s` |
 | `traefik/http/serversTransports/ServersTransport0/forwardingTimeouts/idleConnTimeout` | `42s` |
 | `traefik/http/serversTransports/ServersTransport0/forwardingTimeouts/responseHeaderTimeout` | `42s` |
@@ -182,6 +183,7 @@
 | `traefik/http/serversTransports/ServersTransport1/certificates/0/keyFile` | `foobar` |
 | `traefik/http/serversTransports/ServersTransport1/certificates/1/certFile` | `foobar` |
 | `traefik/http/serversTransports/ServersTransport1/certificates/1/keyFile` | `foobar` |
+| `traefik/http/serversTransports/ServersTransport1/disableHTTP2` | `true` |
 | `traefik/http/serversTransports/ServersTransport1/forwardingTimeouts/dialTimeout` | `42s` |
 | `traefik/http/serversTransports/ServersTransport1/forwardingTimeouts/idleConnTimeout` | `42s` |
 | `traefik/http/serversTransports/ServersTransport1/forwardingTimeouts/responseHeaderTimeout` | `42s` |
@@ -208,12 +210,14 @@
 | `traefik/http/services/Service01/loadBalancer/sticky/cookie/name` | `foobar` |
 | `traefik/http/services/Service01/loadBalancer/sticky/cookie/sameSite` | `foobar` |
 | `traefik/http/services/Service01/loadBalancer/sticky/cookie/secure` | `true` |
+| `traefik/http/services/Service02/mirroring/healthCheck` | `` |
 | `traefik/http/services/Service02/mirroring/maxBodySize` | `42` |
 | `traefik/http/services/Service02/mirroring/mirrors/0/name` | `foobar` |
 | `traefik/http/services/Service02/mirroring/mirrors/0/percent` | `42` |
 | `traefik/http/services/Service02/mirroring/mirrors/1/name` | `foobar` |
 | `traefik/http/services/Service02/mirroring/mirrors/1/percent` | `42` |
 | `traefik/http/services/Service02/mirroring/service` | `foobar` |
+| `traefik/http/services/Service03/weighted/healthCheck` | `` |
 | `traefik/http/services/Service03/weighted/services/0/name` | `foobar` |
 | `traefik/http/services/Service03/weighted/services/0/weight` | `42` |
 | `traefik/http/services/Service03/weighted/services/1/name` | `foobar` |

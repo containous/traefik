@@ -11,12 +11,12 @@ Traefik supports 4 metrics backends:
 
 To enable metrics:
 
-```toml tab="File (TOML)"
-[metrics]
-```
-
 ```yaml tab="File (YAML)"
 metrics: {}
+```
+
+```toml tab="File (TOML)"
+[metrics]
 ```
 
 ```bash tab="CLI"

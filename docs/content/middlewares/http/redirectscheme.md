@@ -51,14 +51,6 @@ labels:
   - "traefik.http.middlewares.test-redirectscheme.redirectscheme.permanent=true"
 ```
 
-```toml tab="File (TOML)"
-# Redirect to https
-[http.middlewares]
-  [http.middlewares.test-redirectscheme.redirectScheme]
-    scheme = "https"
-    permanent = true
-```
-
 ```yaml tab="File (YAML)"
 # Redirect to https
 http:
@@ -67,6 +59,14 @@ http:
       redirectScheme:
         scheme: https
         permanent: true
+```
+
+```toml tab="File (TOML)"
+# Redirect to https
+[http.middlewares]
+  [http.middlewares.test-redirectscheme.redirectScheme]
+    scheme = "https"
+    permanent = true
 ```
 
 ## Configuration Options
@@ -115,14 +115,6 @@ labels:
   - "traefik.http.middlewares.test-redirectscheme.redirectscheme.permanent=true"
 ```
 
-```toml tab="File (TOML)"
-# Redirect to https
-[http.middlewares]
-  [http.middlewares.test-redirectscheme.redirectScheme]
-    # ...
-    permanent = true
-```
-
 ```yaml tab="File (YAML)"
 # Redirect to https
 http:
@@ -131,6 +123,14 @@ http:
       redirectScheme:
         # ...
         permanent: true
+```
+
+```toml tab="File (TOML)"
+# Redirect to https
+[http.middlewares]
+  [http.middlewares.test-redirectscheme.redirectScheme]
+    # ...
+    permanent = true
 ```
 
 ### `scheme`
@@ -172,13 +172,6 @@ labels:
   - "traefik.http.middlewares.test-redirectscheme.redirectscheme.scheme=https"
 ```
 
-```toml tab="File (TOML)"
-# Redirect to https
-[http.middlewares]
-  [http.middlewares.test-redirectscheme.redirectScheme]
-    scheme = "https"
-```
-
 ```yaml tab="File (YAML)"
 # Redirect to https
 http:
@@ -186,6 +179,13 @@ http:
     test-redirectscheme:
       redirectScheme:
         scheme: https
+```
+
+```toml tab="File (TOML)"
+# Redirect to https
+[http.middlewares]
+  [http.middlewares.test-redirectscheme.redirectScheme]
+    scheme = "https"
 ```
 
 ### `port`
@@ -232,14 +232,6 @@ labels:
   - "traefik.http.middlewares.test-redirectscheme.redirectscheme.port=443"
 ```
 
-```toml tab="File (TOML)"
-# Redirect to https
-[http.middlewares]
-  [http.middlewares.test-redirectscheme.redirectScheme]
-    # ...
-    port = 443
-```
-
 ```yaml tab="File (YAML)"
 # Redirect to https
 http:
@@ -248,6 +240,14 @@ http:
       redirectScheme:
         # ...
         port: "443"
+```
+
+```toml tab="File (TOML)"
+# Redirect to https
+[http.middlewares]
+  [http.middlewares.test-redirectscheme.redirectScheme]
+    # ...
+    port = 443
 ```
 
 !!! info "Port in this configuration is a string, not a numeric value."

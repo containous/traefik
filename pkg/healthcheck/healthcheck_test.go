@@ -445,7 +445,7 @@ func (th *testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func TestLBStatusUpdater(t *testing.T) {
 	lb := &testLoadBalancer{RWMutex: &sync.RWMutex{}}
 	svInfo := &runtime.ServiceInfo{}
-	lbsu := NewLBStatusUpdater(lb, svInfo)
+	lbsu := NewLBStatusUpdater(lb, svInfo, nil)
 	newServer, err := url.Parse("http://foo.com")
 	assert.NoError(t, err)
 	err = lbsu.UpsertServer(newServer, roundrobin.Weight(1))

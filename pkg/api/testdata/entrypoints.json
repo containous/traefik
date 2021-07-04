@@ -19,13 +19,13 @@
 		},
 		"transport": {
 			"lifeCycle": {
-				"graceTimeOut": 2,
-				"requestAcceptGraceTimeout": 1
+				"graceTimeOut": "2ns",
+				"requestAcceptGraceTimeout": "1ns"
 			},
 			"respondingTimeouts": {
-				"idleTimeout": 5,
-				"readTimeout": 3,
-				"writeTimeout": 4
+				"idleTimeout": "5ns",
+				"readTimeout": "3ns",
+				"writeTimeout": "4ns"
 			}
 		}
 	},
@@ -49,13 +49,13 @@
 		},
 		"transport": {
 			"lifeCycle": {
-				"graceTimeOut": 20,
-				"requestAcceptGraceTimeout": 10
+				"graceTimeOut": "20ns",
+				"requestAcceptGraceTimeout": "10ns"
 			},
 			"respondingTimeouts": {
-				"idleTimeout": 50,
-				"readTimeout": 30,
-				"writeTimeout": 40
+				"idleTimeout": "50ns",
+				"readTimeout": "30ns",
+				"writeTimeout": "40ns"
 			}
 		}
 	}

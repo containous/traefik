@@ -185,8 +185,10 @@ type Headers struct {
 	ContentSecurityPolicy   string `json:"contentSecurityPolicy,omitempty" toml:"contentSecurityPolicy,omitempty" yaml:"contentSecurityPolicy,omitempty"`
 	PublicKey               string `json:"publicKey,omitempty" toml:"publicKey,omitempty" yaml:"publicKey,omitempty"`
 	ReferrerPolicy          string `json:"referrerPolicy,omitempty" toml:"referrerPolicy,omitempty" yaml:"referrerPolicy,omitempty" export:"true"`
-	FeaturePolicy           string `json:"featurePolicy,omitempty" toml:"featurePolicy,omitempty" yaml:"featurePolicy,omitempty" export:"true"`
-	IsDevelopment           bool   `json:"isDevelopment,omitempty" toml:"isDevelopment,omitempty" yaml:"isDevelopment,omitempty" export:"true"`
+	// Deprecated: use PermissionsPolicy instead.
+	FeaturePolicy     string `json:"featurePolicy,omitempty" toml:"featurePolicy,omitempty" yaml:"featurePolicy,omitempty" export:"true"`
+	PermissionsPolicy string `json:"permissionsPolicy,omitempty" toml:"permissionsPolicy,omitempty" yaml:"permissionsPolicy,omitempty" export:"true"`
+	IsDevelopment     bool   `json:"isDevelopment,omitempty" toml:"isDevelopment,omitempty" yaml:"isDevelopment,omitempty" export:"true"`
 }
 
 // HasCustomHeadersDefined checks to see if any of the custom header elements have been set.
@@ -229,6 +231,7 @@ func (h *Headers) HasSecureHeadersDefined() bool {
 		h.PublicKey != "" ||
 		h.ReferrerPolicy != "" ||
 		h.FeaturePolicy != "" ||
+		h.PermissionsPolicy != "" ||
 		h.IsDevelopment)
 }
 
@@ -243,7 +246,7 @@ type IPStrategy struct {
 
 // Get an IP selection strategy.
 // If nil return the RemoteAddr strategy
-// else return a strategy base on the configuration using the X-Forwarded-For Header.
+// else return a strategy based on the configuration using the X-Forwarded-For Header.
 // Depth override the ExcludedIPs.
 func (s *IPStrategy) Get() (ip.Strategy, error) {
 	if s == nil {
@@ -261,7 +264,7 @@ func (s *IPStrategy) Get() (ip.Strategy, error) {
 		if err != nil {
 			return nil, err
 		}
-		return &ip.CheckerStrategy{
+		return &ip.PoolStrategy{
 			Checker: checker,
 		}, nil
 	}

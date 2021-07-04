@@ -135,7 +135,7 @@ func (m *Manager) getMirrorServiceHandler(ctx context.Context, config *dynamic.M
 	if config.MaxBodySize != nil {
 		maxBodySize = *config.MaxBodySize
 	}
-	handler := mirror.New(serviceHandler, m.routinePool, maxBodySize)
+	handler := mirror.New(serviceHandler, m.routinePool, maxBodySize, config.HealthCheck)
 	for _, mirrorConfig := range config.Mirrors {
 		mirrorHandler, err := m.BuildHTTP(ctx, mirrorConfig.Name)
 		if err != nil {
@@ -156,7 +156,7 @@ func (m *Manager) getWRRServiceHandler(ctx context.Context, serviceName string, 
 		config.Sticky.Cookie.Name = cookie.GetName(config.Sticky.Cookie.Name, serviceName)
 	}
 
-	balancer := wrr.New(config.Sticky)
+	balancer := wrr.New(config.Sticky, config.HealthCheck)
 	for _, service := range config.Services {
 		serviceHandler, err := m.BuildHTTP(ctx, service.Name)
 		if err != nil {
@@ -164,7 +164,25 @@ func (m *Manager) getWRRServiceHandler(ctx context.Context, serviceName string, 
 		}
 
 		balancer.AddService(service.Name, serviceHandler, service.Weight)
+		if config.HealthCheck == nil {
+			continue
+		}
+
+		childName := service.Name
+		updater, ok := serviceHandler.(healthcheck.StatusUpdater)
+		if !ok {
+			return nil, fmt.Errorf("child service %v of %v not a healthcheck.StatusUpdater (%T)", childName, serviceName, serviceHandler)
+		}
+
+		if err := updater.RegisterStatusUpdater(func(up bool) {
+			balancer.SetStatus(ctx, childName, up)
+		}); err != nil {
+			return nil, fmt.Errorf("cannot register %v as updater for %v: %w", childName, serviceName, err)
+		}
+
+		log.FromContext(ctx).Debugf("Child service %v will update parent %v on status change", childName, serviceName)
 	}
+
 	return balancer, nil
 }
 
@@ -213,34 +231,30 @@ func (m *Manager) getLoadBalancerServiceHandler(ctx context.Context, serviceName
 	return emptybackendhandler.New(balancer), nil
 }
 
-// LaunchHealthCheck Launches the health checks.
+// LaunchHealthCheck launches the health checks.
 func (m *Manager) LaunchHealthCheck() {
 	backendConfigs := make(map[string]*healthcheck.BackendConfig)
 
 	for serviceName, balancers := range m.balancers {
 		ctx := log.With(context.Background(), log.Str(log.ServiceName, serviceName))
 
-		// TODO Should all the services handle healthcheck? Handle different types
 		service := m.configs[serviceName].LoadBalancer
 
 		// Health Check
-		var backendHealthCheck *healthcheck.BackendConfig
-		if hcOpts := buildHealthCheckOptions(ctx, balancers, serviceName, service.HealthCheck); hcOpts != nil {
-			log.FromContext(ctx).Debugf("Setting up healthcheck for service %s with %s", serviceName, *hcOpts)
-
-			hcOpts.Transport, _ = m.roundTripperManager.Get(service.ServersTransport)
-			backendHealthCheck = healthcheck.NewBackendConfig(*hcOpts, serviceName)
+		hcOpts := buildHealthCheckOptions(ctx, balancers, serviceName, service.HealthCheck)
+		if hcOpts == nil {
+			continue
 		}
+		hcOpts.Transport, _ = m.roundTripperManager.Get(service.ServersTransport)
+		log.FromContext(ctx).Debugf("Setting up healthcheck for service %s with %s", serviceName, *hcOpts)
 
-		if backendHealthCheck != nil {
-			backendConfigs[serviceName] = backendHealthCheck
-		}
+		backendConfigs[serviceName] = healthcheck.NewBackendConfig(*hcOpts, serviceName)
 	}
 
 	healthcheck.GetHealthCheck(m.metricsRegistry).SetBackendsConfiguration(context.Background(), backendConfigs)
 }
 
-func buildHealthCheckOptions(ctx context.Context, lb healthcheck.Balancer, backend string, hc *dynamic.HealthCheck) *healthcheck.Options {
+func buildHealthCheckOptions(ctx context.Context, lb healthcheck.Balancer, backend string, hc *dynamic.ServerHealthCheck) *healthcheck.Options {
 	if hc == nil || hc.Path == "" {
 		return nil
 	}
@@ -295,7 +309,7 @@ func buildHealthCheckOptions(ctx context.Context, lb healthcheck.Balancer, backe
 	}
 }
 
-func (m *Manager) getLoadBalancer(ctx context.Context, serviceName string, service *dynamic.ServersLoadBalancer, fwd http.Handler) (healthcheck.BalancerHandler, error) {
+func (m *Manager) getLoadBalancer(ctx context.Context, serviceName string, service *dynamic.ServersLoadBalancer, fwd http.Handler) (healthcheck.BalancerStatusHandler, error) {
 	logger := log.FromContext(ctx)
 	logger.Debug("Creating load-balancer")
 
@@ -327,7 +341,7 @@ func (m *Manager) getLoadBalancer(ctx context.Context, serviceName string, servi
 		return nil, err
 	}
 
-	lbsu := healthcheck.NewLBStatusUpdater(lb, m.configs[serviceName])
+	lbsu := healthcheck.NewLBStatusUpdater(lb, m.configs[serviceName], service.HealthCheck)
 	if err := m.upsertServers(ctx, lbsu, service.Servers); err != nil {
 		return nil, fmt.Errorf("error configuring load balancer for service %s: %w", serviceName, err)
 	}

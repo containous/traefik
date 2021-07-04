@@ -248,6 +248,9 @@ providers:
       cert: foobar
       key: foobar
       insecureSkipVerify: true
+  plugin:
+    Descriptor0: {}
+    Descriptor1: {}
 api:
   insecure: true
   dashboard: true
@@ -407,8 +410,10 @@ certificatesResolvers:
       tlsChallenge: {}
 pilot:
   token: foobar
+  dashboard: true
 experimental:
   kubernetesGateway: true
+  http3: true
   plugins:
     Descriptor0:
       moduleName: foobar
@@ -416,9 +421,8 @@ experimental:
     Descriptor1:
       moduleName: foobar
       version: foobar
-  devPlugin:
-    goPath: foobar
-    moduleName: foobar
-  http3: true
-  kubernetesGateway: true
-
+  localPlugins:
+    Descriptor0:
+      moduleName: foobar
+    Descriptor1:
+      moduleName: foobar

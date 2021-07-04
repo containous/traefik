@@ -13,13 +13,13 @@ Attach tags to your services and let Traefik do the rest!
 
     Enabling the consul catalog provider
 
-    ```toml tab="File (TOML)"
-    [providers.consulCatalog]
-    ```
-
     ```yaml tab="File (YAML)"
     providers:
       consulCatalog: {}
+    ```
+
+    ```toml tab="File (TOML)"
+    [providers.consulCatalog]
     ```
 
     ```bash tab="CLI"
@@ -44,17 +44,17 @@ _Optional, Default=15s_
 
 Defines the polling interval.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  refreshInterval = "30s"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     refreshInterval: 30s
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  refreshInterval = "30s"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -68,17 +68,17 @@ _required, Default="traefik"_
 
 The prefix for Consul Catalog tags defining Traefik labels.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  prefix = "test"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     prefix: test
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  prefix = "test"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -98,17 +98,17 @@ Forces the read to be fully consistent.
 
     For more information, see the consul [documentation on consistency](https://www.consul.io/api-docs/features/consistency).
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  requireConsistent = true
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     requireConsistent: true
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  requireConsistent = true
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -128,17 +128,17 @@ Use stale consistency for catalog reads.
 
     For more information, see the consul [documentation on consistency](https://www.consul.io/api-docs/features/consistency).
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  stale = true
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     stale: true
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  stale = true
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -152,17 +152,17 @@ _Optional, Default=false_
 
 Use local agent caching for catalog reads.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  cache = true
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     cache: true
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  cache = true
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -180,18 +180,18 @@ Defines the address of the Consul server.
 
 _Optional, Default="127.0.0.1:8500"_
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  [providers.consulCatalog.endpoint]
-    address = "127.0.0.1:8500"
-    # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     endpoint:
       address: 127.0.0.1:8500
+    # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  [providers.consulCatalog.endpoint]
+    address = "127.0.0.1:8500"
     # ...
 ```
 
@@ -206,18 +206,18 @@ _Optional, Default=""_
 
 Defines the URI scheme for the Consul server.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  [providers.consulCatalog.endpoint]
-    scheme = "https"
-    # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     endpoint:
       scheme: https
+    # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  [providers.consulCatalog.endpoint]
+    scheme = "https"
     # ...
 ```
 
@@ -233,18 +233,18 @@ _Optional, Default=""_
 Defines the datacenter to use.
 If not provided in Traefik, Consul uses the default agent datacenter.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  [providers.consulCatalog.endpoint]
-    datacenter = "test"
-    # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     endpoint:
       datacenter: test
+    # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  [providers.consulCatalog.endpoint]
+    datacenter = "test"
     # ...
 ```
 
@@ -259,18 +259,18 @@ _Optional, Default=""_
 
 Token is used to provide a per-request ACL token which overwrites the agent's default token.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  [providers.consulCatalog.endpoint]
-    token = "test"
-    # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     endpoint:
       token: test
+    # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  [providers.consulCatalog.endpoint]
+    token = "test"
     # ...
 ```
 
@@ -286,18 +286,18 @@ _Optional, Default=""_
 Limits the duration for which a Watch can block.
 If not provided, the agent default values will be used.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  [providers.consulCatalog.endpoint]
-    endpointWaitTime = "15s"
-    # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     endpoint:
       endpointWaitTime: 15s
+    # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  [providers.consulCatalog.endpoint]
+    endpointWaitTime = "15s"
     # ...
 ```
 
@@ -318,17 +318,17 @@ _Optional, Default=""_
 
 Username to use for HTTP Basic Authentication.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog.endpoint.httpAuth]
-  username = "test"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     endpoint:
       httpAuth:
         username: test
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog.endpoint.httpAuth]
+  username = "test"
 ```
 
 ```bash tab="CLI"
@@ -341,17 +341,17 @@ _Optional, Default=""_
 
 Password to use for HTTP Basic Authentication.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog.endpoint.httpAuth]
-  password = "test"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     endpoint:
       httpAuth:
         password: test
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog.endpoint.httpAuth]
+  password = "test"
 ```
 
 ```bash tab="CLI"
@@ -370,17 +370,17 @@ _Optional_
 
 `ca` is the path to the CA certificate used for Consul communication, defaults to the system bundle if not specified.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog.endpoint.tls]
-  ca = "path/to/ca.crt"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     endpoint:
       tls:
         ca: path/to/ca.crt
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog.endpoint.tls]
+  ca = "path/to/ca.crt"
 ```
 
 ```bash tab="CLI"
@@ -401,17 +401,17 @@ When this option is set to `true`, a client certificate is requested during the 
 
 When this option is set to `false`, a client certificate is requested during the handshake, and at least one valid certificate should be sent by the client.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog.endpoint.tls]
-  caOptional = true
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     endpoint:
       tls:
         caOptional: true
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog.endpoint.tls]
+  caOptional = true
 ```
 
 ```bash tab="CLI"
@@ -426,12 +426,6 @@ _Optional_
 
 When using this option, setting the `key` option is required.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog.endpoint.tls]
-  cert = "path/to/foo.cert"
-  key = "path/to/foo.key"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
@@ -439,6 +433,12 @@ providers:
       tls:
         cert: path/to/foo.cert
         key: path/to/foo.key
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog.endpoint.tls]
+  cert = "path/to/foo.cert"
+  key = "path/to/foo.key"
 ```
 
 ```bash tab="CLI"
@@ -454,12 +454,6 @@ _Optional_
 
 When using this option, setting the `cert` option is required.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog.endpoint.tls]
-  cert = "path/to/foo.cert"
-  key = "path/to/foo.key"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
@@ -467,6 +461,12 @@ providers:
       tls:
         cert: path/to/foo.cert
         key: path/to/foo.key
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog.endpoint.tls]
+  cert = "path/to/foo.cert"
+  key = "path/to/foo.key"
 ```
 
 ```bash tab="CLI"
@@ -480,17 +480,17 @@ _Optional_
 
 If `insecureSkipVerify` is `true`, the TLS connection to Consul accepts any certificate presented by the server regardless of the hostnames it covers.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog.endpoint.tls]
-  insecureSkipVerify = true
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     endpoint:
       tls:
         insecureSkipVerify: true
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog.endpoint.tls]
+  insecureSkipVerify = true
 ```
 
 ```bash tab="CLI"
@@ -506,17 +506,17 @@ If set to `false`, services that don't have a `traefik.enable=true` tag will be 
 
 For additional information, refer to [Restrict the Scope of Service Discovery](./overview.md#restrict-the-scope-of-service-discovery).
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  exposedByDefault = false
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     exposedByDefault: false
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  exposedByDefault = false
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -538,17 +538,17 @@ and the template has access to all the labels (i.e. tags beginning with the `pre
 
 The option can be overridden on an instance basis with the `traefik.http.routers.{name-of-your-choice}.rule` tag.
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  defaultRule = "Host(`{{ .Name }}.{{ index .Labels \"customLabel\"}}`)"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     defaultRule: "Host(`{{ .Name }}.{{ index .Labels \"customLabel\"}}`)"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  defaultRule = "Host(`{{ .Name }}.{{ index .Labels \"customLabel\"}}`)"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -599,17 +599,17 @@ as well as the usual boolean logic, as shown in examples below.
     constraints = "TagRegex(`a\.tag\.t.+`)"
     ```
 
-```toml tab="File (TOML)"
-[providers.consulCatalog]
-  constraints = "Tag(`a.tag.name`)"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   consulCatalog:
     constraints: "Tag(`a.tag.name`)"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.consulCatalog]
+  constraints = "Tag(`a.tag.name`)"
+  # ...
 ```
 
 ```bash tab="CLI"

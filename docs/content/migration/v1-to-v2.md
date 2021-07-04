@@ -68,27 +68,27 @@ Then any router can refer to an instance of the wanted middleware.
       [frontends.frontend1]
         entryPoints = ["http"]
         backend = "backend1"
-    
+
         [frontends.frontend1.routes]
           [frontends.frontend1.routes.route0]
             rule = "Host:test.localhost"
           [frontends.frontend1.routes.route0]
             rule = "PathPrefix:/test"
-        
+
         [frontends.frontend1.auth]
           [frontends.frontend1.auth.basic]
             users = [
               "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/",
               "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0",
             ]
-    
+
     [backends]
       [backends.backend1]
         [backends.backend1.servers.server0]
           url = "http://10.10.10.1:80"
         [backends.backend1.servers.server1]
           url = "http://10.10.10.2:80"
-    
+
         [backends.backend1.loadBalancer]
           method = "wrr"
     ```
@@ -110,19 +110,19 @@ Then any router can refer to an instance of the wanted middleware.
     metadata:
       name: basicauth
       namespace: foo
-    
+
     spec:
       basicAuth:
         users:
           - test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/
           - test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0
-    
+
     ---
     apiVersion: traefik.containo.us/v1alpha1
     kind: IngressRoute
     metadata:
       name: ingressroutebar
-    
+
     spec:
       entryPoints:
         - http
@@ -139,27 +139,6 @@ Then any router can refer to an instance of the wanted middleware.
           namespace: foo
     ```
 
-    ```toml tab="File (TOML)"
-    [http.routers]
-      [http.routers.router0]
-        rule = "Host(`test.localhost`) && PathPrefix(`/test`)"
-        middlewares = ["auth"]
-        service = "my-service"
-    
-    [http.services]
-      [[http.services.my-service.loadBalancer.servers]]
-        url = "http://10.10.10.1:80"
-      [[http.services.my-service.loadBalancer.servers]]
-        url = "http://10.10.10.2:80"
-    
-    [http.middlewares]
-      [http.middlewares.auth.basicAuth]
-        users = [
-          "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/",
-          "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0",
-        ]
-    ```
-
     ```yaml tab="File (YAML)"
     http:
       routers:
@@ -168,20 +147,41 @@ Then any router can refer to an instance of the wanted middleware.
           service: my-service
           middlewares:
             - auth
-    
+
       services:
         my-service:
           loadBalancer:
             servers:
               - url: http://10.10.10.1:80
               - url: http://10.10.10.2:80
-    
+
       middlewares:
         auth:
           basicAuth:
             users:
               - "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
               - "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0"
+    ```
+
+    ```toml tab="File (TOML)"
+    [http.routers]
+      [http.routers.router0]
+        rule = "Host(`test.localhost`) && PathPrefix(`/test`)"
+        middlewares = ["auth"]
+        service = "my-service"
+
+    [http.services]
+      [[http.services.my-service.loadBalancer.servers]]
+        url = "http://10.10.10.1:80"
+      [[http.services.my-service.loadBalancer.servers]]
+        url = "http://10.10.10.2:80"
+
+    [http.middlewares]
+      [http.middlewares.auth.basicAuth]
+        users = [
+          "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/",
+          "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0",
+        ]
     ```
 
 ## TLS Configuration is Now Dynamic, per Router.
@@ -193,13 +193,13 @@ Then, a [router's TLS field](../routing/routers/index.md#tls) can refer to one o
 !!! example "TLS on websecure entryPoint becomes TLS option on Router-1"
 
     !!! info "v1"
-    
+
     ```toml tab="File (TOML)"
     # static configuration
     [entryPoints]
       [entryPoints.websecure]
         address = ":443"
-    
+
         [entryPoints.websecure.tls]
           minVersion = "VersionTLS12"
           cipherSuites = [
@@ -221,33 +221,6 @@ Then, a [router's TLS field](../routing/routers/index.md#tls) can refer to one o
 
     !!! info "v2"
 
-    ```toml tab="File (TOML)"
-    # dynamic configuration
-    [http.routers]
-      [http.routers.Router-1]
-        rule = "Host(`example.com`)"
-        service = "service-id"
-        # will terminate the TLS request
-        [http.routers.Router-1.tls]
-          options = "myTLSOptions"
-    
-    [[tls.certificates]]
-      certFile = "/path/to/domain.cert"
-      keyFile = "/path/to/domain.key"
-    
-    [tls.options]
-      [tls.options.myTLSOptions]
-        minVersion = "VersionTLS12"
-        cipherSuites = [
-          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-          "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-          "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
-          "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
-          "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-        ]
-    ```
-
     ```yaml tab="File (YAML)"
     http:
       routers:
@@ -257,7 +230,7 @@ Then, a [router's TLS field](../routing/routers/index.md#tls) can refer to one o
           # will terminate the TLS request
           tls:
             options: myTLSOptions
-    
+
     tls:
       certificates:
         - certFile: /path/to/domain.cert
@@ -273,6 +246,33 @@ Then, a [router's TLS field](../routing/routers/index.md#tls) can refer to one o
 	        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
     ```
 
+    ```toml tab="File (TOML)"
+    # dynamic configuration
+    [http.routers]
+      [http.routers.Router-1]
+        rule = "Host(`example.com`)"
+        service = "service-id"
+        # will terminate the TLS request
+        [http.routers.Router-1.tls]
+          options = "myTLSOptions"
+
+    [[tls.certificates]]
+      certFile = "/path/to/domain.cert"
+      keyFile = "/path/to/domain.key"
+
+    [tls.options]
+      [tls.options.myTLSOptions]
+        minVersion = "VersionTLS12"
+        cipherSuites = [
+          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+          "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+          "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+          "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+          "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+          "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+        ]
+    ```
+
     ```yaml tab="K8s IngressRoute"
     # The definitions below require the definitions for the TLSOption and IngressRoute kinds.
     # https://doc.traefik.io/traefik/v2.3/reference/dynamic-configuration/kubernetes-crd/#definitions
@@ -281,7 +281,7 @@ Then, a [router's TLS field](../routing/routers/index.md#tls) can refer to one o
     metadata:
       name: mytlsoption
       namespace: default
-    
+
     spec:
       minVersion: VersionTLS12
       cipherSuites:
@@ -290,13 +290,13 @@ Then, a [router's TLS field](../routing/routers/index.md#tls) can refer to one o
 	    - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
 	    - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
 	    - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-    
+
     ---
     apiVersion: traefik.containo.us/v1alpha1
     kind: IngressRoute
     metadata:
       name: ingressroutebar
-    
+
     spec:
       entryPoints:
         - web
@@ -322,7 +322,7 @@ Then, a [router's TLS field](../routing/routers/index.md#tls) can refer to one o
 ## HTTP to HTTPS Redirection is Now Configured on Routers
 
 Previously on Traefik v1, the redirection was applied on an entry point or on a frontend.
-With Traefik v2 it is applied on an entry point or a [Router](../routing/routers/index.md). 
+With Traefik v2 it is applied on an entry point or a [Router](../routing/routers/index.md).
 
 To apply a redirection:
 
@@ -332,11 +332,11 @@ To apply a redirection:
 !!! example "Global HTTP to HTTPS redirection"
 
     !!! info "v1"
-    
+
     ```toml tab="File (TOML)"
     # static configuration
     defaultEntryPoints = ["web", "websecure"]
-    
+
     [entryPoints]
       [entryPoints.web]
         address = ":80"
@@ -354,35 +354,11 @@ To apply a redirection:
     ```
 
     !!! info "v2"
-    
-    ```bash tab="CLI"
-    ## static configuration
-    
-    --entrypoints.web.address=:80
-    --entrypoints.web.http.redirections.entrypoint.to=websecure
-    --entrypoints.web.http.redirections.entrypoint.scheme=https
-    --entrypoints.websecure.address=:443
-    --providers.docker=true
-    ```
-    
-    ```toml tab="File (TOML)"
-    # traefik.toml
-    ## static configuration
-    
-    [entryPoints.web]
-      address = ":80"
-      [entryPoints.web.http.redirections.entryPoint]
-        to = "websecure"
-        scheme = "https"
-   
-    [entryPoints.websecure]
-      address = ":443"
-    ```
-    
+
     ```yaml tab="File (YAML)"
-    # traefik.yaml
+    # traefik.yml
     ## static configuration
-    
+
     entryPoints:
       web:
         address: ":80"
@@ -391,15 +367,39 @@ To apply a redirection:
             entrypoint:
               to: websecure
               scheme: https
-    
+
       websecure:
         address: ":443"
+    ```
+
+    ```toml tab="File (TOML)"
+    # traefik.toml
+    ## static configuration
+
+    [entryPoints.web]
+      address = ":80"
+      [entryPoints.web.http.redirections.entryPoint]
+        to = "websecure"
+        scheme = "https"
+
+    [entryPoints.websecure]
+      address = ":443"
+    ```
+
+    ```bash tab="CLI"
+    ## static configuration
+
+    --entrypoints.web.address=:80
+    --entrypoints.web.http.redirections.entrypoint.to=websecure
+    --entrypoints.web.http.redirections.entrypoint.scheme=https
+    --entrypoints.websecure.address=:443
+    --providers.docker=true
     ```
 
 !!! example "HTTP to HTTPS redirection per domain"
 
     !!! info "v1"
-    
+
     ```toml tab="File (TOML)"
     [entryPoints]
       [entryPoints.web]
@@ -408,9 +408,9 @@ To apply a redirection:
       [entryPoints.websecure]
         address = ":443"
         [entryPoints.websecure.tls]
-    
+
     [file]
-    
+
     [frontends]
       [frontends.frontend1]
         entryPoints = ["web", "websecure"]
@@ -428,11 +428,11 @@ To apply a redirection:
       traefik.http.routers.app.rule: Host(`example.net`)
       traefik.http.routers.app.entrypoints: web
       traefik.http.routers.app.middlewares: https_redirect
-    
+
       traefik.http.routers.appsecured.rule: Host(`example.net`)
       traefik.http.routers.appsecured.entrypoints: websecure
       traefik.http.routers.appsecured.tls: true
-    
+
       traefik.http.middlewares.https_redirect.redirectscheme.scheme: https
       traefik.http.middlewares.https_redirect.redirectscheme.permanent: true
     ```
@@ -441,8 +441,8 @@ To apply a redirection:
     apiVersion: traefik.containo.us/v1alpha1
     kind: IngressRoute
     metadata:
-      name: http-redirect-ingressRoute
-    
+      name: http-redirect-ingressroute
+
     spec:
       entryPoints:
         - web
@@ -454,13 +454,13 @@ To apply a redirection:
               port: 80
           middlewares:
             - name: https-redirect
-    
+
     ---
     apiVersion: traefik.containo.us/v1alpha1
     kind: IngressRoute
     metadata:
-      name: https-ingressRoute
-    
+      name: https-ingressroute
+
     spec:
       entryPoints:
         - websecure
@@ -471,7 +471,7 @@ To apply a redirection:
             - name: whoami
               port: 80
       tls: {}
-      
+
     ---
     apiVersion: traefik.containo.us/v1alpha1
     kind: Middleware
@@ -483,33 +483,10 @@ To apply a redirection:
         permanent: true
     ```
 
-    ```toml tab="File (TOML)"
-    ## dynamic configuration
-    # dynamic-conf.toml
-    
-    [http.routers]
-      [http.routers.router0]
-        rule = "Host(`example.net`)"
-        service = "my-service"
-        entrypoints = ["web"]
-        middlewares = ["https_redirect"]
-    
-    [http.routers.router1]
-        rule = "Host(`example.net`)"
-        service = "my-service"
-        entrypoints = ["websecure"]
-        [http.routers.router1.tls]
-    
-    [http.middlewares]
-      [http.middlewares.https_redirect.redirectScheme]
-        scheme = "https"
-        permanent = true
-    ```
-
     ```yaml tab="File (YAML)"
     ## dynamic configuration
     # dynamic-conf.yml
-    
+
     http:
       routers:
         router0:
@@ -519,19 +496,42 @@ To apply a redirection:
           middlewares:
             - https_redirect
           service: my-service
-    
+
         router1:
           rule: "Host(`example.net`)"
           entryPoints:
             - websecure
           service: my-service
           tls: {}
-    
+
       middlewares:
         https-redirect:
           redirectScheme:
             scheme: https
             permanent: true
+    ```
+
+    ```toml tab="File (TOML)"
+    ## dynamic configuration
+    # dynamic-conf.toml
+
+    [http.routers]
+      [http.routers.router0]
+        rule = "Host(`example.net`)"
+        service = "my-service"
+        entrypoints = ["web"]
+        middlewares = ["https_redirect"]
+
+    [http.routers.router1]
+        rule = "Host(`example.net`)"
+        service = "my-service"
+        entrypoints = ["websecure"]
+        [http.routers.router1.tls]
+
+    [http.middlewares]
+      [http.middlewares.https_redirect.redirectScheme]
+        scheme = "https"
+        permanent = true
     ```
 
 ## Strip and Rewrite Path Prefixes
@@ -595,7 +595,7 @@ with the path `/admin` stripped, e.g. to `http://<IP>:<port>/`. In this case, yo
     apiVersion: traefik.containo.us/v1alpha1
     kind: IngressRoute
     metadata:
-      name: http-redirect-ingressRoute
+      name: http-redirect-ingressroute
       namespace: admin-web
     spec:
       entryPoints:
@@ -619,23 +619,6 @@ with the path `/admin` stripped, e.g. to `http://<IP>:<port>/`. In this case, yo
           - /admin
     ```
 
-    ```toml tab="File (TOML)"
-    ## Dynamic configuration
-    # dynamic-conf.toml
-
-    [http.routers.router1]
-        rule = "Host(`example.org`) && PathPrefix(`/admin`)"
-        service = "admin-svc"
-        entrypoints = ["web"]
-        middlewares = ["admin-stripprefix"]
-
-    [http.middlewares]
-      [http.middlewares.admin-stripprefix.stripPrefix]
-      prefixes = ["/admin"]
-    
-    # ...
-    ```
-
     ```yaml tab="File (YAML)"
     ## Dynamic Configuration
     # dynamic-conf.yml
@@ -652,8 +635,25 @@ with the path `/admin` stripped, e.g. to `http://<IP>:<port>/`. In this case, yo
       middlewares:
         admin-stripprefix:
           stripPrefix:
-            prefixes: 
+            prefixes:
             - "/admin"
+
+    # ...
+    ```
+
+    ```toml tab="File (TOML)"
+    ## Dynamic configuration
+    # dynamic-conf.toml
+
+    [http.routers.router1]
+        rule = "Host(`example.org`) && PathPrefix(`/admin`)"
+        service = "admin-svc"
+        entrypoints = ["web"]
+        middlewares = ["admin-stripprefix"]
+
+    [http.middlewares]
+      [http.middlewares.admin-stripprefix.stripPrefix]
+      prefixes = ["/admin"]
 
     # ...
     ```
@@ -674,11 +674,11 @@ with the path `/admin` stripped, e.g. to `http://<IP>:<port>/`. In this case, yo
 !!! example "ACME from provider to a specific Certificate Resolver"
 
     !!! info "v1"
-    
+
     ```toml tab="File (TOML)"
     # static configuration
     defaultEntryPoints = ["websecure","web"]
-    
+
     [entryPoints.web]
     address = ":80"
       [entryPoints.web.redirect]
@@ -686,7 +686,7 @@ with the path `/admin` stripped, e.g. to `http://<IP>:<port>/`. In this case, yo
     [entryPoints.websecure]
       address = ":443"
       [entryPoints.websecure.tls]
-    
+
     [acme]
       email = "your-email-here@example.com"
       storage = "acme.json"
@@ -708,40 +708,40 @@ with the path `/admin` stripped, e.g. to `http://<IP>:<port>/`. In this case, yo
 
     !!! info "v2"
 
-    ```toml tab="File (TOML)"
-    # static configuration
-    [entryPoints]
-      [entryPoints.web]
-        address = ":80"
-    
-      [entryPoints.websecure]
-        address = ":443"
-      [entryPoints.websecure.http.tls]
-        certResolver = "myresolver"
-    
-    [certificatesResolvers.myresolver.acme]
-      email = "your-email@example.com"
-      storage = "acme.json"
-      [certificatesResolvers.myresolver.acme.tlsChallenge]
-    ```
-
     ```yaml tab="File (YAML)"
     entryPoints:
       web:
         address: ":80"
-    
+
       websecure:
         address: ":443"
         http:
           tls:
             certResolver: myresolver
-    
+
     certificatesResolvers:
       myresolver:
         acme:
           email: your-email@example.com
           storage: acme.json
           tlsChallenge: {}
+    ```
+
+    ```toml tab="File (TOML)"
+    # static configuration
+    [entryPoints]
+      [entryPoints.web]
+        address = ":80"
+
+      [entryPoints.websecure]
+        address = ":443"
+      [entryPoints.websecure.http.tls]
+        certResolver = "myresolver"
+
+    [certificatesResolvers.myresolver.acme]
+      email = "your-email@example.com"
+      storage = "acme.json"
+      [certificatesResolvers.myresolver.acme.tlsChallenge]
     ```
 
     ```bash tab="CLI"
@@ -764,7 +764,7 @@ There is no more log configuration at the root level.
     ```toml tab="File (TOML)"
     # static configuration
     logLevel = "DEBUG"
-    
+
     [traefikLog]
       filePath = "/path/to/traefik.log"
       format   = "json"
@@ -778,20 +778,20 @@ There is no more log configuration at the root level.
 
     !!! info "v2"
 
-    ```toml tab="File (TOML)"
-    # static configuration
-    [log]
-      level = "DEBUG"
-      filePath = "/path/to/log-file.log"
-      format = "json"
-    ```
-
     ```yaml tab="File (YAML)"
     # static configuration
     log:
       level: DEBUG
       filePath: /path/to/log-file.log
       format: json
+    ```
+
+    ```toml tab="File (TOML)"
+    # static configuration
+    [log]
+      level = "DEBUG"
+      filePath = "/path/to/log-file.log"
+      format = "json"
     ```
 
     ```bash tab="CLI"
@@ -838,17 +838,6 @@ Traefik v2 retains OpenTracing support. The `backend` root option from the v1 is
 
     !!! info "v2"
 
-    ```toml tab="File (TOML)"
-    # static configuration
-    [tracing]
-      servicename = "tracing"
-      [tracing.jaeger]
-        samplingParam = 1.0
-        samplingServerURL = "http://12.0.0.1:5778/sampling"
-        samplingType = "const"
-        localAgentHostPort = "12.0.0.1:6831"
-    ```
-
     ```yaml tab="File (YAML)"
     # static configuration
     tracing:
@@ -858,6 +847,17 @@ Traefik v2 retains OpenTracing support. The `backend` root option from the v1 is
         samplingServerURL: 'http://12.0.0.1:5778/sampling'
         samplingType: const
         localAgentHostPort: '12.0.0.1:6831'
+    ```
+
+    ```toml tab="File (TOML)"
+    # static configuration
+    [tracing]
+      servicename = "tracing"
+      [tracing.jaeger]
+        samplingParam = 1.0
+        samplingServerURL = "http://12.0.0.1:5778/sampling"
+        samplingType = "const"
+        localAgentHostPort = "12.0.0.1:6831"
     ```
 
     ```bash tab="CLI"
@@ -891,13 +891,6 @@ For a basic configuration, the [metrics configuration](../observability/metrics/
 
     !!! info "v2"
 
-    ```toml tab="File (TOML)"
-    # static configuration
-    [metrics.prometheus]
-      buckets = [0.1,0.3,1.2,5.0]
-      entryPoint = "metrics"
-    ```
-
     ```yaml tab="File (YAML)"
     # static configuration
     metrics:
@@ -908,6 +901,13 @@ For a basic configuration, the [metrics configuration](../observability/metrics/
           - 1.2
           - 5
         entryPoint: metrics
+    ```
+
+    ```toml tab="File (TOML)"
+    # static configuration
+    [metrics.prometheus]
+      buckets = [0.1,0.3,1.2,5.0]
+      entryPoint = "metrics"
     ```
 
     ```bash tab="CLI"
@@ -955,41 +955,41 @@ Each root item has been moved to a related section or removed.
 
     !!! info "v2"
 
-    ```toml tab="File (TOML)"
-    # static configuration
-    [global]
-      checkNewVersion = true
-      sendAnonymousUsage = true
-    
-    [log]
-      level = "DEBUG"
-    
-    [serversTransport]
-      insecureSkipVerify = true
-      rootCAs = [ "/mycert.cert" ]
-      maxIdleConnsPerHost = 42
-    
-    [providers]
-      providersThrottleDuration = 42
-    ```
-
     ```yaml tab="File (YAML)"
     # static configuration
     global:
       checkNewVersion: true
       sendAnonymousUsage: true
-    
+
     log:
       level: DEBUG
-    
+
     serversTransport:
       insecureSkipVerify: true
       rootCAs:
         - /mycert.cert
       maxIdleConnsPerHost: 42
-    
+
     providers:
       providersThrottleDuration: 42
+    ```
+
+    ```toml tab="File (TOML)"
+    # static configuration
+    [global]
+      checkNewVersion = true
+      sendAnonymousUsage = true
+
+    [log]
+      level = "DEBUG"
+
+    [serversTransport]
+      insecureSkipVerify = true
+      rootCAs = [ "/mycert.cert" ]
+      maxIdleConnsPerHost = 42
+
+    [providers]
+      providersThrottleDuration = 42
     ```
 
     ```bash tab="CLI"
@@ -1018,7 +1018,7 @@ To activate the dashboard, you can either:
     ```toml tab="File (TOML)"
     ## static configuration
     # traefik.toml
-    
+
     [entryPoints.websecure]
       address = ":443"
       [entryPoints.websecure.tls]
@@ -1027,7 +1027,7 @@ To activate the dashboard, you can either:
           users = [
             "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
           ]
-    
+
     [api]
       entryPoint = "websecure"
     ```
@@ -1050,55 +1050,25 @@ To activate the dashboard, you can either:
       - "traefik.http.middlewares.myAuth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/"
     ```
 
-    ```toml tab="File (TOML)"
-    ## static configuration
-    # traefik.toml
-    
-    [entryPoints.websecure]
-      address = ":443"
-    
-    [api]
-    
-    [providers.file]
-      directory = "/path/to/dynamic/config"
-    
-    ##---------------------##
-    
-    ## dynamic configuration
-    # /path/to/dynamic/config/dynamic-conf.toml
-    
-    [http.routers.api]
-      rule = "Host(`traefik.docker.localhost`)"
-      entrypoints = ["websecure"]
-      service = "api@internal"
-      middlewares = ["myAuth"]
-      [http.routers.api.tls]
-    
-    [http.middlewares.myAuth.basicAuth]
-      users = [
-        "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
-      ]
-    ```
-
     ```yaml tab="File (YAML)"
     ## static configuration
-    # traefik.yaml
-    
+    # traefik.yml
+
     entryPoints:
       websecure:
         address: ':443'
-        
+
     api: {}
-    
+
     providers:
       file:
         directory: /path/to/dynamic/config
-   
+
     ##---------------------##
-    
+
     ## dynamic configuration
-    # /path/to/dynamic/config/dynamic-conf.yaml
-    
+    # /path/to/dynamic/config/dynamic-conf.yml
+
      http:
       routers:
         api:
@@ -1109,12 +1079,42 @@ To activate the dashboard, you can either:
           middlewares:
             - myAuth
           tls: {}
-          
+
       middlewares:
         myAuth:
           basicAuth:
             users:
               - 'test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/'
+    ```
+
+    ```toml tab="File (TOML)"
+    ## static configuration
+    # traefik.toml
+
+    [entryPoints.websecure]
+      address = ":443"
+
+    [api]
+
+    [providers.file]
+      directory = "/path/to/dynamic/config"
+
+    ##---------------------##
+
+    ## dynamic configuration
+    # /path/to/dynamic/config/dynamic-conf.toml
+
+    [http.routers.api]
+      rule = "Host(`traefik.docker.localhost`)"
+      entrypoints = ["websecure"]
+      service = "api@internal"
+      middlewares = ["myAuth"]
+      [http.routers.api.tls]
+
+    [http.middlewares.myAuth.basicAuth]
+      users = [
+        "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
+      ]
     ```
 
 ## Providers

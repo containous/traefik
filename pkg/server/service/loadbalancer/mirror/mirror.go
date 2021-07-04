@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/traefik/traefik/v2/pkg/config/dynamic"
+	"github.com/traefik/traefik/v2/pkg/healthcheck"
 	"github.com/traefik/traefik/v2/pkg/log"
 	"github.com/traefik/traefik/v2/pkg/middlewares/accesslog"
 	"github.com/traefik/traefik/v2/pkg/safe"
@@ -23,19 +25,21 @@ type Mirroring struct {
 	rw             http.ResponseWriter
 	routinePool    *safe.Pool
 
-	maxBodySize int64
+	maxBodySize      int64
+	wantsHealthCheck bool
 
 	lock  sync.RWMutex
 	total uint64
 }
 
 // New returns a new instance of *Mirroring.
-func New(handler http.Handler, pool *safe.Pool, maxBodySize int64) *Mirroring {
+func New(handler http.Handler, pool *safe.Pool, maxBodySize int64, hc *dynamic.HealthCheck) *Mirroring {
 	return &Mirroring{
-		routinePool: pool,
-		handler:     handler,
-		rw:          blackHoleResponseWriter{},
-		maxBodySize: maxBodySize,
+		routinePool:      pool,
+		handler:          handler,
+		rw:               blackHoleResponseWriter{},
+		maxBodySize:      maxBodySize,
+		wantsHealthCheck: hc != nil,
 	}
 }
 
@@ -131,6 +135,31 @@ func (m *Mirroring) AddMirror(handler http.Handler, percent int) error {
 		return errors.New("percent must be between 0 and 100")
 	}
 	m.mirrorHandlers = append(m.mirrorHandlers, &mirrorHandler{Handler: handler, percent: percent})
+	return nil
+}
+
+// RegisterStatusUpdater adds fn to the list of hooks that are run when the
+// status of handler of the Mirroring changes.
+// Not thread safe.
+func (m *Mirroring) RegisterStatusUpdater(fn func(up bool)) error {
+	// Since the status propagation is completely transparent through the
+	// mirroring (because of the recursion on the underlying service), we could maybe
+	// skip that below, and even not add HealthCheck as a field of
+	// dynamic.Mirroring. But I think it's easier to understand for the user
+	// if the HealthCheck is required absolutely everywhere in the config.
+	if !m.wantsHealthCheck {
+		return errors.New("healthCheck not enabled in config for this mirroring service")
+	}
+
+	updater, ok := m.handler.(healthcheck.StatusUpdater)
+	if !ok {
+		return fmt.Errorf("service of mirroring %T not a healthcheck.StatusUpdater", m.handler)
+	}
+
+	if err := updater.RegisterStatusUpdater(fn); err != nil {
+		return fmt.Errorf("cannot register service of mirroring as updater: %w", err)
+	}
+
 	return nil
 }
 

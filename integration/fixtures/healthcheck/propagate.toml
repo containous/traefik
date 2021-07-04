@@ -1,0 +1,117 @@
+[global]
+  checkNewVersion = false
+  sendAnonymousUsage = false
+
+[log]
+  level = "DEBUG"
+
+[entryPoints]
+  [entryPoints.web]
+    address = ":8000"
+
+[api]
+  insecure = true
+
+[providers.file]
+  filename = "{{ .SelfFilename }}"
+
+## dynamic configuration ##
+
+[http.routers]
+  [http.routers.wsp-router-1]
+    service = "wsp-service1"
+    rule = "Host(`root.localhost`)"
+  [http.routers.wsp-router-2]
+    service = "wsp-service2"
+    rule = "Host(`foo.localhost`)"
+  [http.routers.wsp-router-3]
+    service = "wsp-service3"
+    rule = "Host(`bar.localhost`)"
+
+[http.services]
+  [http.services.wsp-service1.weighted]
+    [http.services.wsp-service1.weighted.healthcheck]
+    [[http.services.wsp-service1.weighted.services]]
+      name = "wsp12"
+      weight = 1
+    [[http.services.wsp-service1.weighted.services]]
+      name = "wsp34"
+      weight = 1
+  [http.services.wsp-service2.weighted]
+    [http.services.wsp-service2.weighted.healthcheck]
+    [[http.services.wsp-service2.weighted.services]]
+      name = "wsp13"
+      weight = 1
+    [[http.services.wsp-service2.weighted.services]]
+      name = "wsp12"
+      weight = 1
+  [http.services.wsp-service3.weighted]
+    [http.services.wsp-service3.weighted.healthcheck]
+    [[http.services.wsp-service3.weighted.services]]
+      name = "wsp13"
+      weight = 1
+    [[http.services.wsp-service3.weighted.services]]
+      name = "wsp12b"
+      weight = 1
+  [http.services.wsp12.weighted]
+    [http.services.wsp12.weighted.healthcheck]
+    [[http.services.wsp12.weighted.services]]
+      name = "wsp1"
+      weight = 1
+    [[http.services.wsp12.weighted.services]]
+      name = "wsp2"
+      weight = 1
+  [http.services.wsp34.weighted]
+    [http.services.wsp34.weighted.healthcheck]
+    [[http.services.wsp34.weighted.services]]
+      name = "wsp3"
+      weight = 1
+    [[http.services.wsp34.weighted.services]]
+      name = "wsp4"
+      weight = 1
+  [http.services.wsp13.weighted]
+    [http.services.wsp13.weighted.healthcheck]
+    [[http.services.wsp13.weighted.services]]
+      name = "wsp1"
+      weight = 1
+    [[http.services.wsp13.weighted.services]]
+      name = "wsp3"
+      weight = 1
+
+  [http.services.wsp1.loadBalancer]
+    [http.services.wsp1.loadBalancer.healthcheck]
+      path = "/health"
+      interval = "1s"
+      timeout = "0.9s"
+    [[http.services.wsp1.loadBalancer.servers]]
+      url = "http://{{.Server1}}:80"
+  [http.services.wsp2.loadBalancer]
+    [http.services.wsp2.loadBalancer.healthcheck]
+      path = "/health"
+      interval = "1s"
+      timeout = "0.9s"
+    [[http.services.wsp2.loadBalancer.servers]]
+      url = "http://{{.Server2}}:80"
+  [http.services.wsp3.loadBalancer]
+    [http.services.wsp3.loadBalancer.healthcheck]
+      path = "/health"
+      interval = "1s"
+      timeout = "0.9s"
+    [[http.services.wsp3.loadBalancer.servers]]
+      url = "http://{{.Server3}}:80"
+  [http.services.wsp4.loadBalancer]
+    [http.services.wsp4.loadBalancer.healthcheck]
+      path = "/health"
+      interval = "1s"
+      timeout = "0.9s"
+    [[http.services.wsp4.loadBalancer.servers]]
+      url = "http://{{.Server4}}:80"
+  [http.services.wsp12b.loadBalancer]
+    [http.services.wsp12b.loadBalancer.healthcheck]
+      path = "/health"
+      interval = "1s"
+      timeout = "0.9s"
+    [[http.services.wsp12b.loadBalancer.servers]]
+      url = "http://{{.Server1}}:80"
+    [[http.services.wsp12b.loadBalancer.servers]]
+      url = "http://{{.Server2}}:80"

@@ -9,8 +9,6 @@ import (
 	"github.com/traefik/yaegi/stdlib"
 )
 
-const devPluginName = "dev"
-
 // Constructor creates a plugin handler.
 type Constructor func(context.Context, http.Handler) (http.Handler, error)
 
@@ -35,7 +33,7 @@ type Builder struct {
 }
 
 // NewBuilder creates a new Builder.
-func NewBuilder(client *Client, plugins map[string]Descriptor, devPlugin *DevPlugin) (*Builder, error) {
+func NewBuilder(client *Client, plugins map[string]Descriptor, localPlugins map[string]LocalDescriptor) (*Builder, error) {
 	pb := &Builder{
 		middlewareDescriptors: map[string]pluginContext{},
 		providerDescriptors:   map[string]pluginContext{},
@@ -49,8 +47,16 @@ func NewBuilder(client *Client, plugins map[string]Descriptor, devPlugin *DevPlu
 		}
 
 		i := interp.New(interp.Options{GoPath: client.GoPath()})
-		i.Use(stdlib.Symbols)
-		i.Use(ppSymbols())
+
+		err = i.Use(stdlib.Symbols)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to load symbols: %w", desc.ModuleName, err)
+		}
+
+		err = i.Use(ppSymbols())
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to load provider symbols: %w", desc.ModuleName, err)
+		}
 
 		_, err = i.Eval(fmt.Sprintf(`import "%s"`, manifest.Import))
 		if err != nil {
@@ -77,33 +83,41 @@ func NewBuilder(client *Client, plugins map[string]Descriptor, devPlugin *DevPlu
 		}
 	}
 
-	if devPlugin != nil {
-		manifest, err := ReadManifest(devPlugin.GoPath, devPlugin.ModuleName)
+	for pName, desc := range localPlugins {
+		manifest, err := ReadManifest(localGoPath, desc.ModuleName)
 		if err != nil {
-			return nil, fmt.Errorf("%s: failed to read manifest: %w", devPlugin.ModuleName, err)
+			return nil, fmt.Errorf("%s: failed to read manifest: %w", desc.ModuleName, err)
 		}
 
-		i := interp.New(interp.Options{GoPath: devPlugin.GoPath})
-		i.Use(stdlib.Symbols)
-		i.Use(ppSymbols())
+		i := interp.New(interp.Options{GoPath: localGoPath})
+
+		err = i.Use(stdlib.Symbols)
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to load symbols: %w", desc.ModuleName, err)
+		}
+
+		err = i.Use(ppSymbols())
+		if err != nil {
+			return nil, fmt.Errorf("%s: failed to load provider symbols: %w", desc.ModuleName, err)
+		}
 
 		_, err = i.Eval(fmt.Sprintf(`import "%s"`, manifest.Import))
 		if err != nil {
-			return nil, fmt.Errorf("%s: failed to import plugin code %q: %w", devPlugin.ModuleName, manifest.Import, err)
+			return nil, fmt.Errorf("%s: failed to import plugin code %q: %w", desc.ModuleName, manifest.Import, err)
 		}
 
 		switch manifest.Type {
 		case "middleware":
-			pb.middlewareDescriptors[devPluginName] = pluginContext{
+			pb.middlewareDescriptors[pName] = pluginContext{
 				interpreter: i,
-				GoPath:      devPlugin.GoPath,
+				GoPath:      localGoPath,
 				Import:      manifest.Import,
 				BasePkg:     manifest.BasePkg,
 			}
 		case "provider":
-			pb.providerDescriptors[devPluginName] = pluginContext{
+			pb.providerDescriptors[pName] = pluginContext{
 				interpreter: i,
-				GoPath:      devPlugin.GoPath,
+				GoPath:      localGoPath,
 				Import:      manifest.Import,
 				BasePkg:     manifest.BasePkg,
 			}

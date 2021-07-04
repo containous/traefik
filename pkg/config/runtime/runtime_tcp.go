@@ -15,14 +15,8 @@ func (c *Configuration) GetTCPRoutersByEntryPoints(ctx context.Context, entryPoi
 	for rtName, rt := range c.TCPRouters {
 		logger := log.FromContext(log.With(ctx, log.Str(log.RouterName, rtName)))
 
-		eps := rt.EntryPoints
-		if len(eps) == 0 {
-			logger.Debugf("No entryPoint defined for this router, using the default one(s) instead: %+v", entryPoints)
-			eps = entryPoints
-		}
-
 		entryPointsCount := 0
-		for _, entryPointName := range eps {
+		for _, entryPointName := range rt.EntryPoints {
 			if !contains(entryPoints, entryPointName) {
 				rt.AddError(fmt.Errorf("entryPoint %q doesn't exist", entryPointName), false)
 				logger.WithField(log.EntryPointName, entryPointName).

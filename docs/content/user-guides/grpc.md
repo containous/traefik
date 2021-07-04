@@ -8,17 +8,6 @@ This section explains how to use Traefik as reverse proxy for gRPC application.
 
 Static configuration:
 
-```toml tab="File (TOML)"
-[entryPoints]
-  [entryPoints.web]
-    address = ":80"
-
-[api]
-    
-[providers.file]
-  directory = "/path/to/dynamic/config"
-```
-
 ```yaml tab="File (YAML)"
 entryPoints:
   web:
@@ -31,30 +20,24 @@ providers:
 api: {}
 ```
 
+```toml tab="File (TOML)"
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+
+[api]
+
+[providers.file]
+  directory = "/path/to/dynamic/config"
+```
+
 ```yaml tab="CLI"
 --entryPoints.web.address=:80
 --providers.file.directory=/path/to/dynamic/config
 --api.insecure=true
 ```
 
-`/path/to/dynamic/config/dynamic_conf.{toml,yml}`:
-
-```toml tab="TOML"
-## dynamic configuration ##
-
-[http]
-
-  [http.routers]
-    [http.routers.routerTest]
-      service = "srv-grpc"
-      rule = "Host(`frontend.local`)"
-    
-  [http.services]
-    [http.services.srv-grpc]
-      [http.services.srv-grpc.loadBalancer]
-        [[http.services.srv-grpc.loadBalancer.servers]]
-          url = "h2c://backend.local:8080"
-```
+`/path/to/dynamic/config/dynamic_conf.{yml,toml}`:
 
 ```yaml tab="YAML"
 ## dynamic configuration ##
@@ -70,6 +53,23 @@ http:
       loadBalancer:
         servers:
         - url: h2c://backend.local:8080
+```
+
+```toml tab="TOML"
+## dynamic configuration ##
+
+[http]
+
+  [http.routers]
+    [http.routers.routerTest]
+      service = "srv-grpc"
+      rule = "Host(`frontend.local`)"
+
+  [http.services]
+    [http.services.srv-grpc]
+      [http.services.srv-grpc.loadBalancer]
+        [[http.services.srv-grpc.loadBalancer.servers]]
+          url = "h2c://backend.local:8080"
 ```
 
 !!! warning
@@ -119,22 +119,6 @@ At last, we configure our Traefik instance to use both self-signed certificates.
 
 Static configuration:
 
-```toml tab="File (TOML)"
-[entryPoints]
-  [entryPoints.websecure]
-    address = ":4443"
-
-
-[serversTransport]
-  # For secure connection on backend.local
-  rootCAs = [ "./backend.cert" ]
-
-[api]
-
-[provider.file]
-  directory = "/path/to/dynamic/config"
-```
-
 ```yaml tab="File (YAML)"
 entryPoints:
   websecure:
@@ -152,6 +136,22 @@ providers:
 api: {}
 ```
 
+```toml tab="File (TOML)"
+[entryPoints]
+  [entryPoints.websecure]
+    address = ":4443"
+
+
+[serversTransport]
+  # For secure connection on backend.local
+  rootCAs = [ "./backend.cert" ]
+
+[api]
+
+[provider.file]
+  directory = "/path/to/dynamic/config"
+```
+
 ```yaml tab="CLI"
 --entryPoints.websecure.address=:4443
 # For secure connection on backend.local
@@ -160,32 +160,7 @@ api: {}
 --api.insecure=true
 ```
 
-`/path/to/dynamic/config/dynamic_conf.{toml,yml}`:
-
-```toml tab="TOML"
-## dynamic configuration ##
-
-[http]
-
-  [http.routers]
-    [http.routers.routerTest]
-      service = "srv-grpc"
-      rule = "Host(`frontend.local`)"
-    
-  [http.services]
-    [http.services.srv-grpc]
-      [http.services.srv-grpc.loadBalancer]
-        [[http.services.srv-grpc.loadBalancer.servers]]
-          # Access on backend with HTTPS
-          url = "https://backend.local:8080"
-
-[tls]
-
-  # For secure connection on frontend.local
-  [[tls.certificates]]
-    certFile = "./frontend.cert"
-    keyFile = "./frontend.key"
-```
+`/path/to/dynamic/config/dynamic_conf.{yml,toml}`:
 
 ```yaml tab="YAML"
 ## dynamic configuration ##
@@ -206,6 +181,31 @@ tls:
   certificates:
   - certfile: ./frontend.cert
     keyfile: ./frontend.key
+```
+
+```toml tab="TOML"
+## dynamic configuration ##
+
+[http]
+
+  [http.routers]
+    [http.routers.routerTest]
+      service = "srv-grpc"
+      rule = "Host(`frontend.local`)"
+
+  [http.services]
+    [http.services.srv-grpc]
+      [http.services.srv-grpc.loadBalancer]
+        [[http.services.srv-grpc.loadBalancer.servers]]
+          # Access on backend with HTTPS
+          url = "https://backend.local:8080"
+
+[tls]
+
+  # For secure connection on frontend.local
+  [[tls.certificates]]
+    certFile = "./frontend.cert"
+    keyFile = "./frontend.key"
 ```
 
 !!! warning

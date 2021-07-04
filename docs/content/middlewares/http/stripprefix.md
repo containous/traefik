@@ -47,13 +47,6 @@ labels:
   - "traefik.http.middlewares.test-stripprefix.stripprefix.prefixes=/foobar,/fiibar"
 ```
 
-```toml tab="File (TOML)"
-# Strip prefix /foobar and /fiibar
-[http.middlewares]
-  [http.middlewares.test-stripprefix.stripPrefix]
-    prefixes = ["/foobar", "/fiibar"]
-```
-
 ```yaml tab="File (YAML)"
 # Strip prefix /foobar and /fiibar
 http:
@@ -63,6 +56,13 @@ http:
         prefixes:
           - "/foobar"
           - "/fiibar"
+```
+
+```toml tab="File (TOML)"
+# Strip prefix /foobar and /fiibar
+[http.middlewares]
+  [http.middlewares.test-stripprefix.stripPrefix]
+    prefixes = ["/foobar", "/fiibar"]
 ```
 
 ## Configuration Options
@@ -149,13 +149,6 @@ labels:
   - "traefik.http.middlewares.example.stripprefix.forceSlash=false"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.example.stripPrefix]
-    prefixes = ["/foobar"]
-    forceSlash = false
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
@@ -164,4 +157,11 @@ http:
         prefixes:
           - "/foobar"
         forceSlash: false
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.example.stripPrefix]
+    prefixes = ["/foobar"]
+    forceSlash = false
 ```

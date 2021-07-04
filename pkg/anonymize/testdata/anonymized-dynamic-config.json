@@ -178,6 +178,7 @@
           "publicKey": "xxxx",
           "referrerPolicy": "foo",
           "featurePolicy": "foo",
+          "permissionsPolicy": "foo",
           "isDevelopment": true
         },
         "errors": {
@@ -189,7 +190,7 @@
         },
         "rateLimit": {
           "average": 42,
-          "period": 42,
+          "period": "42ns",
           "burst": 42,
           "sourceCriterion": {
             "ipStrategy": {
@@ -307,7 +308,7 @@
         },
         "retry": {
           "attempts": 42,
-          "initialInterval": 42
+          "initialInterval": "42ns"
         },
         "contentType": {
           "autoDetect": true
@@ -353,9 +354,9 @@
         ],
         "maxIdleConnsPerHost": 42,
         "forwardingTimeouts": {
-          "dialTimeout": 42,
-          "responseHeaderTimeout": 42,
-          "idleConnTimeout": 42
+          "dialTimeout": "42ns",
+          "responseHeaderTimeout": "42ns",
+          "idleConnTimeout": "42ns"
         }
       }
     }

@@ -21,7 +21,7 @@ func TestMirroringOn100(t *testing.T) {
 		rw.WriteHeader(http.StatusOK)
 	})
 	pool := safe.NewPool(context.Background())
-	mirror := New(handler, pool, defaultMaxBodySize)
+	mirror := New(handler, pool, defaultMaxBodySize, nil)
 	err := mirror.AddMirror(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		atomic.AddInt32(&countMirror1, 1)
 	}), 10)
@@ -50,7 +50,7 @@ func TestMirroringOn10(t *testing.T) {
 		rw.WriteHeader(http.StatusOK)
 	})
 	pool := safe.NewPool(context.Background())
-	mirror := New(handler, pool, defaultMaxBodySize)
+	mirror := New(handler, pool, defaultMaxBodySize, nil)
 	err := mirror.AddMirror(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		atomic.AddInt32(&countMirror1, 1)
 	}), 10)
@@ -74,7 +74,7 @@ func TestMirroringOn10(t *testing.T) {
 }
 
 func TestInvalidPercent(t *testing.T) {
-	mirror := New(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {}), safe.NewPool(context.Background()), defaultMaxBodySize)
+	mirror := New(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {}), safe.NewPool(context.Background()), defaultMaxBodySize, nil)
 	err := mirror.AddMirror(nil, -1)
 	assert.Error(t, err)
 
@@ -93,7 +93,7 @@ func TestHijack(t *testing.T) {
 		rw.WriteHeader(http.StatusOK)
 	})
 	pool := safe.NewPool(context.Background())
-	mirror := New(handler, pool, defaultMaxBodySize)
+	mirror := New(handler, pool, defaultMaxBodySize, nil)
 
 	var mirrorRequest bool
 	err := mirror.AddMirror(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -117,7 +117,7 @@ func TestFlush(t *testing.T) {
 		rw.WriteHeader(http.StatusOK)
 	})
 	pool := safe.NewPool(context.Background())
-	mirror := New(handler, pool, defaultMaxBodySize)
+	mirror := New(handler, pool, defaultMaxBodySize, nil)
 
 	var mirrorRequest bool
 	err := mirror.AddMirror(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
@@ -154,7 +154,7 @@ func TestMirroringWithBody(t *testing.T) {
 		rw.WriteHeader(http.StatusOK)
 	})
 
-	mirror := New(handler, pool, defaultMaxBodySize)
+	mirror := New(handler, pool, defaultMaxBodySize, nil)
 
 	for i := 0; i < numMirrors; i++ {
 		err := mirror.AddMirror(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {

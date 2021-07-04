@@ -26,14 +26,14 @@ If you enable the API, a new special `service` named `api@internal` is created a
 To enable the API handler, use the following option on the
 [static configuration](../getting-started/configuration-overview.md#the-static-configuration):
 
-```toml tab="File (TOML)"
-# Static Configuration
-[api]
-```
-
 ```yaml tab="File (YAML)"
 # Static Configuration
 api: {}
+```
+
+```toml tab="File (TOML)"
+# Static Configuration
+[api]
 ```
 
 ```bash tab="CLI"
@@ -74,14 +74,14 @@ Enable the API in `insecure` mode, which means that the API will be available di
 !!! info
     If the entryPoint named `traefik` is not configured, it will be automatically created on port 8080.
 
-```toml tab="File (TOML)"
-[api]
-  insecure = true
-```
-
 ```yaml tab="File (YAML)"
 api:
   insecure: true
+```
+
+```toml tab="File (TOML)"
+[api]
+  insecure = true
 ```
 
 ```bash tab="CLI"
@@ -94,14 +94,14 @@ _Optional, Default=true_
 
 Enable the dashboard. More about the dashboard features [here](./dashboard.md).
 
-```toml tab="File (TOML)"
-[api]
-  dashboard = true
-```
-
 ```yaml tab="File (YAML)"
 api:
   dashboard: true
+```
+
+```toml tab="File (TOML)"
+[api]
+  dashboard = true
 ```
 
 ```bash tab="CLI"
@@ -117,14 +117,14 @@ _Optional, Default=false_
 
 Enable additional [endpoints](./api.md#endpoints) for debugging and profiling, served under `/debug/`.
 
-```toml tab="File (TOML)"
-[api]
-  debug = true
-```
-
 ```yaml tab="File (YAML)"
 api:
   debug: true
+```
+
+```toml tab="File (TOML)"
+[api]
+  debug = true
 ```
 
 ```bash tab="CLI"

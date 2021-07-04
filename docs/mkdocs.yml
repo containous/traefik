@@ -68,6 +68,7 @@ nav:
       - 'Quick Start': 'getting-started/quick-start.md'
       - 'Configuration Introduction': 'getting-started/configuration-overview.md'
       - 'Install Traefik': 'getting-started/install-traefik.md'
+      - 'Frequently Asked Questions': 'getting-started/faq.md'
   - 'Configuration Discovery':
       - 'Overview': 'providers/overview.md'
       - 'Docker': 'providers/docker.md'

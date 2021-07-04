@@ -226,6 +226,9 @@
       cert = "foobar"
       key = "foobar"
       insecureSkipVerify = true
+  [providers.plugin]
+    [providers.plugin.Descriptor0]
+    [providers.plugin.Descriptor1]
 
 [api]
   insecure = true
@@ -386,9 +389,11 @@
 
 [pilot]
   token = "foobar"
+  dashboard = true
 
 [experimental]
   kubernetesGateway = true
+  http3 = true
   [experimental.plugins]
     [experimental.plugins.Descriptor0]
       moduleName = "foobar"
@@ -396,8 +401,8 @@
     [experimental.plugins.Descriptor1]
       moduleName = "foobar"
       version = "foobar"
-  [experimental.devPlugin]
-    goPath = "foobar"
-    moduleName = "foobar"
-  http3 = true
-  kubernetesGateway = true
+  [experimental.localPlugins]
+    [experimental.localPlugins.Descriptor0]
+      moduleName = "foobar"
+    [experimental.localPlugins.Descriptor1]
+      moduleName = "foobar"

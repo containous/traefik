@@ -77,26 +77,6 @@ labels:
   - "traefik.http.routers.router1.middlewares=foo-add-prefix@rancher"
 ```
 
-```toml tab="File (TOML)"
-# As TOML Configuration File
-[http.routers]
-  [http.routers.router1]
-    service = "myService"
-    middlewares = ["foo-add-prefix"]
-    rule = "Host(`example.com`)"
-
-[http.middlewares]
-  [http.middlewares.foo-add-prefix.addPrefix]
-    prefix = "/foo"
-
-[http.services]
-  [http.services.service1]
-    [http.services.service1.loadBalancer]
-
-      [[http.services.service1.loadBalancer.servers]]
-        url = "http://127.0.0.1:80"
-```
-
 ```yaml tab="File (YAML)"
 # As YAML Configuration File
 http:
@@ -117,6 +97,26 @@ http:
       loadBalancer:
         servers:
           - url: "http://127.0.0.1:80"
+```
+
+```toml tab="File (TOML)"
+# As TOML Configuration File
+[http.routers]
+  [http.routers.router1]
+    service = "myService"
+    middlewares = ["foo-add-prefix"]
+    rule = "Host(`example.com`)"
+
+[http.middlewares]
+  [http.middlewares.foo-add-prefix.addPrefix]
+    prefix = "/foo"
+
+[http.services]
+  [http.services.service1]
+    [http.services.service1.loadBalancer]
+
+      [[http.services.service1.loadBalancer.servers]]
+        url = "http://127.0.0.1:80"
 ```
 
 ## Available Middlewares

@@ -7,12 +7,12 @@ Checking the Health of Your Traefik Instances
 
 To enable the API handler:
 
-```toml tab="File (TOML)"
-[ping]
-```
-
 ```yaml tab="File (YAML)"
 ping: {}
+```
+
+```toml tab="File (TOML)"
+[ping]
 ```
 
 ```bash tab="CLI"
@@ -39,15 +39,6 @@ _Optional, Default="traefik"_
 
 Enabling /ping on a dedicated EntryPoint.
 
-```toml tab="File (TOML)"
-[entryPoints]
-  [entryPoints.ping]
-    address = ":8082"
-
-[ping]
-  entryPoint = "ping"
-```
-
 ```yaml tab="File (YAML)"
 entryPoints:
   ping:
@@ -55,6 +46,15 @@ entryPoints:
 
 ping:
   entryPoint: "ping"
+```
+
+```toml tab="File (TOML)"
+[entryPoints]
+  [entryPoints.ping]
+    address = ":8082"
+
+[ping]
+  entryPoint = "ping"
 ```
 
 ```bash tab="CLI"
@@ -68,14 +68,14 @@ _Optional, Default=false_
 
 If `manualRouting` is `true`, it disables the default internal router in order to allow one to create a custom router for the `ping@internal` service.
 
-```toml tab="File (TOML)"
-[ping]
-  manualRouting = true
-```
-
 ```yaml tab="File (YAML)"
 ping:
   manualRouting: true
+```
+
+```toml tab="File (TOML)"
+[ping]
+  manualRouting = true
 ```
 
 ```bash tab="CLI"
@@ -93,14 +93,14 @@ be expected as the signal for graceful termination. In which case, the
 terminatingStatusCode can be used to set the code returned by the ping
 handler during termination.
 
-```toml tab="File (TOML)"
-[ping]
-  terminatingStatusCode = 204
-```
-
 ```yaml tab="File (YAML)"
 ping:
   terminatingStatusCode: 204
+```
+
+```toml tab="File (TOML)"
+[ping]
+  terminatingStatusCode = 204
 ```
 
 ```bash tab="CLI"

@@ -48,16 +48,6 @@ labels:
   - "traefik.http.middlewares.test-auth.basicauth.users=test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/,test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0"
 ```
 
-```toml tab="File (TOML)"
-# Declaring the user list
-[http.middlewares]
-  [http.middlewares.test-auth.basicAuth]
-  users = [
-    "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/", 
-    "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0",
-  ]
-```
-
 ```yaml tab="File (YAML)"
 # Declaring the user list
 http:
@@ -65,8 +55,18 @@ http:
     test-auth:
       basicAuth:
         users:
-          - "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/" 
+          - "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
           - "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0"
+```
+
+```toml tab="File (TOML)"
+# Declaring the user list
+[http.middlewares]
+  [http.middlewares.test-auth.basicAuth]
+  users = [
+    "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/",
+    "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0",
+  ]
 ```
 
 ## Configuration Options
@@ -75,7 +75,7 @@ http:
 
 Passwords must be hashed using MD5, SHA1, or BCrypt.
 
-!!! tip 
+!!! tip
 
     Use `htpasswd` to generate the passwords.
 
@@ -84,7 +84,7 @@ Passwords must be hashed using MD5, SHA1, or BCrypt.
 The `users` option is an array of authorized users. Each user must be declared using the `name:hashed-password` format.
 
 !!! note ""
-    
+
     - If both `users` and `usersFile` are provided, the two are merged. The contents of `usersFile` have precedence over the values in `users`.
     - For security reasons, the field `users` doesn't exist for Kubernetes IngressRoute, and one should use the `secret` field instead.
 
@@ -142,16 +142,6 @@ labels:
   - "traefik.http.middlewares.test-auth.basicauth.users=test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/,test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0"
 ```
 
-```toml tab="File (TOML)"
-# Declaring the user list
-[http.middlewares]
-  [http.middlewares.test-auth.basicAuth]
-    users = [
-      "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/", 
-      "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0",
-    ]
-```
-
 ```yaml tab="File (YAML)"
 # Declaring the user list
 http:
@@ -159,8 +149,18 @@ http:
     test-auth:
       basicAuth:
         users:
-          - "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/" 
+          - "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/"
           - "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0"
+```
+
+```toml tab="File (TOML)"
+# Declaring the user list
+[http.middlewares]
+  [http.middlewares.test-auth.basicAuth]
+    users = [
+      "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/",
+      "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0",
+    ]
 ```
 
 ### `usersFile`
@@ -170,9 +170,9 @@ The `usersFile` option is the path to an external file that contains the authori
 The file content is a list of `name:hashed-password`.
 
 !!! note ""
-    
+
     - If both `users` and `usersFile` are provided, the two are merged. The contents of `usersFile` have precedence over the values in `users`.
-    - Because it does not make much sense to refer to a file path on Kubernetes, the `usersFile` field doesn't exist for Kubernetes IngressRoute, and one should use the `secret` field instead. 
+    - Because it does not make much sense to refer to a file path on Kubernetes, the `usersFile` field doesn't exist for Kubernetes IngressRoute, and one should use the `secret` field instead.
 
 ```yaml tab="Docker"
 labels:
@@ -216,18 +216,18 @@ labels:
   - "traefik.http.middlewares.test-auth.basicauth.usersfile=/path/to/my/usersfile"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-auth.basicAuth]
-    usersFile = "/path/to/my/usersfile"
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
     test-auth:
       basicAuth:
         usersFile: "/path/to/my/usersfile"
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-auth.basicAuth]
+    usersFile = "/path/to/my/usersfile"
 ```
 
 ??? example "A file containing test/test and test2/test2"
@@ -239,7 +239,7 @@ http:
 
 ### `realm`
 
-You can customize the realm for the authentication with the `realm` option. The default value is `traefik`. 
+You can customize the realm for the authentication with the `realm` option. The default value is `traefik`.
 
 ```yaml tab="Docker"
 labels:
@@ -271,18 +271,18 @@ labels:
   - "traefik.http.middlewares.test-auth.basicauth.realm=MyRealm"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-auth.basicAuth]
-    realm = "MyRealm"
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
     test-auth:
       basicAuth:
         realm: "MyRealm"
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-auth.basicAuth]
+    realm = "MyRealm"
 ```
 
 ### `headerField`
@@ -315,12 +315,6 @@ spec:
 }
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares.my-auth.basicAuth]
-  # ...
-  headerField = "X-WebAuth-User"
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
@@ -328,6 +322,12 @@ http:
       basicAuth:
         # ...
         headerField: "X-WebAuth-User"
+```
+
+```toml tab="File (TOML)"
+[http.middlewares.my-auth.basicAuth]
+  # ...
+  headerField = "X-WebAuth-User"
 ```
 
 ### `removeHeader`
@@ -364,16 +364,16 @@ labels:
   - "traefik.http.middlewares.test-auth.basicauth.removeheader=true"
 ```
 
-```toml tab="File (TOML)"
-[http.middlewares]
-  [http.middlewares.test-auth.basicAuth]
-    removeHeader = true
-```
-
 ```yaml tab="File (YAML)"
 http:
   middlewares:
     test-auth:
       basicAuth:
         removeHeader: true
+```
+
+```toml tab="File (TOML)"
+[http.middlewares]
+  [http.middlewares.test-auth.basicAuth]
+    removeHeader = true
 ```

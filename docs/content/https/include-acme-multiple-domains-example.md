@@ -64,18 +64,6 @@ labels:
   - traefik.http.routers.blog.tls.domains[0].sans=*.example.org
 ```
 
-```toml tab="File (TOML)"
-## Dynamic configuration
-[http.routers]
-  [http.routers.blog]
-    rule = "Host(`example.com`) && Path(`/blog`)"
-    [http.routers.blog.tls]
-      certResolver = "myresolver" # From static configuration
-      [[http.routers.blog.tls.domains]]
-        main = "example.org"
-        sans = ["*.example.org"]
-```
-
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
 http:
@@ -88,4 +76,16 @@ http:
           - main: "example.org"
             sans:
               - "*.example.org"
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.routers]
+  [http.routers.blog]
+    rule = "Host(`example.com`) && Path(`/blog`)"
+    [http.routers.blog.tls]
+      certResolver = "myresolver" # From static configuration
+      [[http.routers.blog.tls.domains]]
+        main = "example.org"
+        sans = ["*.example.org"]
 ```

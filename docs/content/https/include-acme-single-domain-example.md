@@ -52,15 +52,6 @@ labels:
   - traefik.http.routers.blog.tls.certresolver=myresolver
 ```
 
-```toml tab="File (TOML)"
-## Dynamic configuration
-[http.routers]
-  [http.routers.blog]
-  rule = "Host(`example.com`) && Path(`/blog`)"
-  [http.routers.blog.tls]
-    certResolver = "myresolver"
-```
-
 ```yaml tab="File (YAML)"
 ## Dynamic configuration
 http:
@@ -69,4 +60,13 @@ http:
       rule: "Host(`example.com`) && Path(`/blog`)"
       tls:
         certResolver: myresolver
+```
+
+```toml tab="File (TOML)"
+## Dynamic configuration
+[http.routers]
+  [http.routers.blog]
+  rule = "Host(`example.com`) && Path(`/blog`)"
+  [http.routers.blog.tls]
+    certResolver = "myresolver"
 ```

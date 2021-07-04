@@ -1,9 +1,9 @@
 # Add Prefix
 
-Prefixing the Path 
+Prefixing the Path
 {: .subtitle }
 
-![AddPrefix](../../assets/img/middleware/addprefix.png) 
+![AddPrefix](../../assets/img/middleware/addprefix.png)
 
 The AddPrefix middleware updates the path of a request before forwarding it.
 
@@ -43,13 +43,6 @@ labels:
   - "traefik.http.middlewares.add-foo.addprefix.prefix=/foo"
 ```
 
-```toml tab="File (TOML)"
-# Prefixing with /foo
-[http.middlewares]
-  [http.middlewares.add-foo.addPrefix]
-    prefix = "/foo"
-```
-
 ```yaml tab="File (YAML)"
 # Prefixing with /foo
 http:
@@ -57,6 +50,13 @@ http:
     add-foo:
       addPrefix:
         prefix: "/foo"
+```
+
+```toml tab="File (TOML)"
+# Prefixing with /foo
+[http.middlewares]
+  [http.middlewares.add-foo.addPrefix]
+    prefix = "/foo"
 ```
 
 ## Configuration Options

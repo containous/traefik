@@ -11,12 +11,12 @@ You can install Traefik with the following flavors:
 
 Choose one of the [official Docker images](https://hub.docker.com/_/traefik) and run it with one sample configuration file:
 
-* [TOML](https://raw.githubusercontent.com/traefik/traefik/v2.4/traefik.sample.toml)
 * [YAML](https://raw.githubusercontent.com/traefik/traefik/v2.4/traefik.sample.yml)
+* [TOML](https://raw.githubusercontent.com/traefik/traefik/v2.4/traefik.sample.toml)
 
 ```bash
 docker run -d -p 8080:8080 -p 80:80 \
-    -v $PWD/traefik.toml:/etc/traefik/traefik.toml traefik:v2.4
+    -v $PWD/traefik.yml:/etc/traefik/traefik.yml traefik:v2.5
 ```
 
 For more details, go to the [Docker provider documentation](../providers/docker.md)
@@ -31,8 +31,8 @@ For more details, go to the [Docker provider documentation](../providers/docker.
 ## Use the Helm Chart
 
 !!! warning
-    
-    The Traefik Chart from 
+
+    The Traefik Chart from
     [Helm's default charts repository](https://github.com/helm/charts/tree/master/stable/traefik) is still using [Traefik v1.7](https://doc.traefik.io/traefik/v1.7).
 
 Traefik can be installed in Kubernetes using the Helm chart from <https://github.com/traefik/traefik-helm-chart>.
@@ -61,7 +61,7 @@ helm install traefik traefik/traefik
 ```
 
 !!! tip "Helm Features"
-    
+
     All [Helm features](https://helm.sh/docs/intro/using_helm/) are supported.
     For instance, installing the chart in a dedicated namespace:
 
@@ -73,30 +73,30 @@ helm install traefik traefik/traefik
     ```
 
 ??? example "Installing with Custom Values"
-    
+
     You can customize the installation by specifying custom values,
     as with [any helm chart](https://helm.sh/docs/intro/using_helm/#customizing-the-chart-before-installing).
     {: #helm-custom-values }
-    
+
     The values are not (yet) documented, but are self-explanatory:
     you can look at the [default `values.yaml`](https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml) file to explore possibilities.
-    
+
     You can also set Traefik command line flags using `additionalArguments`.
     Example of installation with logging set to `DEBUG`:
-    
+
     ```bash tab="Using Helm CLI"
     helm install --namespace=traefik-v2 \
         --set="additionalArguments={--log.level=DEBUG}" \
         traefik traefik/traefik
     ```
-    
+
     ```yml tab="With a custom values file"
     # File custom-values.yml
     ## Install with "helm install --values=./custom-values.yml traefik traefik/traefik
     additionalArguments:
       - "--log.level=DEBUG"
     ```
-    
+
 ### Exposing the Traefik dashboard
 
 This HelmChart does not expose the Traefik dashboard by default, for security concerns.

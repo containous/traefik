@@ -59,13 +59,6 @@ labels:
   - "traefik.http.middlewares.latency-check.circuitbreaker.expression=LatencyAtQuantileMS(50.0) > 100"
 ```
 
-```toml tab="File (TOML)"
-# Latency Check
-[http.middlewares]
-  [http.middlewares.latency-check.circuitBreaker]
-    expression = "LatencyAtQuantileMS(50.0) > 100"
-```
-
 ```yaml tab="File (YAML)"
 # Latency Check
 http:
@@ -73,6 +66,13 @@ http:
     latency-check:
       circuitBreaker:
         expression: "LatencyAtQuantileMS(50.0) > 100"
+```
+
+```toml tab="File (TOML)"
+# Latency Check
+[http.middlewares]
+  [http.middlewares.latency-check.circuitBreaker]
+    expression = "LatencyAtQuantileMS(50.0) > 100"
 ```
 
 ## Possible States

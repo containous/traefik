@@ -69,6 +69,8 @@
         service = "foobar"
         maxBodySize = 42
 
+        [http.services.Service02.mirroring.healthCheck]
+
         [[http.services.Service02.mirroring.mirrors]]
           name = "foobar"
           percent = 42
@@ -78,6 +80,7 @@
           percent = 42
     [http.services.Service03]
       [http.services.Service03.weighted]
+        [http.services.Service03.weighted.healthCheck]
 
         [[http.services.Service03.weighted.services]]
           name = "foobar"

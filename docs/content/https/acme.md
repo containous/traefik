@@ -13,7 +13,7 @@ You can configure Traefik to use an ACME provider (like Let's Encrypt) for autom
 
 ## Certificate Resolvers
 
-Traefik requires you to define "Certificate Resolvers" in the [static configuration](../getting-started/configuration-overview.md#the-static-configuration), 
+Traefik requires you to define "Certificate Resolvers" in the [static configuration](../getting-started/configuration-overview.md#the-static-configuration),
 which are responsible for retrieving certificates from an ACME server.
 
 Then, each ["router"](../routing/routers/index.md) is configured to enable TLS,
@@ -26,33 +26,33 @@ You can read more about this retrieval mechanism in the following section: [ACME
 !!! important "Defining a certificates resolver does not result in all routers automatically using it. Each router that is supposed to use the resolver must [reference](../routing/routers/index.md#certresolver) it."
 
 ??? note "Configuration Reference"
-    
+
     There are many available options for ACME.
     For a quick glance at what's possible, browse the configuration reference:
-    
-    ```toml tab="File (TOML)"
-    --8<-- "content/https/ref-acme.toml"
-    ```
-    
+
     ```yaml tab="File (YAML)"
     --8<-- "content/https/ref-acme.yaml"
     ```
-    
+
+    ```toml tab="File (TOML)"
+    --8<-- "content/https/ref-acme.toml"
+    ```
+
     ```bash tab="CLI"
     --8<-- "content/https/ref-acme.txt"
     ```
 
 ## Domain Definition
 
-Certificate resolvers request certificates for a set of the domain names 
+Certificate resolvers request certificates for a set of the domain names
 inferred from routers, with the following logic:
 
 - If the router has a [`tls.domains`](../routing/routers/index.md#domains) option set,
   then the certificate resolver uses the `main` (and optionally `sans`) option of `tls.domains` to know the domain names for this router.
 
-- If no [`tls.domains`](../routing/routers/index.md#domains) option is set, 
-  then the certificate resolver uses the [router's rule](../routing/routers/index.md#rule), 
-  by checking the `Host()` matchers. 
+- If no [`tls.domains`](../routing/routers/index.md#domains) option is set,
+  then the certificate resolver uses the [router's rule](../routing/routers/index.md#rule),
+  by checking the `Host()` matchers.
   Please note that [multiple `Host()` matchers can be used](../routing/routers/index.md#certresolver)) for specifying multiple domain names for this router.
 
 Please note that:
@@ -69,31 +69,15 @@ Please check the [configuration examples below](#configuration-examples) for mor
 ## Configuration Examples
 
 ??? example "Enabling ACME"
-    
-    ```toml tab="File (TOML)"
-    [entryPoints]
-      [entryPoints.web]
-        address = ":80"
-    
-      [entryPoints.websecure]
-        address = ":443"
-    
-    [certificatesResolvers.myresolver.acme]
-      email = "your-email@example.com"
-      storage = "acme.json"
-      [certificatesResolvers.myresolver.acme.httpChallenge]
-        # used during the challenge
-        entryPoint = "web"
-    ```
-    
+
     ```yaml tab="File (YAML)"
     entryPoints:
       web:
         address: ":80"
-    
+
       websecure:
         address: ":443"
-    
+
     certificatesResolvers:
       myresolver:
         acme:
@@ -103,7 +87,23 @@ Please check the [configuration examples below](#configuration-examples) for mor
             # used during the challenge
             entryPoint: web
     ```
-    
+
+    ```toml tab="File (TOML)"
+    [entryPoints]
+      [entryPoints.web]
+        address = ":80"
+
+      [entryPoints.websecure]
+        address = ":443"
+
+    [certificatesResolvers.myresolver.acme]
+      email = "your-email@example.com"
+      storage = "acme.json"
+      [certificatesResolvers.myresolver.acme.httpChallenge]
+        # used during the challenge
+        entryPoint = "web"
+    ```
+
     ```bash tab="CLI"
     --entrypoints.web.address=:80
     --entrypoints.websecure.address=:443
@@ -117,23 +117,23 @@ Please check the [configuration examples below](#configuration-examples) for mor
 !!! important "Defining a certificates resolver does not result in all routers automatically using it. Each router that is supposed to use the resolver must [reference](../routing/routers/index.md#certresolver) it."
 
 ??? example "Single Domain from Router's Rule Example"
-    
+
     * A certificate for the domain `example.com` is requested:
 
     --8<-- "content/https/include-acme-single-domain-example.md"
 
 ??? example "Multiple Domains from Router's Rule Example"
- 
+
     * A certificate for the domains `example.com` (main) and `blog.example.org`
       is requested:
-    
+
     --8<-- "content/https/include-acme-multiple-domains-from-rule-example.md"
-    
+
 ??? example "Multiple Domains from Router's `tls.domain` Example"
 
     * A certificate for the domains `example.com` (main) and `*.example.org` (SAN)
       is requested:
-      
+
     --8<-- "content/https/include-acme-multiple-domains-example.md"
 
 ## Automatic Renewals
@@ -165,12 +165,6 @@ when using the `TLS-ALPN-01` challenge, Traefik must be reachable by Let's Encry
 
 ??? example "Configuring the `tlsChallenge`"
 
-    ```toml tab="File (TOML)"
-    [certificatesResolvers.myresolver.acme]
-      # ...
-      [certificatesResolvers.myresolver.acme.tlsChallenge]
-    ```
-
     ```yaml tab="File (YAML)"
     certificatesResolvers:
       myresolver:
@@ -178,7 +172,13 @@ when using the `TLS-ALPN-01` challenge, Traefik must be reachable by Let's Encry
           # ...
           tlsChallenge: {}
     ```
-    
+
+    ```toml tab="File (TOML)"
+    [certificatesResolvers.myresolver.acme]
+      # ...
+      [certificatesResolvers.myresolver.acme.tlsChallenge]
+    ```
+
     ```bash tab="CLI"
     # ...
     --certificatesresolvers.myresolver.acme.tlschallenge=true
@@ -193,28 +193,14 @@ when using the `HTTP-01` challenge, `certificatesresolvers.myresolver.acme.httpc
 
 ??? example "Using an EntryPoint Called web for the `httpChallenge`"
 
-    ```toml tab="File (TOML)"
-    [entryPoints]
-      [entryPoints.web]
-        address = ":80"
-      
-      [entryPoints.websecure]
-        address = ":443"
-    
-    [certificatesResolvers.myresolver.acme]
-      # ...
-      [certificatesResolvers.myresolver.acme.httpChallenge]
-        entryPoint = "web"
-    ```
-
     ```yaml tab="File (YAML)"
     entryPoints:
       web:
         address: ":80"
-    
+
       websecure:
         address: ":443"
-    
+
     certificatesResolvers:
       myresolver:
         acme:
@@ -222,7 +208,21 @@ when using the `HTTP-01` challenge, `certificatesresolvers.myresolver.acme.httpc
           httpChallenge:
             entryPoint: web
     ```
-    
+
+    ```toml tab="File (TOML)"
+    [entryPoints]
+      [entryPoints.web]
+        address = ":80"
+
+      [entryPoints.websecure]
+        address = ":443"
+
+    [certificatesResolvers.myresolver.acme]
+      # ...
+      [certificatesResolvers.myresolver.acme.httpChallenge]
+        entryPoint = "web"
+    ```
+
     ```bash tab="CLI"
     --entrypoints.web.address=:80
     --entrypoints.websecure.address=:443
@@ -239,15 +239,6 @@ Use the `DNS-01` challenge to generate and renew ACME certificates by provisioni
 
 ??? example "Configuring a `dnsChallenge` with the DigitalOcean Provider"
 
-    ```toml tab="File (TOML)"
-    [certificatesResolvers.myresolver.acme]
-      # ...
-      [certificatesResolvers.myresolver.acme.dnsChallenge]
-        provider = "digitalocean"
-        delayBeforeCheck = 0
-    # ...
-    ```
-    
     ```yaml tab="File (YAML)"
     certificatesResolvers:
       myresolver:
@@ -258,7 +249,16 @@ Use the `DNS-01` challenge to generate and renew ACME certificates by provisioni
             delayBeforeCheck: 0
         # ...
     ```
-    
+
+    ```toml tab="File (TOML)"
+    [certificatesResolvers.myresolver.acme]
+      # ...
+      [certificatesResolvers.myresolver.acme.dnsChallenge]
+        provider = "digitalocean"
+        delayBeforeCheck = 0
+    # ...
+    ```
+
     ```bash tab="CLI"
     # ...
     --certificatesresolvers.myresolver.acme.dnschallenge.provider=digitalocean
@@ -270,7 +270,7 @@ Use the `DNS-01` challenge to generate and renew ACME certificates by provisioni
         A `provider` is mandatory.
 
 #### `providers`
- 
+
 Here is a list of supported `providers`, that can automate the DNS verification,
 along with the required environment variables and their [wildcard & root domain support](#wildcard-domains).
 Do not hesitate to complete it.
@@ -323,6 +323,7 @@ For complete details, refer to your provider's _Additional configuration_ link.
 | HTTP request                                                | `httpreq`      | `HTTPREQ_ENDPOINT`, `HTTPREQ_MODE`, `HTTPREQ_USERNAME`, `HTTPREQ_PASSWORD` [^1]                                                             | [Additional configuration](https://go-acme.github.io/lego/dns/httpreq)      |
 | [HyperOne](https://www.hyperone.com)                        | `hyperone`     | `HYPERONE_PASSPORT_LOCATION`, `HYPERONE_LOCATION_ID`                                                                                        | [Additional configuration](https://go-acme.github.io/lego/dns/hyperone)     |
 | [IIJ](https://www.iij.ad.jp/)                               | `iij`          | `IIJ_API_ACCESS_KEY`, `IIJ_API_SECRET_KEY`, `IIJ_DO_SERVICE_CODE`                                                                           | [Additional configuration](https://go-acme.github.io/lego/dns/iij)          |
+| [Infoblox](https://www.infoblox.com/)                       | `infoblox`     | `INFOBLOX_USER`, `INFOBLOX_PASSWORD`, `INFOBLOX_HOST`                                                                                       | [Additional configuration](https://go-acme.github.io/lego/dns/infoblox)     |
 | [Infomaniak](https://www.infomaniak.com)                    | `infomaniak`   | `INFOMANIAK_ACCESS_TOKEN`                                                                                                                   | [Additional configuration](https://go-acme.github.io/lego/dns/infomaniak)   |
 | [INWX](https://www.inwx.de/en)                              | `inwx`         | `INWX_USERNAME`, `INWX_PASSWORD`                                                                                                            | [Additional configuration](https://go-acme.github.io/lego/dns/inwx)         |
 | [ionos](https://ionos.com/)                                 | `ionos`        | `IONOS_API_KEY`                                                                                                                             | [Additional configuration](https://go-acme.github.io/lego/dns/ionos)        |
@@ -347,6 +348,7 @@ For complete details, refer to your provider's _Additional configuration_ link.
 | [OVH](https://www.ovh.com)                                  | `ovh`          | `OVH_ENDPOINT`, `OVH_APPLICATION_KEY`, `OVH_APPLICATION_SECRET`, `OVH_CONSUMER_KEY`                                                         | [Additional configuration](https://go-acme.github.io/lego/dns/ovh)          |
 | [Openstack Designate](https://docs.openstack.org/designate) | `designate`    | `OS_AUTH_URL`, `OS_USERNAME`, `OS_PASSWORD`, `OS_TENANT_NAME`, `OS_REGION_NAME`                                                             | [Additional configuration](https://go-acme.github.io/lego/dns/designate)    |
 | [Oracle Cloud](https://cloud.oracle.com/home)               | `oraclecloud`  | `OCI_COMPARTMENT_OCID`, `OCI_PRIVKEY_FILE`, `OCI_PRIVKEY_PASS`, `OCI_PUBKEY_FINGERPRINT`, `OCI_REGION`, `OCI_TENANCY_OCID`, `OCI_USER_OCID` | [Additional configuration](https://go-acme.github.io/lego/dns/oraclecloud)  |
+| [Porkbun](https://porkbun.com/)                             | `porkbun`      | `PORKBUN_SECRET_API_KEY`, `PORKBUN_API_KEY`                                                                                                 | [Additional configuration](https://go-acme.github.io/lego/dns/porkbun)      |
 | [PowerDNS](https://www.powerdns.com)                        | `pdns`         | `PDNS_API_KEY`, `PDNS_API_URL`                                                                                                              | [Additional configuration](https://go-acme.github.io/lego/dns/pdns)         |
 | [Rackspace](https://www.rackspace.com/cloud/dns)            | `rackspace`    | `RACKSPACE_USER`, `RACKSPACE_API_KEY`                                                                                                       | [Additional configuration](https://go-acme.github.io/lego/dns/rackspace)    |
 | [reg.ru](https://www.reg.ru)                                | `regru`        | `REGRU_USERNAME`, `REGRU_PASSWORD`                                                                                                          | [Additional configuration](https://go-acme.github.io/lego/dns/regru)        |
@@ -357,12 +359,16 @@ For complete details, refer to your provider's _Additional configuration_ link.
 | [Scaleway](https://www.scaleway.com)                        | `scaleway`     | `SCALEWAY_API_TOKEN`                                                                                                                        | [Additional configuration](https://go-acme.github.io/lego/dns/scaleway)     |
 | [Selectel](https://selectel.ru/en/)                         | `selectel`     | `SELECTEL_API_TOKEN`                                                                                                                        | [Additional configuration](https://go-acme.github.io/lego/dns/selectel)     |
 | [Servercow](https://servercow.de)                           | `servercow`    | `SERVERCOW_USERNAME`, `SERVERCOW_PASSWORD`                                                                                                  | [Additional configuration](https://go-acme.github.io/lego/dns/servercow)    |
+| [Simply.com](https://www.simply.com/en/domains/)            | `simply`       | `SIMPLY_ACCOUNT_NAME`, `SIMPLY_API_KEY`                                                                                                     | [Additional configuration](https://go-acme.github.io/lego/dns/simply)       |
+| [Sonic](https://www.sonic.com/)                             | `sonic`        | `SONIC_USER_ID`, `SONIC_API_KEY`                                                                                                            | [Additional configuration](https://go-acme.github.io/lego/dns/sonic)        |
 | [Stackpath](https://www.stackpath.com/)                     | `stackpath`    | `STACKPATH_CLIENT_ID`, `STACKPATH_CLIENT_SECRET`, `STACKPATH_STACK_ID`                                                                      | [Additional configuration](https://go-acme.github.io/lego/dns/stackpath)    |
 | [TransIP](https://www.transip.nl/)                          | `transip`      | `TRANSIP_ACCOUNT_NAME`, `TRANSIP_PRIVATE_KEY_PATH`                                                                                          | [Additional configuration](https://go-acme.github.io/lego/dns/transip)      |
 | [VegaDNS](https://github.com/shupp/VegaDNS-API)             | `vegadns`      | `SECRET_VEGADNS_KEY`, `SECRET_VEGADNS_SECRET`, `VEGADNS_URL`                                                                                | [Additional configuration](https://go-acme.github.io/lego/dns/vegadns)      |
 | [Versio](https://www.versio.nl/domeinnamen)                 | `versio`       | `VERSIO_USERNAME`, `VERSIO_PASSWORD`                                                                                                        | [Additional configuration](https://go-acme.github.io/lego/dns/versio)       |
+| [VinylDNS](https://www.vinyldns.io)                         | `vinyldns`     | `VINYLDNS_ACCESS_KEY`, `VINYLDNS_SECRET_KEY`, `VINYLDNS_HOST`                                                                               | [Additional configuration](https://go-acme.github.io/lego/dns/vinyldns)     |
 | [Vscale](https://vscale.io/)                                | `vscale`       | `VSCALE_API_TOKEN`                                                                                                                          | [Additional configuration](https://go-acme.github.io/lego/dns/vscale)       |
 | [VULTR](https://www.vultr.com)                              | `vultr`        | `VULTR_API_KEY`                                                                                                                             | [Additional configuration](https://go-acme.github.io/lego/dns/vultr)        |
+| [WEDOS](https://www.wedos.com)                              | `wedos`        | `WEDOS_USERNAME`, `WEDOS_WAPI_PASSWORD`                                                                                                     | [Additional configuration](https://go-acme.github.io/lego/dns/wedos)        |
 | [Yandex](https://yandex.com)                                | `yandex`       | `YANDEX_PDD_TOKEN`                                                                                                                          | [Additional configuration](https://go-acme.github.io/lego/dns/yandex)       |
 | [Zone.ee](https://www.zone.ee)                              | `zoneee`       | `ZONEEE_API_USER`, `ZONEEE_API_KEY`                                                                                                         | [Additional configuration](https://go-acme.github.io/lego/dns/zoneee)       |
 | [Zonomi](https://zonomi.com)                                | `zonomi`       | `ZONOMI_API_KEY`                                                                                                                            | [Additional configuration](https://go-acme.github.io/lego/dns/zonomi)       |
@@ -382,14 +388,6 @@ For complete details, refer to your provider's _Additional configuration_ link.
 
 Use custom DNS servers to resolve the FQDN authority.
 
-```toml tab="File (TOML)"
-[certificatesResolvers.myresolver.acme]
-  # ...
-  [certificatesResolvers.myresolver.acme.dnsChallenge]
-    # ...
-    resolvers = ["1.1.1.1:53", "8.8.8.8:53"]
-```
-
 ```yaml tab="File (YAML)"
 certificatesResolvers:
   myresolver:
@@ -400,6 +398,14 @@ certificatesResolvers:
         resolvers:
           - "1.1.1.1:53"
           - "8.8.8.8:53"
+```
+
+```toml tab="File (TOML)"
+[certificatesResolvers.myresolver.acme]
+  # ...
+  [certificatesResolvers.myresolver.acme.dnsChallenge]
+    # ...
+    resolvers = ["1.1.1.1:53", "8.8.8.8:53"]
 ```
 
 ```bash tab="CLI"
@@ -417,14 +423,6 @@ As described in [Let's Encrypt's post](https://community.letsencrypt.org/t/stagi
 - `kid`: Key identifier from External CA
 - `hmacEncoded`: HMAC key from External CA, should be in Base64 URL Encoding without padding format
 
-```toml tab="File (TOML)"
-[certificatesResolvers.myresolver.acme]
-  # ...
-  [certificatesResolvers.myresolver.acme.eab]
-    kid = "abc-keyID-xyz"
-    hmacEncoded = "abc-hmac-xyz"
-```
-
 ```yaml tab="File (YAML)"
 certificatesResolvers:
   myresolver:
@@ -433,6 +431,14 @@ certificatesResolvers:
       eab:
         kid: abc-keyID-xyz
         hmacEncoded: abc-hmac-xyz
+```
+
+```toml tab="File (TOML)"
+[certificatesResolvers.myresolver.acme]
+  # ...
+  [certificatesResolvers.myresolver.acme.eab]
+    kid = "abc-keyID-xyz"
+    hmacEncoded = "abc-hmac-xyz"
 ```
 
 ```bash tab="CLI"
@@ -454,13 +460,6 @@ The CA server to use:
 
 ??? example "Using the Let's Encrypt staging server"
 
-    ```toml tab="File (TOML)"
-    [certificatesResolvers.myresolver.acme]
-      # ...
-      caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
-      # ...
-    ```
-    
     ```yaml tab="File (YAML)"
     certificatesResolvers:
       myresolver:
@@ -468,6 +467,13 @@ The CA server to use:
           # ...
           caServer: https://acme-staging-v02.api.letsencrypt.org/directory
           # ...
+    ```
+
+    ```toml tab="File (TOML)"
+    [certificatesResolvers.myresolver.acme]
+      # ...
+      caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+      # ...
     ```
 
     ```bash tab="CLI"
@@ -482,13 +488,6 @@ _Required, Default="acme.json"_
 
 The `storage` option sets the location where your ACME certificates are saved to.
 
-```toml tab="File (TOML)"
-[certificatesResolvers.myresolver.acme]
-  # ...
-  storage = "acme.json"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 certificatesResolvers:
   myresolver:
@@ -496,6 +495,13 @@ certificatesResolvers:
       # ...
       storage: acme.json
       # ...
+```
+
+```toml tab="File (TOML)"
+[certificatesResolvers.myresolver.acme]
+  # ...
+  storage = "acme.json"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -528,13 +534,6 @@ Preferred chain to use.
 If the CA offers multiple certificate chains, prefer the chain with an issuer matching this Subject Common Name.
 If no match, the default offered chain will be used.
 
-```toml tab="File (TOML)"
-[certificatesResolvers.myresolver.acme]
-  # ...
-  preferredChain = "ISRG Root X1"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 certificatesResolvers:
   myresolver:
@@ -542,6 +541,13 @@ certificatesResolvers:
       # ...
       preferredChain: 'ISRG Root X1'
       # ...
+```
+
+```toml tab="File (TOML)"
+[certificatesResolvers.myresolver.acme]
+  # ...
+  preferredChain = "ISRG Root X1"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -556,13 +562,6 @@ _Optional, Default="RSA4096"_
 
 KeyType used for generating certificate private key. Allow value 'EC256', 'EC384', 'RSA2048', 'RSA4096', 'RSA8192'.
 
-```toml tab="File (TOML)"
-[certificatesResolvers.myresolver.acme]
-  # ...
-  keyType = "RSA4096"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 certificatesResolvers:
   myresolver:
@@ -570,6 +569,13 @@ certificatesResolvers:
       # ...
       keyType: 'RSA4096'
       # ...
+```
+
+```toml tab="File (TOML)"
+[certificatesResolvers.myresolver.acme]
+  # ...
+  keyType = "RSA4096"
+  # ...
 ```
 
 ```bash tab="CLI"

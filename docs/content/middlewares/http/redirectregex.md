@@ -53,14 +53,6 @@ labels:
   - "traefik.http.middlewares.test-redirectregex.redirectregex.replacement=http://mydomain/$${1}"
 ```
 
-```toml tab="File (TOML)"
-# Redirect with domain replacement
-[http.middlewares]
-  [http.middlewares.test-redirectregex.redirectRegex]
-    regex = "^http://localhost/(.*)"
-    replacement = "http://mydomain/${1}"
-```
-
 ```yaml tab="File (YAML)"
 # Redirect with domain replacement
 http:
@@ -69,6 +61,14 @@ http:
       redirectRegex:
         regex: "^http://localhost/(.*)"
         replacement: "http://mydomain/${1}"
+```
+
+```toml tab="File (TOML)"
+# Redirect with domain replacement
+[http.middlewares]
+  [http.middlewares.test-redirectregex.redirectRegex]
+    regex = "^http://localhost/(.*)"
+    replacement = "http://mydomain/${1}"
 ```
 
 ## Configuration Options
@@ -84,7 +84,7 @@ Set the `permanent` option to `true` to apply a permanent redirection.
 ### `regex`
 
 The `regex` option is the regular expression to match and capture elements from the request URL.
-    
+
 ### `replacement`
 
 The `replacement` option defines how to modify the URL to have the new target URL.

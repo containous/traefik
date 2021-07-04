@@ -16,16 +16,16 @@ Traefik logs concern everything that happens to Traefik itself (startup, configu
 By default, the logs are written to the standard output.
 You can configure a file path instead using the `filePath` option.
 
-```toml tab="File (TOML)"
-# Writing Logs to a File
-[log]
-  filePath = "/path/to/traefik.log"
-```
-
 ```yaml tab="File (YAML)"
 # Writing Logs to a File
 log:
   filePath: "/path/to/traefik.log"
+```
+
+```toml tab="File (TOML)"
+# Writing Logs to a File
+[log]
+  filePath = "/path/to/traefik.log"
 ```
 
 ```bash tab="CLI"
@@ -35,20 +35,20 @@ log:
 
 #### `format`
 
-By default, the logs use a text format (`common`), but you can also ask for the `json` format in the `format` option.   
-
-```toml tab="File (TOML)"
-# Writing Logs to a File, in JSON
-[log]
-  filePath = "/path/to/log-file.log"
-  format = "json"
-```
+By default, the logs use a text format (`common`), but you can also ask for the `json` format in the `format` option.
 
 ```yaml tab="File (YAML)"
 # Writing Logs to a File, in JSON
 log:
   filePath: "/path/to/log-file.log"
   format: json
+```
+
+```toml tab="File (TOML)"
+# Writing Logs to a File, in JSON
+[log]
+  filePath = "/path/to/log-file.log"
+  format = "json"
 ```
 
 ```bash tab="CLI"
@@ -59,16 +59,16 @@ log:
 
 #### `level`
 
-By default, the `level` is set to `ERROR`. Alternative logging levels are `DEBUG`, `PANIC`, `FATAL`, `ERROR`, `WARN`, and `INFO`. 
-
-```toml tab="File (TOML)"
-[log]
-  level = "DEBUG"
-```
+By default, the `level` is set to `ERROR`. Alternative logging levels are `DEBUG`, `PANIC`, `FATAL`, `ERROR`, `WARN`, and `INFO`.
 
 ```yaml tab="File (YAML)"
 log:
   level: DEBUG
+```
+
+```toml tab="File (TOML)"
+[log]
+  level = "DEBUG"
 ```
 
 ```bash tab="CLI"

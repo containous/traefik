@@ -77,7 +77,7 @@ func TestDo_dynamicConfiguration(t *testing.T) {
 							SameSite: "foo",
 						},
 					},
-					HealthCheck: &dynamic.HealthCheck{
+					HealthCheck: &dynamic.ServerHealthCheck{
 						Scheme:          "foo",
 						Path:            "foo",
 						Port:            42,
@@ -226,6 +226,7 @@ func TestDo_dynamicConfiguration(t *testing.T) {
 					PublicKey:                         "foo",
 					ReferrerPolicy:                    "foo",
 					FeaturePolicy:                     "foo",
+					PermissionsPolicy:                 "foo",
 					IsDevelopment:                     true,
 				},
 				Errors: &dynamic.ErrorPage{
@@ -959,9 +960,13 @@ func TestDo_staticConfiguration(t *testing.T) {
 				Version:    "foobar",
 			},
 		},
-		DevPlugin: &plugins.DevPlugin{
-			GoPath:     "foobar",
-			ModuleName: "foobar",
+		LocalPlugins: map[string]plugins.LocalDescriptor{
+			"Descriptor0": {
+				ModuleName: "foobar",
+			},
+			"Descriptor1": {
+				ModuleName: "foobar",
+			},
 		},
 	}
 

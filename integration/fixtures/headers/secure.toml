@@ -34,7 +34,7 @@
 
 [http.middlewares]
   [http.middlewares.secure.headers]
-    featurePolicy = "vibrate 'none';"
+    permissionsPolicy = "microphone=(),"
 
 [http.services]
   [http.services.service1.loadBalancer]

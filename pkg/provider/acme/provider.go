@@ -473,9 +473,10 @@ func (p *Provider) resolveCertificate(ctx context.Context, domain types.Domain, 
 	}
 
 	request := certificate.ObtainRequest{
-		Domains:    domains,
-		Bundle:     true,
-		MustStaple: oscpMustStaple,
+		Domains:        domains,
+		Bundle:         true,
+		MustStaple:     oscpMustStaple,
+		PreferredChain: p.PreferredChain,
 	}
 
 	cert, err := client.Certificate.Obtain(request)

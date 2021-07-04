@@ -20,13 +20,13 @@ and [Docker Swarm Mode](https://docs.docker.com/engine/swarm/).
 
     Enabling the docker provider
 
-    ```toml tab="File (TOML)"
-    [providers.docker]
-    ```
-
     ```yaml tab="File (YAML)"
     providers:
       docker: {}
+    ```
+
+    ```toml tab="File (TOML)"
+    [providers.docker]
     ```
 
     ```bash tab="CLI"
@@ -48,15 +48,6 @@ and [Docker Swarm Mode](https://docs.docker.com/engine/swarm/).
 
     Enabling the docker provider (Swarm Mode)
 
-    ```toml tab="File (TOML)"
-    [providers.docker]
-      # swarm classic (1.12-)
-      # endpoint = "tcp://127.0.0.1:2375"
-      # docker swarm mode (1.12+)
-      endpoint = "tcp://127.0.0.1:2377"
-      swarmMode = true
-    ```
-
     ```yaml tab="File (YAML)"
     providers:
       docker:
@@ -65,6 +56,15 @@ and [Docker Swarm Mode](https://docs.docker.com/engine/swarm/).
         # docker swarm mode (1.12+)
         endpoint: "tcp://127.0.0.1:2377"
         swarmMode: true
+    ```
+
+    ```toml tab="File (TOML)"
+    [providers.docker]
+      # swarm classic (1.12-)
+      # endpoint = "tcp://127.0.0.1:2375"
+      # docker swarm mode (1.12+)
+      endpoint = "tcp://127.0.0.1:2377"
+      swarmMode = true
     ```
 
     ```bash tab="CLI"
@@ -117,7 +117,7 @@ Port detection works as follows:
 - If a container [exposes](https://docs.docker.com/engine/reference/builder/#expose) a single port,
   then Traefik uses this port for private communication.
 - If a container [exposes](https://docs.docker.com/engine/reference/builder/#expose) multiple ports,
-  or does not expose any port, then you must manually specify which port Traefik should use for communication 
+  or does not expose any port, then you must manually specify which port Traefik should use for communication
   by using the label `traefik.http.services.<service_name>.loadbalancer.server.port`
   (Read more on this label in the dedicated section in [routing](../routing/providers/docker.md#port)).
 
@@ -252,7 +252,7 @@ See the sections [Docker API Access](#docker-api-access) and [Docker Swarm API A
 
     services:
       traefik:
-         image: traefik:v2.4 # The official v2 Traefik docker image
+         image: traefik:v2.5 # The official v2 Traefik docker image
          ports:
            - "80:80"
          volumes:
@@ -261,17 +261,17 @@ See the sections [Docker API Access](#docker-api-access) and [Docker Swarm API A
 
     We specify the docker.sock in traefik's configuration file.
 
-    ```toml tab="File (TOML)"
-    [providers.docker]
-      endpoint = "unix:///var/run/docker.sock"
-      # ...
-    ```
-
     ```yaml tab="File (YAML)"
     providers:
       docker:
         endpoint: "unix:///var/run/docker.sock"
          # ...
+    ```
+
+    ```toml tab="File (TOML)"
+    [providers.docker]
+      endpoint = "unix:///var/run/docker.sock"
+      # ...
     ```
 
     ```bash tab="CLI"
@@ -285,12 +285,6 @@ See the sections [Docker API Access](#docker-api-access) and [Docker Swarm API A
     We specify the SSH host and user in Traefik's configuration file.
     Note that is server requires public keys for authentication you must have those accessible for user who runs Traefik.
 
-    ```toml tab="File (TOML)"
-    [providers.docker]
-      endpoint = "ssh://traefik@192.168.2.5:2022"
-      # ...
-    ```
-
     ```yaml tab="File (YAML)"
     providers:
       docker:
@@ -298,20 +292,26 @@ See the sections [Docker API Access](#docker-api-access) and [Docker Swarm API A
          # ...
     ```
 
+    ```toml tab="File (TOML)"
+    [providers.docker]
+      endpoint = "ssh://traefik@192.168.2.5:2022"
+      # ...
+    ```
+
     ```bash tab="CLI"
     --providers.docker.endpoint=ssh://traefik@192.168.2.5:2022
     # ...
     ```
 
-```toml tab="File (TOML)"
-[providers.docker]
-  endpoint = "unix:///var/run/docker.sock"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     endpoint: "unix:///var/run/docker.sock"
+```
+
+```toml tab="File (TOML)"
+[providers.docker]
+  endpoint = "unix:///var/run/docker.sock"
 ```
 
 ```bash tab="CLI"
@@ -350,17 +350,17 @@ but still uses the `traefik.http.services.<name>.loadbalancer.server.port` that 
         - `ExtPort` stands for "external Port found in the binding"
         - `IntPort` stands for "internal network container's port."
 
-```toml tab="File (TOML)"
-[providers.docker]
-  useBindPortIP = true
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     useBindPortIP: true
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.docker]
+  useBindPortIP = true
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -377,17 +377,17 @@ If set to `false`, containers that do not have a `traefik.enable=true` label are
 
 For additional information, refer to [Restrict the Scope of Service Discovery](./overview.md#restrict-the-scope-of-service-discovery).
 
-```toml tab="File (TOML)"
-[providers.docker]
-  exposedByDefault = false
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     exposedByDefault: false
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.docker]
+  exposedByDefault = false
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -403,17 +403,17 @@ Defines a default docker network to use for connections to all containers.
 
 This option can be overridden on a per-container basis with the `traefik.docker.network` label.
 
-```toml tab="File (TOML)"
-[providers.docker]
-  network = "test"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     network: test
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.docker]
+  network = "test"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -432,17 +432,17 @@ It must be a valid [Go template](https://golang.org/pkg/text/template/), and can
 The container service name can be accessed with the `Name` identifier,
 and the template has access to all the labels defined on this container.
 
-```toml tab="File (TOML)"
-[providers.docker]
-  defaultRule = "Host(`{{ .Name }}.{{ index .Labels \"customLabel\"}}`)"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     defaultRule: "Host(`{{ .Name }}.{{ index .Labels \"customLabel\"}}`)"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.docker]
+  defaultRule = "Host(`{{ .Name }}.{{ index .Labels \"customLabel\"}}`)"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -456,17 +456,17 @@ _Optional, Default=false_
 
 Enables the Swarm Mode (instead of standalone Docker).
 
-```toml tab="File (TOML)"
-[providers.docker]
-  swarmMode = true
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     swarmMode: true
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.docker]
+  swarmMode = true
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -480,17 +480,17 @@ _Optional, Default=15_
 
 Defines the polling interval (in seconds) for Swarm Mode.
 
-```toml tab="File (TOML)"
-[providers.docker]
-  swarmModeRefreshSeconds = 30
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     swarmModeRefreshSeconds: 30
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.docker]
+  swarmModeRefreshSeconds = 30
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -504,17 +504,17 @@ _Optional, Default=0_
 
 Defines the client timeout (in seconds) for HTTP connections. If its value is `0`, no timeout is set.
 
-```toml tab="File (TOML)"
-[providers.docker]
-  httpClientTimeout = 300
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     httpClientTimeout: 300
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.docker]
+  httpClientTimeout = 300
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -528,17 +528,17 @@ _Optional, Default=true_
 
 Watch Docker Swarm events.
 
-```toml tab="File (TOML)"
-[providers.docker]
-  watch = false
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     watch: false
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.docker]
+  watch = false
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -591,17 +591,17 @@ as well as the usual boolean logic, as shown in examples below.
 
 For additional information, refer to [Restrict the Scope of Service Discovery](./overview.md#restrict-the-scope-of-service-discovery).
 
-```toml tab="File (TOML)"
-[providers.docker]
-  constraints = "Label(`a.label.name`,`foo`)"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     constraints: "Label(`a.label.name`,`foo`)"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.docker]
+  constraints = "Label(`a.label.name`,`foo`)"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -617,16 +617,16 @@ _Optional_
 
 Certificate Authority used for the secure connection to Docker.
 
-```toml tab="File (TOML)"
-[providers.docker.tls]
-  ca = "path/to/ca.crt"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     tls:
       ca: path/to/ca.crt
+```
+
+```toml tab="File (TOML)"
+[providers.docker.tls]
+  ca = "path/to/ca.crt"
 ```
 
 ```bash tab="CLI"
@@ -645,16 +645,16 @@ When this option is set to `true`, a client certificate is requested during the 
 
 When this option is set to `false`, a client certificate is requested during the handshake, and at least one valid certificate should be sent by the client.
 
-```toml tab="File (TOML)"
-[providers.docker.tls]
-  caOptional = true
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     tls:
       caOptional: true
+```
+
+```toml tab="File (TOML)"
+[providers.docker.tls]
+  caOptional = true
 ```
 
 ```bash tab="CLI"
@@ -665,18 +665,18 @@ providers:
 
 Public certificate used for the secure connection to Docker.
 
-```toml tab="File (TOML)"
-[providers.docker.tls]
-  cert = "path/to/foo.cert"
-  key = "path/to/foo.key"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     tls:
       cert: path/to/foo.cert
       key: path/to/foo.key
+```
+
+```toml tab="File (TOML)"
+[providers.docker.tls]
+  cert = "path/to/foo.cert"
+  key = "path/to/foo.key"
 ```
 
 ```bash tab="CLI"
@@ -688,18 +688,18 @@ providers:
 
 Private certificate used for the secure connection to Docker.
 
-```toml tab="File (TOML)"
-[providers.docker.tls]
-  cert = "path/to/foo.cert"
-  key = "path/to/foo.key"
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     tls:
       cert: path/to/foo.cert
       key: path/to/foo.key
+```
+
+```toml tab="File (TOML)"
+[providers.docker.tls]
+  cert = "path/to/foo.cert"
+  key = "path/to/foo.key"
 ```
 
 ```bash tab="CLI"
@@ -711,16 +711,16 @@ providers:
 
 If `insecureSkipVerify` is `true`, the TLS connection to Docker accepts any certificate presented by the server regardless of the hostnames it covers.
 
-```toml tab="File (TOML)"
-[providers.docker.tls]
-  insecureSkipVerify = true
-```
-
 ```yaml tab="File (YAML)"
 providers:
   docker:
     tls:
       insecureSkipVerify: true
+```
+
+```toml tab="File (TOML)"
+[providers.docker.tls]
+  insecureSkipVerify = true
 ```
 
 ```bash tab="CLI"

@@ -3,3 +3,9 @@ whoami1:
 
 whoami2:
   image: traefik/whoami
+
+whoami3:
+  image: traefik/whoami
+
+whoami4:
+  image: traefik/whoami

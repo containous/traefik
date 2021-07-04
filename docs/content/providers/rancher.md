@@ -18,13 +18,13 @@ Attach labels to your services and let Traefik do the rest!
 
     Enabling the Rancher provider
 
-    ```toml tab="File (TOML)"
-    [providers.rancher]
-    ```
-
     ```yaml tab="File (YAML)"
     providers:
       rancher: {}
+    ```
+
+    ```toml tab="File (TOML)"
+    [providers.rancher]
     ```
 
     ```bash tab="CLI"
@@ -48,12 +48,12 @@ See the dedicated section in [routing](../routing/providers/rancher.md).
 
     For an overview of all the options that can be set with the Rancher provider, see the following snippets:
 
-    ```toml tab="File (TOML)"
-    --8<-- "content/providers/rancher.toml"
-    ```
-
     ```yaml tab="File (YAML)"
     --8<-- "content/providers/rancher.yml"
+    ```
+
+    ```toml tab="File (TOML)"
+    --8<-- "content/providers/rancher.toml"
     ```
 
     ```bash tab="CLI"
@@ -69,17 +69,17 @@ If set to `false`, services that do not have a `traefik.enable=true` label are i
 
 For additional information, refer to [Restrict the Scope of Service Discovery](./overview.md#restrict-the-scope-of-service-discovery).
 
-```toml tab="File (TOML)"
-[providers.rancher]
-  exposedByDefault = false
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   rancher:
     exposedByDefault: false
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.rancher]
+  exposedByDefault = false
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -102,17 +102,17 @@ and the template has access to all the labels defined on this container.
 
 This option can be overridden on a container basis with the `traefik.http.routers.Router1.rule` label.
 
-```toml tab="File (TOML)"
-[providers.rancher]
-  defaultRule = "Host(`{{ .Name }}.{{ index .Labels \"customLabel\"}}`)"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   rancher:
     defaultRule: "Host(`{{ .Name }}.{{ index .Labels \"customLabel\"}}`)"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.rancher]
+  defaultRule = "Host(`{{ .Name }}.{{ index .Labels \"customLabel\"}}`)"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -126,17 +126,17 @@ _Optional, Default=true_
 
 Filter out services with unhealthy states and inactive states.
 
-```toml tab="File (TOML)"
-[providers.rancher]
-  enableServiceHealthFilter = false
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   rancher:
     enableServiceHealthFilter: false
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.rancher]
+  enableServiceHealthFilter = false
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -150,17 +150,17 @@ _Optional, Default=15_
 
 Defines the polling interval (in seconds).
 
-```toml tab="File (TOML)"
-[providers.rancher]
-  refreshSeconds = 30
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   rancher:
     refreshSeconds: 30
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.rancher]
+  refreshSeconds = 30
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -175,17 +175,17 @@ _Optional, Default=false_
 Poll the Rancher metadata service for changes every `rancher.refreshSeconds`,
 which is less accurate than the default long polling technique which provides near instantaneous updates to Traefik.
 
-```toml tab="File (TOML)"
-[providers.rancher]
-  intervalPoll = true
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   rancher:
     intervalPoll: true
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.rancher]
+  intervalPoll = true
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -199,17 +199,17 @@ _Optional, Default="/latest"_
 
 Prefix used for accessing the Rancher metadata service.
 
-```toml tab="File (TOML)"
-[providers.rancher]
-  prefix = "/test"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   rancher:
     prefix: "/test"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.rancher]
+  prefix = "/test"
+  # ...
 ```
 
 ```bash tab="CLI"
@@ -262,17 +262,17 @@ the usual boolean logic, as shown in examples below.
 
 For additional information, refer to [Restrict the Scope of Service Discovery](./overview.md#restrict-the-scope-of-service-discovery).
 
-```toml tab="File (TOML)"
-[providers.rancher]
-  constraints = "Label(`a.label.name`,`foo`)"
-  # ...
-```
-
 ```yaml tab="File (YAML)"
 providers:
   rancher:
     constraints: "Label(`a.label.name`,`foo`)"
     # ...
+```
+
+```toml tab="File (TOML)"
+[providers.rancher]
+  constraints = "Label(`a.label.name`,`foo`)"
+  # ...
 ```
 
 ```bash tab="CLI"

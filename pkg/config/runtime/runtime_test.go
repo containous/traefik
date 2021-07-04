@@ -48,7 +48,7 @@ func TestPopulateUsedBy(t *testing.T) {
 									{URL: "http://127.0.0.1:8085"},
 									{URL: "http://127.0.0.1:8086"},
 								},
-								HealthCheck: &dynamic.HealthCheck{
+								HealthCheck: &dynamic.ServerHealthCheck{
 									Interval: "500ms",
 									Path:     "/health",
 								},
@@ -158,7 +158,7 @@ func TestPopulateUsedBy(t *testing.T) {
 										URL: "http://127.0.0.1:8086",
 									},
 								},
-								HealthCheck: &dynamic.HealthCheck{
+								HealthCheck: &dynamic.ServerHealthCheck{
 									Interval: "500ms",
 									Path:     "/health",
 								},
@@ -176,7 +176,7 @@ func TestPopulateUsedBy(t *testing.T) {
 										URL: "http://127.0.0.1:8088",
 									},
 								},
-								HealthCheck: &dynamic.HealthCheck{
+								HealthCheck: &dynamic.ServerHealthCheck{
 									Interval: "500ms",
 									Path:     "/health",
 								},

@@ -555,8 +555,8 @@ func loadService(client Client, namespace string, backend networkingv1.IngressBa
 		return nil, errors.New("endpoints not found")
 	}
 
-	var port int32
 	for _, subset := range endpoints.Subsets {
+		var port int32
 		for _, p := range subset.Ports {
 			if portName == p.Name {
 				port = p.Port

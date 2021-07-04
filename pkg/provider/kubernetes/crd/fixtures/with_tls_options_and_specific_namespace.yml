@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: secretCA1
+  name: secret-ca1
   namespace: myns
 
 data:
@@ -11,7 +11,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: secretCA2
+  name: secret-ca2
   namespace: myns
 
 data:
@@ -32,8 +32,8 @@ spec:
     - TLS_RSA_WITH_AES_256_GCM_SHA384
   clientAuth:
     secretNames:
-      - secretCA1
-      - secretCA2
+      - secret-ca1
+      - secret-ca2
     clientAuthType: VerifyClientCertIfGiven
 
 ---

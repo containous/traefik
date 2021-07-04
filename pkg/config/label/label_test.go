@@ -68,6 +68,7 @@ func TestDecodeConfiguration(t *testing.T) {
 		"traefik.http.middlewares.Middleware8.headers.publickey":                                   "foobar",
 		"traefik.http.middlewares.Middleware8.headers.referrerpolicy":                              "foobar",
 		"traefik.http.middlewares.Middleware8.headers.featurepolicy":                               "foobar",
+		"traefik.http.middlewares.Middleware8.headers.permissionspolicy":                           "foobar",
 		"traefik.http.middlewares.Middleware8.headers.sslforcehost":                                "true",
 		"traefik.http.middlewares.Middleware8.headers.sslhost":                                     "foobar",
 		"traefik.http.middlewares.Middleware8.headers.sslproxyheaders.name0":                       "foobar",
@@ -584,6 +585,7 @@ func TestDecodeConfiguration(t *testing.T) {
 						PublicKey:               "foobar",
 						ReferrerPolicy:          "foobar",
 						FeaturePolicy:           "foobar",
+						PermissionsPolicy:       "foobar",
 						IsDevelopment:           true,
 					},
 				},
@@ -627,7 +629,7 @@ func TestDecodeConfiguration(t *testing.T) {
 								Port:   "8080",
 							},
 						},
-						HealthCheck: &dynamic.HealthCheck{
+						HealthCheck: &dynamic.ServerHealthCheck{
 							Scheme:   "foobar",
 							Path:     "foobar",
 							Port:     42,
@@ -654,7 +656,7 @@ func TestDecodeConfiguration(t *testing.T) {
 								Port:   "8080",
 							},
 						},
-						HealthCheck: &dynamic.HealthCheck{
+						HealthCheck: &dynamic.ServerHealthCheck{
 							Scheme:   "foobar",
 							Path:     "foobar",
 							Port:     42,
@@ -1069,6 +1071,7 @@ func TestEncodeConfiguration(t *testing.T) {
 						PublicKey:               "foobar",
 						ReferrerPolicy:          "foobar",
 						FeaturePolicy:           "foobar",
+						PermissionsPolicy:       "foobar",
 						IsDevelopment:           true,
 					},
 				},
@@ -1103,7 +1106,7 @@ func TestEncodeConfiguration(t *testing.T) {
 								Port:   "8080",
 							},
 						},
-						HealthCheck: &dynamic.HealthCheck{
+						HealthCheck: &dynamic.ServerHealthCheck{
 							Scheme:   "foobar",
 							Path:     "foobar",
 							Port:     42,
@@ -1129,7 +1132,7 @@ func TestEncodeConfiguration(t *testing.T) {
 								Port:   "8080",
 							},
 						},
-						HealthCheck: &dynamic.HealthCheck{
+						HealthCheck: &dynamic.ServerHealthCheck{
 							Scheme:   "foobar",
 							Path:     "foobar",
 							Port:     42,
@@ -1210,6 +1213,7 @@ func TestEncodeConfiguration(t *testing.T) {
 		"traefik.HTTP.Middlewares.Middleware8.Headers.PublicKey":                                   "foobar",
 		"traefik.HTTP.Middlewares.Middleware8.Headers.ReferrerPolicy":                              "foobar",
 		"traefik.HTTP.Middlewares.Middleware8.Headers.FeaturePolicy":                               "foobar",
+		"traefik.HTTP.Middlewares.Middleware8.Headers.PermissionsPolicy":                           "foobar",
 		"traefik.HTTP.Middlewares.Middleware8.Headers.SSLForceHost":                                "true",
 		"traefik.HTTP.Middlewares.Middleware8.Headers.SSLHost":                                     "foobar",
 		"traefik.HTTP.Middlewares.Middleware8.Headers.SSLProxyHeaders.name0":                       "foobar",

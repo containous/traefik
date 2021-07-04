@@ -43,14 +43,16 @@ func (s *DepthStrategy) GetIP(req *http.Request) string {
 	return strings.TrimSpace(xffs[len(xffs)-s.Depth])
 }
 
-// CheckerStrategy a strategy based on an IP Checker
-// allows to check that addresses are in a trusted IPs.
-type CheckerStrategy struct {
+// PoolStrategy is a strategy based on an IP Checker.
+// It allows to check whether addresses are in a given pool of IPs.
+type PoolStrategy struct {
 	Checker *Checker
 }
 
-// GetIP return the selected IP.
-func (s *CheckerStrategy) GetIP(req *http.Request) string {
+// GetIP checks the list of Forwarded IPs (most recent first) against the
+// Checker pool of IPs. It returns the first IP that is not in the pool, or the
+// empty string otherwise.
+func (s *PoolStrategy) GetIP(req *http.Request) string {
 	if s.Checker == nil {
 		return ""
 	}
@@ -60,9 +62,13 @@ func (s *CheckerStrategy) GetIP(req *http.Request) string {
 
 	for i := len(xffs) - 1; i >= 0; i-- {
 		xffTrimmed := strings.TrimSpace(xffs[i])
+		if len(xffTrimmed) == 0 {
+			continue
+		}
 		if contain, _ := s.Checker.Contains(xffTrimmed); !contain {
 			return xffTrimmed
 		}
 	}
+
 	return ""
 }
