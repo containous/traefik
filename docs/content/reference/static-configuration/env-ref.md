@@ -243,6 +243,36 @@ Datadog push interval. (Default: ```10```)
 `TRAEFIK_METRICS_INFLUXDB`:  
 InfluxDB metrics exporter type. (Default: ```false```)
 
+`TRAEFIK_METRICS_INFLUXDB2`:  
+InfluxDB v2 metrics exporter type. (Default: ```false```)
+
+`TRAEFIK_METRICS_INFLUXDB2_ADDENTRYPOINTSLABELS`:  
+Enable metrics on entry points. (Default: ```true```)
+
+`TRAEFIK_METRICS_INFLUXDB2_ADDRESS`:  
+InfluxDB v2 server address. (Default: ```localhost:8086```)
+
+`TRAEFIK_METRICS_INFLUXDB2_ADDSERVICESLABELS`:  
+Enable metrics on services. (Default: ```true```)
+
+`TRAEFIK_METRICS_INFLUXDB2_BATCHSIZE`:  
+InfluxDB v2 push batch size. (Default: ```10```)
+
+`TRAEFIK_METRICS_INFLUXDB2_BUCKET`:  
+InfluxDB v2 bucket ID.
+
+`TRAEFIK_METRICS_INFLUXDB2_ORG`:  
+InfluxDB v2 org ID.
+
+`TRAEFIK_METRICS_INFLUXDB2_POINTINTERVAL`:  
+Interval between points saving. (Default: ```10```)
+
+`TRAEFIK_METRICS_INFLUXDB2_PUSHINTERVAL`:  
+InfluxDB v2 push to DB interval. (Default: ```30```)
+
+`TRAEFIK_METRICS_INFLUXDB2_TOKEN`:  
+InfluxDB v2 access token.
+
 `TRAEFIK_METRICS_INFLUXDB_ADDENTRYPOINTSLABELS`:  
 Enable metrics on entry points. (Default: ```true```)
 
