@@ -122,6 +122,7 @@ func (i *InfluxDB2) SetDefaults() {
 	i.BatchSize = 10
 	i.PushInterval = types.Duration(30 * time.Second)
 	i.AddEntryPointsLabels = true
+	i.AddRoutersLabels = true
 	i.AddServicesLabels = true
 }
 
