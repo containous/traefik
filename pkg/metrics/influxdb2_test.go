@@ -243,9 +243,11 @@ type mockInfluxDB2Client struct{}
 func (c *mockInfluxDB2Client) Setup(ctx context.Context, username, password, org, bucket string, retentionPeriodHours int) (*domain.OnboardingResponse, error) {
 	return nil, nil
 }
+
 func (c *mockInfluxDB2Client) Ready(ctx context.Context) (bool, error) {
 	return true, nil
 }
+
 func (c *mockInfluxDB2Client) Health(ctx context.Context) (*domain.HealthCheck, error) {
 	return nil, nil
 }
@@ -253,39 +255,51 @@ func (c *mockInfluxDB2Client) Close() {}
 func (c *mockInfluxDB2Client) Options() *influxdb2.Options {
 	return nil
 }
+
 func (c *mockInfluxDB2Client) ServerURL() string {
 	return ""
 }
+
 func (c *mockInfluxDB2Client) HTTPService() httpApi.Service {
 	return nil
 }
+
 func (c *mockInfluxDB2Client) WriteAPI(org, bucket string) api.WriteAPI {
 	return nil
 }
+
 func (c *mockInfluxDB2Client) WriteAPIBlocking(org, bucket string) api.WriteAPIBlocking {
 	return nil
 }
+
 func (c *mockInfluxDB2Client) QueryAPI(org string) api.QueryAPI {
 	return nil
 }
+
 func (c *mockInfluxDB2Client) AuthorizationsAPI() api.AuthorizationsAPI {
 	return nil
 }
+
 func (c *mockInfluxDB2Client) OrganizationsAPI() api.OrganizationsAPI {
 	return nil
 }
+
 func (c *mockInfluxDB2Client) UsersAPI() api.UsersAPI {
 	return nil
 }
+
 func (c *mockInfluxDB2Client) DeleteAPI() api.DeleteAPI {
 	return nil
 }
+
 func (c *mockInfluxDB2Client) BucketsAPI() api.BucketsAPI {
 	return nil
 }
+
 func (c *mockInfluxDB2Client) LabelsAPI() api.LabelsAPI {
 	return nil
 }
+
 func (c *mockInfluxDB2Client) TasksAPI() api.TasksAPI {
 	return nil
 }
