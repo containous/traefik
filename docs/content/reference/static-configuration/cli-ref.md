@@ -280,7 +280,10 @@ InfluxDB v2 metrics exporter type. (Default: ```false```)
 Enable metrics on entry points. (Default: ```true```)
 
 `--metrics.influxdb2.address`:  
-InfluxDB v2 server address. (Default: ```localhost:8086```)
+InfluxDB v2 server address. (Default: ```http://localhost:8086```)
+
+`--metrics.influxdb2.addrouterslabels`:  
+Enable metrics on routers. (Default: ```false```)
 
 `--metrics.influxdb2.addserviceslabels`:  
 Enable metrics on services. (Default: ```true```)
@@ -294,11 +297,8 @@ InfluxDB v2 bucket ID.
 `--metrics.influxdb2.org`:  
 InfluxDB v2 org ID.
 
-`--metrics.influxdb2.pointinterval`:  
-Interval between points saving. (Default: ```10```)
-
 `--metrics.influxdb2.pushinterval`:  
-InfluxDB v2 push to DB interval. (Default: ```30```)
+InfluxDB v2 push interval. (Default: ```30```)
 
 `--metrics.influxdb2.token`:  
 InfluxDB v2 access token.
