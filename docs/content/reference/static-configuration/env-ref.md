@@ -253,7 +253,7 @@ Enable metrics on entry points. (Default: ```true```)
 InfluxDB v2 server address. (Default: ```http://localhost:8086```)
 
 `TRAEFIK_METRICS_INFLUXDB2_ADDROUTERSLABELS`:  
-Enable metrics on routers. (Default: ```false```)
+Enable metrics on routers. (Default: ```true```)
 
 `TRAEFIK_METRICS_INFLUXDB2_ADDSERVICESLABELS`:  
 Enable metrics on services. (Default: ```true```)
