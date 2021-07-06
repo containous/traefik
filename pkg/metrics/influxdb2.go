@@ -18,24 +18,25 @@ var (
 )
 
 const (
-	influxDB2MetricsServiceReqsName      = "traefik_service_requests_total"
-	influxDB2MetricsServiceReqsTLSName   = "traefik_service_requests_tls_total"
-	influxDB2MetricsServiceLatencyName   = "traefik_service_request_duration"
-	influxDB2RetriesTotalName            = "traefik_service_retries_total"
-	influxDB2ConfigReloadsName           = "traefik_config_reload_total"
-	influxDB2ConfigReloadsFailureName    = influxDBConfigReloadsName + "_failure"
-	influxDB2LastConfigReloadSuccessName = "traefik_config_reload_lastSuccessTimestamp"
-	influxDB2LastConfigReloadFailureName = "traefik_config_reload_lastFailureTimestamp"
-	influxDB2EntryPointReqsName          = "traefik_entrypoint_requests_total"
-	influxDB2EntryPointReqsTLSName       = "traefik_entrypoint_requests_tls_total"
-	influxDB2EntryPointReqDurationName   = "traefik_entrypoint_request_duration"
-	influxDB2EntryPointOpenConnsName     = "traefik_entrypoint_connections_open"
-	influxDB2RouterReqsName              = "traefik.router.requests.total"
-	influxDB2RouterReqsTLSName           = "traefik.router.requests.tls.total"
-	influxDB2RouterReqsDurationName      = "traefik.router.request.duration"
-	influxDB2RouterOpenConnsName         = "traefik.router.connections.open"
-	influxDB2OpenConnsName               = "traefik_service_connections_open"
-	influxDB2ServerUpName                = "traefik_service_server_up"
+	influxDB2MetricsServiceReqsName        = "traefik_service_requests_total"
+	influxDB2MetricsServiceReqsTLSName     = "traefik_service_requests_tls_total"
+	influxDB2MetricsServiceLatencyName     = "traefik_service_request_duration"
+	influxDB2RetriesTotalName              = "traefik_service_retries_total"
+	influxDB2ConfigReloadsName             = "traefik_config_reload_total"
+	influxDB2ConfigReloadsFailureName      = influxDBConfigReloadsName + "_failure"
+	influxDB2LastConfigReloadSuccessName   = "traefik_config_reload_lastSuccessTimestamp"
+	influxDB2LastConfigReloadFailureName   = "traefik_config_reload_lastFailureTimestamp"
+	influxDB2EntryPointReqsName            = "traefik_entrypoint_requests_total"
+	influxDB2EntryPointReqsTLSName         = "traefik_entrypoint_requests_tls_total"
+	influxDB2EntryPointReqDurationName     = "traefik_entrypoint_request_duration"
+	influxDB2EntryPointOpenConnsName       = "traefik_entrypoint_connections_open"
+	influxDB2RouterReqsName                = "traefik_router_requests_total"
+	influxDB2RouterReqsTLSName             = "traefik_router_requests_tls_total"
+	influxDB2RouterReqsDurationName        = "traefik_router_request_duration"
+	influxDB2RouterOpenConnsName           = "traefik_router_connections_open"
+	influxDB2OpenConnsName                 = "traefik_service_connections_open"
+	influxDB2ServerUpName                  = "traefik_service_server_up"
+	influxDB2TLSCertsNotAfterTimestampName = "traefik_tls_certs_notAfterTimestamp"
 )
 
 // RegisterInfluxDB2 creates metrics exporter for InfluxDB2.
@@ -61,10 +62,11 @@ func RegisterInfluxDB2(ctx context.Context, config *types.InfluxDB2) Registry {
 	}
 
 	registry := &standardRegistry{
-		configReloadsCounter:         newInfluxDB2Counter(influxDB2ConfigReloadsName),
-		configReloadsFailureCounter:  newInfluxDB2Counter(influxDB2ConfigReloadsFailureName),
-		lastConfigReloadSuccessGauge: newInfluxDB2Gauge(influxDB2LastConfigReloadSuccessName),
-		lastConfigReloadFailureGauge: newInfluxDB2Gauge(influxDB2LastConfigReloadFailureName),
+		configReloadsCounter:           newInfluxDB2Counter(influxDB2ConfigReloadsName),
+		configReloadsFailureCounter:    newInfluxDB2Counter(influxDB2ConfigReloadsFailureName),
+		lastConfigReloadSuccessGauge:   newInfluxDB2Gauge(influxDB2LastConfigReloadSuccessName),
+		lastConfigReloadFailureGauge:   newInfluxDB2Gauge(influxDB2LastConfigReloadFailureName),
+		tlsCertsNotAfterTimestampGauge: newInfluxDB2Gauge(influxDB2TLSCertsNotAfterTimestampName),
 	}
 
 	if config.AddEntryPointsLabels {
