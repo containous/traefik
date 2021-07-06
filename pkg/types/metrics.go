@@ -14,6 +14,7 @@ type Metrics struct {
 	Datadog    *Datadog    `description:"Datadog metrics exporter type." json:"datadog,omitempty" toml:"datadog,omitempty" yaml:"datadog,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
 	StatsD     *Statsd     `description:"StatsD metrics exporter type." json:"statsD,omitempty" toml:"statsD,omitempty" yaml:"statsD,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
 	InfluxDB   *InfluxDB   `description:"InfluxDB metrics exporter type." json:"influxDB,omitempty" toml:"influxDB,omitempty" yaml:"influxDB,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
+	InfluxDB2  *InfluxDB2  `description:"InfluxDB v2 metrics exporter type." json:"influxDB2,omitempty" toml:"influxDB2,omitempty" yaml:"influxDB2,omitempty" label:"allowEmpty" file:"allowEmpty" export:"true"`
 }
 
 // Prometheus can contain specific configuration used by the Prometheus Metrics exporter.
@@ -99,6 +100,29 @@ func (i *InfluxDB) SetDefaults() {
 	i.Protocol = "udp"
 	i.PushInterval = types.Duration(10 * time.Second)
 	i.AddEntryPointsLabels = true
+	i.AddServicesLabels = true
+}
+
+// InfluxDB2 contains address, token and metrics pushing interval configuration.
+type InfluxDB2 struct {
+	Address              string         `description:"InfluxDB v2 server address." json:"address,omitempty" toml:"address,omitempty" yaml:"address,omitempty"`
+	Token                string         `description:"InfluxDB v2 access token." json:"token,omitempty" toml:"token,omitempty" yaml:"token,omitempty"`
+	BatchSize            uint           `description:"InfluxDB v2 push batch size." json:"batchSize,omitempty" toml:"batchSize,omitempty" yaml:"batchSize,omitempty" export:"true"`
+	PushInterval         types.Duration `description:"InfluxDB v2 push interval." json:"pushInterval,omitempty" toml:"pushInterval,omitempty" yaml:"pushInterval,omitempty" export:"true"`
+	Org                  string         `description:"InfluxDB v2 org ID." json:"org,omitempty" toml:"org,omitempty" yaml:"org,omitempty" export:"true"`
+	Bucket               string         `description:"InfluxDB v2 bucket ID." json:"bucket,omitempty" toml:"bucket,omitempty" yaml:"bucket,omitempty" export:"true"`
+	AddEntryPointsLabels bool           `description:"Enable metrics on entry points." json:"addEntryPointsLabels,omitempty" toml:"addEntryPointsLabels,omitempty" yaml:"addEntryPointsLabels,omitempty" export:"true"`
+	AddRoutersLabels     bool           `description:"Enable metrics on routers." json:"addRoutersLabels,omitempty" toml:"addRoutersLabels,omitempty" yaml:"addRoutersLabels,omitempty" export:"true"`
+	AddServicesLabels    bool           `description:"Enable metrics on services." json:"addServicesLabels,omitempty" toml:"addServicesLabels,omitempty" yaml:"addServicesLabels,omitempty" export:"true"`
+}
+
+// SetDefaults sets the default values.
+func (i *InfluxDB2) SetDefaults() {
+	i.Address = "http://localhost:8086"
+	i.BatchSize = 10
+	i.PushInterval = types.Duration(30 * time.Second)
+	i.AddEntryPointsLabels = true
+	i.AddRoutersLabels = true
 	i.AddServicesLabels = true
 }
 

@@ -456,6 +456,20 @@ func registerMetricClients(metricsConfig *types.Metrics) []metrics.Registry {
 			metricsConfig.InfluxDB.Address, metricsConfig.InfluxDB.PushInterval)
 	}
 
+	if metricsConfig.InfluxDB2 != nil {
+		ctx := log.With(context.Background(), log.Str(log.MetricsProviderName, "influxdb2"))
+
+		if metricsConfig.InfluxDB2.Token == "" ||
+			metricsConfig.InfluxDB2.Org == "" ||
+			metricsConfig.InfluxDB2.Bucket == "" {
+			log.FromContext(ctx).Warn("InfluxDB v2 config must contain token, org and bucket properties!")
+		}
+
+		registries = append(registries, metrics.RegisterInfluxDB2(ctx, metricsConfig.InfluxDB2))
+		log.FromContext(ctx).Debugf("Configured InfluxDB v2 metrics: pushing to %s (%s org/%s bucket) once every %s",
+			metricsConfig.InfluxDB2.Address, metricsConfig.InfluxDB2.Org, metricsConfig.InfluxDB2.Bucket, metricsConfig.InfluxDB2.PushInterval)
+	}
+
 	return registries
 }
 
