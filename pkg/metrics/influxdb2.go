@@ -2,6 +2,8 @@ package metrics
 
 import (
 	"context"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-kit/kit/metrics"
@@ -127,12 +129,14 @@ func sendInfluxDB2(name string, labels []string, value interface{}) {
 }
 
 type influxDB2Counter struct {
-	c *generic.Counter
+	c        *generic.Counter
+	counters *sync.Map
 }
 
 func newInfluxDB2Counter(name string) *influxDB2Counter {
 	return &influxDB2Counter{
-		c: generic.NewCounter(name),
+		c:        generic.NewCounter(name),
+		counters: &sync.Map{},
 	}
 }
 
@@ -142,23 +146,30 @@ func (c *influxDB2Counter) With(labels ...string) metrics.Counter {
 	newCounter.ValueReset()
 
 	return &influxDB2Counter{
-		c: newCounter,
+		c:        newCounter,
+		counters: c.counters,
 	}
 }
 
 // Add adds the given delta to the counter.
 func (c *influxDB2Counter) Add(delta float64) {
-	c.c.Add(delta)
-	sendInfluxDB2(c.c.Name, c.c.LabelValues(), c.c.Value())
+	labelsKey := strings.Join(c.c.LabelValues(), ",")
+	v, _ := c.counters.LoadOrStore(labelsKey, c)
+	counter := v.(*influxDB2Counter)
+	counter.c.Add(delta)
+
+	sendInfluxDB2(counter.c.Name, counter.c.LabelValues(), counter.c.Value())
 }
 
 type influxDB2Gauge struct {
-	g *generic.Gauge
+	g      *generic.Gauge
+	gauges *sync.Map
 }
 
 func newInfluxDB2Gauge(name string) *influxDB2Gauge {
 	return &influxDB2Gauge{
-		g: generic.NewGauge(name),
+		g:      generic.NewGauge(name),
+		gauges: &sync.Map{},
 	}
 }
 
@@ -168,20 +179,29 @@ func (g *influxDB2Gauge) With(labels ...string) metrics.Gauge {
 	newGauge.Set(0)
 
 	return &influxDB2Gauge{
-		g: newGauge,
+		g:      newGauge,
+		gauges: g.gauges,
 	}
 }
 
 // Set sets the given value to the gauge.
 func (g *influxDB2Gauge) Set(value float64) {
-	g.g.Set(value)
-	sendInfluxDB2(g.g.Name, g.g.LabelValues(), g.g.Value())
+	labelsKey := strings.Join(g.g.LabelValues(), ",")
+	v, _ := g.gauges.LoadOrStore(labelsKey, g)
+	gauge := v.(*influxDB2Gauge)
+	gauge.g.Set(value)
+
+	sendInfluxDB2(gauge.g.Name, gauge.g.LabelValues(), value)
 }
 
 // Add adds the given delta to the gauge.
 func (g *influxDB2Gauge) Add(delta float64) {
-	g.g.Add(delta)
-	sendInfluxDB2(g.g.Name, g.g.LabelValues(), g.g.Value())
+	labelsKey := strings.Join(g.g.LabelValues(), ",")
+	v, _ := g.gauges.LoadOrStore(labelsKey, g)
+	gauge := v.(*influxDB2Gauge)
+	gauge.g.Add(delta)
+
+	sendInfluxDB2(gauge.g.Name, gauge.g.LabelValues(), gauge.g.Value())
 }
 
 type influxDB2Histogram struct {
