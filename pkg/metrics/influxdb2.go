@@ -79,10 +79,10 @@ func RegisterInfluxDB2(ctx context.Context, config *types.InfluxDB2) Registry {
 
 	if config.AddRoutersLabels {
 		registry.routerEnabled = config.AddRoutersLabels
-		registry.routerReqsCounter = influxDBClient.NewCounter(influxDB2RouterReqsName)
-		registry.routerReqsTLSCounter = influxDBClient.NewCounter(influxDB2RouterReqsTLSName)
+		registry.routerReqsCounter = newInfluxDB2Counter(influxDB2RouterReqsName)
+		registry.routerReqsTLSCounter = newInfluxDB2Counter(influxDB2RouterReqsTLSName)
 		registry.routerReqDurationHistogram, _ = NewHistogramWithScale(newInfluxDB2Histogram(influxDB2RouterReqsDurationName), time.Second)
-		registry.routerOpenConnsGauge = influxDBClient.NewGauge(influxDB2RouterOpenConnsName)
+		registry.routerOpenConnsGauge = newInfluxDB2Gauge(influxDB2RouterOpenConnsName)
 	}
 
 	if config.AddServicesLabels {
