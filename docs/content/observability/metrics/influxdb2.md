@@ -134,7 +134,7 @@ metrics:
 
 #### `addRoutersLabels`
 
-_Optional, Default=false_
+_Optional, Default=true_
 
 Enable metrics on routers.
 
