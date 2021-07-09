@@ -741,6 +741,7 @@ spec:
                       type: string
                     type: object
                   featurePolicy:
+                    description: 'Deprecated: use PermissionsPolicy instead.'
                     type: string
                   forceSTSHeader:
                     type: boolean
@@ -752,6 +753,8 @@ spec:
                     type: array
                   isDevelopment:
                     type: boolean
+                  permissionsPolicy:
+                    type: string
                   publicKey:
                     type: string
                   referrerPolicy:
