@@ -189,11 +189,7 @@ func (p *Provider) loadConfigurationFromIngresses(ctx context.Context, client Cl
 		TCP: &dynamic.TCPConfiguration{},
 	}
 
-	serverVersion, err := client.GetServerVersion()
-	if err != nil {
-		log.FromContext(ctx).Errorf("Failed to get server version: %v", err)
-		return conf
-	}
+	serverVersion := client.GetServerVersion()
 
 	var ingressClasses []*networkingv1beta1.IngressClass
 

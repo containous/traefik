@@ -1298,6 +1298,7 @@ func TestLoadConfigurationFromIngresses(t *testing.T) {
 			}
 
 			clientMock := newClientMock(serverVersion, paths...)
+
 			p := Provider{IngressClass: test.ingressClass}
 			conf := p.loadConfigurationFromIngresses(context.Background(), clientMock)
 

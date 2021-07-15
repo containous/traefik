@@ -60,7 +60,7 @@ type Client interface {
 	GetSecret(namespace, name string) (*corev1.Secret, bool, error)
 	GetEndpoints(namespace, name string) (*corev1.Endpoints, bool, error)
 	UpdateIngressStatus(ing *networkingv1beta1.Ingress, ingStatus []corev1.LoadBalancerIngress) error
-	GetServerVersion() (*version.Version, error)
+	GetServerVersion() *version.Version
 }
 
 type clientWrapper struct {
@@ -72,6 +72,7 @@ type clientWrapper struct {
 	ingressLabelSelector string
 	isNamespaceAll       bool
 	watchedNamespaces    []string
+	serverVersion        *version.Version
 }
 
 // newInClusterClient returns a new Provider client that is expected to run
@@ -149,6 +150,19 @@ func newClientImpl(clientset kubernetes.Interface) *clientWrapper {
 
 // WatchAll starts namespace-specific controllers for all relevant kinds.
 func (c *clientWrapper) WatchAll(namespaces []string, stopCh <-chan struct{}) (<-chan interface{}, error) {
+	// Get and store the serverVersion for future use.
+	serverVersionInfo, err := c.clientset.Discovery().ServerVersion()
+	if err != nil {
+		return nil, fmt.Errorf("could not retrieve server version: %w", err)
+	}
+
+	serverVersion, err := version.NewVersion(serverVersionInfo.GitVersion)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse server version: %w", err)
+	}
+
+	c.serverVersion = serverVersion
+
 	eventCh := make(chan interface{}, 1)
 	eventHandler := &resourceEventHandler{eventCh}
 
@@ -206,12 +220,6 @@ func (c *clientWrapper) WatchAll(namespaces []string, stopCh <-chan struct{}) (<
 				return nil, fmt.Errorf("timed out waiting for controller caches to sync %s in namespace %q", typ, ns)
 			}
 		}
-	}
-
-	serverVersion, err := c.GetServerVersion()
-	if err != nil {
-		log.WithoutContext().Errorf("Failed to get server version: %v", err)
-		return eventCh, nil
 	}
 
 	if supportsIngressClass(serverVersion) {
@@ -426,13 +434,8 @@ func (c *clientWrapper) lookupNamespace(ns string) string {
 }
 
 // GetServerVersion returns the cluster server version, or an error.
-func (c *clientWrapper) GetServerVersion() (*version.Version, error) {
-	serverVersion, err := c.clientset.Discovery().ServerVersion()
-	if err != nil {
-		return nil, fmt.Errorf("could not retrieve server version: %w", err)
-	}
-
-	return version.NewVersion(serverVersion.GitVersion)
+func (c *clientWrapper) GetServerVersion() *version.Version {
+	return c.serverVersion
 }
 
 // eventHandlerFunc will pass the obj on to the events channel or drop it.

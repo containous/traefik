@@ -73,8 +73,8 @@ func (c clientMock) GetIngresses() []*networkingv1beta1.Ingress {
 	return c.ingresses
 }
 
-func (c clientMock) GetServerVersion() (*version.Version, error) {
-	return c.serverVersion, nil
+func (c clientMock) GetServerVersion() *version.Version {
+	return c.serverVersion
 }
 
 func (c clientMock) GetService(namespace, name string) (*corev1.Service, bool, error) {
