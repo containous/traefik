@@ -44,6 +44,7 @@ require (
 	github.com/hashicorp/go-version v1.2.1
 	github.com/influxdata/influxdb1-client v0.0.0-20191209144304-8bf82d3c094d
 	github.com/instana/go-sensor v1.5.1
+	github.com/klauspost/compress v1.13.0
 	github.com/libkermit/compose v0.0.0-20171122111507-c04e39c026ad
 	github.com/libkermit/docker v0.0.0-20171122101128-e6674d32b807
 	github.com/libkermit/docker-check v0.0.0-20171122104347-1113af38e591
@@ -71,7 +72,6 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/stvp/go-udp-testing v0.0.0-20191102171040-06b61409b154
 	github.com/tinylib/msgp v1.0.2 // indirect
-	github.com/traefik/gziphandler v1.1.2-0.20210212101304-175e0fad6888
 	github.com/traefik/paerser v0.1.4
 	github.com/traefik/yaegi v0.9.20
 	github.com/uber/jaeger-client-go v2.29.1+incompatible

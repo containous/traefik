@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/klauspost/compress/gzhttp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/traefik/gziphandler"
 	"github.com/traefik/traefik/v2/pkg/config/dynamic"
 	"github.com/traefik/traefik/v2/pkg/testhelpers"
 )
@@ -26,13 +26,14 @@ func TestShouldCompressWhenNoContentEncodingHeader(t *testing.T) {
 	req := testhelpers.MustNewRequest(http.MethodGet, "http://localhost", nil)
 	req.Header.Add(acceptEncodingHeader, gzipValue)
 
-	baseBody := generateBytes(gziphandler.DefaultMinSize)
+	baseBody := generateBytes(gzhttp.DefaultMinSize)
 
 	next := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		_, err := rw.Write(baseBody)
 		assert.NoError(t, err)
 	})
-	handler := &compress{next: next}
+	handler, err := New(context.Background(), next, dynamic.Compress{}, "testing")
+	require.NoError(t, err)
 
 	rw := httptest.NewRecorder()
 	handler.ServeHTTP(rw, req)
@@ -49,7 +50,7 @@ func TestShouldNotCompressWhenContentEncodingHeader(t *testing.T) {
 	req := testhelpers.MustNewRequest(http.MethodGet, "http://localhost", nil)
 	req.Header.Add(acceptEncodingHeader, gzipValue)
 
-	fakeCompressedBody := generateBytes(gziphandler.DefaultMinSize)
+	fakeCompressedBody := generateBytes(gzhttp.DefaultMinSize)
 	next := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		rw.Header().Add(contentEncodingHeader, gzipValue)
 		rw.Header().Add(varyHeader, acceptEncodingHeader)
@@ -58,7 +59,8 @@ func TestShouldNotCompressWhenContentEncodingHeader(t *testing.T) {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 		}
 	})
-	handler := &compress{next: next}
+	handler, err := New(context.Background(), next, dynamic.Compress{}, "testing")
+	require.NoError(t, err)
 
 	rw := httptest.NewRecorder()
 	handler.ServeHTTP(rw, req)
@@ -72,14 +74,15 @@ func TestShouldNotCompressWhenContentEncodingHeader(t *testing.T) {
 func TestShouldNotCompressWhenNoAcceptEncodingHeader(t *testing.T) {
 	req := testhelpers.MustNewRequest(http.MethodGet, "http://localhost", nil)
 
-	fakeBody := generateBytes(gziphandler.DefaultMinSize)
+	fakeBody := generateBytes(gzhttp.DefaultMinSize)
 	next := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		_, err := rw.Write(fakeBody)
 		if err != nil {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 		}
 	})
-	handler := &compress{next: next}
+	handler, err := New(context.Background(), next, dynamic.Compress{}, "testing")
+	require.NoError(t, err)
 
 	rw := httptest.NewRecorder()
 	handler.ServeHTTP(rw, req)
@@ -89,7 +92,7 @@ func TestShouldNotCompressWhenNoAcceptEncodingHeader(t *testing.T) {
 }
 
 func TestShouldNotCompressWhenSpecificContentType(t *testing.T) {
-	baseBody := generateBytes(gziphandler.DefaultMinSize)
+	baseBody := generateBytes(gzhttp.DefaultMinSize)
 
 	testCases := []struct {
 		desc            string
@@ -190,7 +193,9 @@ func TestIntegrationShouldNotCompress(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
-			compress := &compress{next: test.handler}
+			compress, err := New(context.Background(), test.handler, dynamic.Compress{}, "testing")
+			require.NoError(t, err)
+
 			ts := httptest.NewServer(compress)
 			defer ts.Close()
 
@@ -223,7 +228,9 @@ func TestShouldWriteHeaderWhenFlush(t *testing.T) {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 		}
 	})
-	handler := &compress{next: next}
+	handler, err := New(context.Background(), next, dynamic.Compress{}, "testing")
+	require.NoError(t, err)
+
 	ts := httptest.NewServer(handler)
 	defer ts.Close()
 
@@ -272,7 +279,9 @@ func TestIntegrationShouldCompress(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.name, func(t *testing.T) {
-			compress := &compress{next: test.handler}
+			compress, err := New(context.Background(), test.handler, dynamic.Compress{}, "testing")
+			require.NoError(t, err)
+
 			ts := httptest.NewServer(compress)
 			defer ts.Close()
 
@@ -294,6 +303,86 @@ func TestIntegrationShouldCompress(t *testing.T) {
 			}
 		})
 	}
+}
+
+func BenchmarkCompress(b *testing.B) {
+	testCases := []struct {
+		name     string
+		parallel bool
+		size     int
+	}{
+		{
+			name: "2k",
+			size: 2048,
+		},
+		{
+			name: "20k",
+			size: 20480,
+		},
+		{
+			name: "100k",
+			size: 102400,
+		},
+		{
+			name:     "2k parallel",
+			parallel: true,
+			size:     2048,
+		},
+		{
+			name:     "20k parallel",
+			parallel: true,
+			size:     20480,
+		},
+		{
+			name:     "100k parallel",
+			parallel: true,
+			size:     102400,
+		},
+	}
+
+	for _, test := range testCases {
+		b.Run(test.name, func(b *testing.B) {
+			baseBody := generateBytes(test.size)
+
+			next := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+				_, err := rw.Write(baseBody)
+				assert.NoError(b, err)
+			})
+			handler, _ := New(context.Background(), next, dynamic.Compress{}, "testing")
+
+			req, _ := http.NewRequest("GET", "/whatever", nil)
+			req.Header.Set("Accept-Encoding", "gzip")
+
+			b.ReportAllocs()
+			b.SetBytes(int64(test.size))
+			if test.parallel {
+				b.ResetTimer()
+				b.RunParallel(func(pb *testing.PB) {
+					for pb.Next() {
+						runBenchmark(b, req, handler)
+					}
+				})
+				return
+			}
+
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				runBenchmark(b, req, handler)
+			}
+		})
+	}
+}
+
+func runBenchmark(b *testing.B, req *http.Request, handler http.Handler) {
+	b.Helper()
+
+	res := httptest.NewRecorder()
+	handler.ServeHTTP(res, req)
+	if code := res.Code; code != 200 {
+		b.Fatalf("Expected 200 but got %d", code)
+	}
+
+	assert.Equal(b, gzipValue, res.Header().Get(contentEncodingHeader))
 }
 
 func generateBytes(length int) []byte {
