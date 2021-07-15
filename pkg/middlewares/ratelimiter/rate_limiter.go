@@ -156,7 +156,7 @@ func (rl *rateLimiter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// a Reservation to take place, but also gives a 0 delay below (because of a
 	// division by zero, followed by a multiplication that flips into the negatives),
 	// regardless of the current load. However, for now we take advantage of this
-	// behaviour to provide the no-limit ratelimiter when config.Average is 0.
+	// behavior to provide the no-limit ratelimiter when config.Average is 0.
 	res := bucket.Reserve()
 	if !res.OK() {
 		http.Error(w, "No bursty traffic allowed", http.StatusTooManyRequests)
