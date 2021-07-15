@@ -152,7 +152,7 @@ func (rl *rateLimiter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// time/rate is bugged imho, since a rate.Limiter with a 0 Limit not only allows
+	// time/rate is bugged, since a rate.Limiter with a 0 Limit not only allows
 	// a Reservation to take place, but also gives a 0 delay below (because of a
 	// division by zero, followed by a multiplication that flips into the negatives),
 	// regardless of the current load. However, for now we take advantage of this
