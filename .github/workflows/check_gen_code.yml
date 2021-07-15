@@ -1,0 +1,57 @@
+name: Check generated Code
+
+on:
+  pull_request:
+
+jobs:
+
+  generate:
+    name: Check and verify code
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.16
+      env:
+        GOPATH: /__w/traefik/traefik/go/
+    strategy:
+      matrix:
+        go: [ 1.16 ]
+
+    steps:
+
+      - name: Setup go
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Installing dependancies
+        env:
+          GOPROXY: https://proxy.golang.org
+        run: |
+          go get -u github.com/containous/go-bindata/...
+          go get k8s.io/gengo/...
+
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          path: go/src/github.com/traefik/traefik
+
+      - name: go generate
+        working-directory: go/src/github.com/traefik/traefik
+        run: |
+          export PATH=$PATH:/__w/traefik/traefik/go/bin/
+          go generate
+          git diff --exit-code
+
+      - name: go mod tidy
+        working-directory: go/src/github.com/traefik/traefik
+        run: |
+          go mod tidy
+          git diff --exit-code
+
+      - name: make generate-crd
+        working-directory: go/src/github.com/traefik/traefik
+        run: |
+          export PATH=$PATH:/__w/traefik/traefik/go/bin/
+          make generate-crd
+          git diff --exit-code
