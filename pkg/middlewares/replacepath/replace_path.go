@@ -41,10 +41,13 @@ func (r *replacePath) GetTracingInformation() (string, ext.SpanKindEnum) {
 }
 
 func (r *replacePath) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	if req.URL.RawPath == "" {
-		req.Header.Add(ReplacedPathHeader, req.URL.Path)
-	} else {
+	switch {
+	case req.URL.RawPath != "":
 		req.Header.Add(ReplacedPathHeader, req.URL.RawPath)
+	case req.URL.String() != req.URL.Path:
+		req.Header.Add(ReplacedPathHeader, req.URL.String())
+	default:
+		req.Header.Add(ReplacedPathHeader, req.URL.Path)
 	}
 
 	req.URL.RawPath = r.path

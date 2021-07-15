@@ -106,6 +106,16 @@ func TestReplacePathRegex(t *testing.T) {
 			expectedPath:    "/aaa/bbb",
 			expectedRawPath: "/aaa%2Fbbb",
 		},
+		{
+			desc: "path with percent encoded backspace char",
+			path: "/foo/%08bar",
+			config: dynamic.ReplacePathRegex{
+				Replacement: "/$1",
+				Regex:       `^/foo/(.*)`,
+			},
+			expectedPath:    "/\bbar",
+			expectedRawPath: "/%08bar",
+		},
 	}
 
 	for _, test := range testCases {

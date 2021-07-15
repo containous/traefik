@@ -51,15 +51,18 @@ func (rp *replacePathRegex) GetTracingInformation() (string, ext.SpanKindEnum) {
 
 func (rp *replacePathRegex) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	var currentPath string
-	if req.URL.RawPath == "" {
-		currentPath = req.URL.Path
-	} else {
+	switch {
+	case req.URL.RawPath != "":
 		currentPath = req.URL.RawPath
+	case req.URL.String() != req.URL.Path:
+		// If req.URL.String() != req.URL.Path, then the original URL may contain percent encoded values decoded in req.URL.Path.
+		currentPath = req.URL.String()
+	default:
+		currentPath = req.URL.Path
 	}
 
 	if rp.regexp != nil && len(rp.replacement) > 0 && rp.regexp.MatchString(currentPath) {
 		req.Header.Add(replacepath.ReplacedPathHeader, currentPath)
-
 		req.URL.RawPath = rp.regexp.ReplaceAllString(currentPath, rp.replacement)
 
 		// as replacement can introduce escaped characters
