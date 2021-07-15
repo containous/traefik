@@ -81,6 +81,8 @@ func (b *BackendConfig) newRequest(serverURL *url.URL) (*http.Request, error) {
 		return nil, err
 	}
 
+	u.Path = serverURL.Path + u.Path
+
 	if len(b.Scheme) > 0 {
 		u.Scheme = b.Scheme
 	}

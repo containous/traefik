@@ -263,6 +263,18 @@ func TestNewRequest(t *testing.T) {
 				value: "",
 			},
 		},
+		{
+			desc:      "path with configured path",
+			serverURL: "http://backend1:80/test1",
+			options: Options{
+				Path: "/xx/yy",
+				Port: 0,
+			},
+			expected: expected{
+				err:   false,
+				value: "http://backend1:80/test1/xx/yy",
+			},
+		},
 	}
 
 	for _, test := range testCases {
