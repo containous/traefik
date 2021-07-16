@@ -262,6 +262,13 @@ func getTestCases() []ProvideTestCase {
 			expectedNumRouter:  20,
 			expectedNumService: 20,
 		},
+		{
+			desc:               "simple file with empty store yaml",
+			filePath:           "./fixtures/yaml/simple_empty_store.yml",
+			expectedNumRouter:  0,
+			expectedNumService: 0,
+			expectedNumTLSConf: 0,
+		},
 	}
 }
 
